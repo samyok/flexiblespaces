@@ -1,5 +1,7 @@
 extends Node3D
 
+const FlexibleRoom = preload("FlexibleRoom.gd")
+
 
 func _process(_delta):
 	pass
@@ -139,11 +141,35 @@ func _ready():
 	# path.width = 3.0
 	# path.compute_path()
 	# draw_path(path)
-	generate_flexible_spaces_points(Vector2(0, 0), Vector2(2, -8))
+
+	# create a room in the current location
+	var r1 = FlexibleRoom.new(self.get_parent(), Vector2(0, 0))
+	var d1 = r1.create_door(Vector2(0, -1))
+	room_walls(r1)
+
+	var r2 = FlexibleRoom.new(self.get_parent(), Vector2(10, 10))
+	print(r2.walls)
+	var d2 = r2.create_door(Vector2(0, -1))
+	room_walls(r2)
+
+	generate_flexible_spaces_points(d1, d2)
+
+	# then, when the room
+	# generate_flexible_spaces_points(Vector2(0, 0), Vector2(2, -8))
+
+
+func room_walls(room: FlexibleRoom):
+	for wall in room.wall_nodes:
+		wall.erase()
+
+	room.wall_nodes.clear()
+
+	for wall in room.walls:
+		create_wall(wall[0], wall[1])
 
 
 # given two points, we have to create a wall between them
-func create_wall(point1: Vector2, point2: Vector2):
+func create_wall(point1: Vector2, point2: Vector2) -> CSGMesh3D:
 	var template = get_node("%wall_template")
 	var new_wall = template.duplicate()
 	new_wall.position.x = (point1.x + point2.x) / 2
@@ -157,6 +183,7 @@ func create_wall(point1: Vector2, point2: Vector2):
 	# new_wall.look_at(Vector3(direction.x, 0, direction.y), Vector3(0, 1, 0))
 	add_child(new_wall)
 	new_wall.visible = true
+	return new_wall
 
 
 # @export var BOUNDS = {"x": [-10, 10], "z": [-10, 10]}
