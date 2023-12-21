@@ -10,11 +10,13 @@ var wall_nodes: Array[Node3D]
 var wall_template: CSGMesh3D
 var parent: Node3D
 var door: Node3D
+var door_point: Vector2
+var door_direction: Vector2
 
 var door_size = 1
 
 
-func _init(_parent: Node3D, _position: Vector2 = Vector2(0, 0), _size = 3) -> void:
+func _init(_parent: Node3D, _position: Vector2 = Vector2(0, 0), _size = 4) -> void:
 	self.position = _position
 	# create coordinates of the walls based on the size of the room, where the position is the center of the room
 	self.size = _size
@@ -46,7 +48,7 @@ func _init(_parent: Node3D, _position: Vector2 = Vector2(0, 0), _size = 3) -> vo
 
 	print("FlexibleRoom created at " + str(position))
 
-	print("closest wall to (0, 0): " + str(self._wall_segment_closest_to_a_point(Vector2(0, 0))))
+	print("closest wall to (0, 0): " + str(self.wall_segment_closest_to_a_point(Vector2(0, 0))))
 
 	# self.create_door(Vector2(1, 0))
 
@@ -75,7 +77,7 @@ func closest_point_on_segment_to_point(
 	return pb
 
 
-func _wall_segment_closest_to_a_point(point: Vector2) -> Array:
+func wall_segment_closest_to_a_point(point: Vector2) -> Array:
 	var closest_segment = 0
 
 	for i in range(1, self.walls.size()):
@@ -132,15 +134,33 @@ func _wall_segment_closest_to_a_point(point: Vector2) -> Array:
 # 	new_wall.visible = true
 
 
+func bounds() -> Array[Vector2]:
+	var mnx = INF
+	var mny = INF
+	var mxx = -INF
+	var mxy = -INF
+
+	for wall in self.walls:
+		mnx = min(mnx, wall[0].x, wall[1].x)
+		mny = min(mny, wall[0].y, wall[1].y)
+		mxx = max(mxx, wall[0].x, wall[1].x)
+		mxy = max(mxy, wall[0].y, wall[1].y)
+
+	return [Vector2(mnx, mny), Vector2(mxx, mxy)]
+
+
 func create_door(point) -> Vector2:
 	# creates a hole in the wall closest to a point
-	var wall_seg = self._wall_segment_closest_to_a_point(point)
+	var wall_seg = self.wall_segment_closest_to_a_point(point)
 	var wall_idx = wall_seg[0]
 	var wall_point = wall_seg[1]
 
 	var wall = self.walls[wall_idx]
 	var wall_start = wall[0]
 	var wall_end = wall[1]
+
+	# keep track of the wall_direction for the door
+	self.door_direction = (wall_end - wall_start).normalized()
 
 	# remove the wall from the list
 	self.walls.pop_at(wall_idx)
@@ -154,6 +174,7 @@ func create_door(point) -> Vector2:
 	self.walls.append([wall_point + (wall_end - wall_point).normalized() * door_size / 2, wall_end])
 
 	# rebuild walls in the scene after this!
+	self.door_point = wall_point
 
 	return wall_point
 
