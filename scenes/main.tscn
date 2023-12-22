@@ -1,4 +1,4 @@
-[gd_scene load_steps=31 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=32 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/GameController.gd" id="2_42an5"]
@@ -6,6 +6,7 @@
 [ext_resource type="Texture2D" uid="uid://ki1hqej086hg" path="res://textures/stone_brick.webp" id="3_na154"]
 [ext_resource type="PackedScene" uid="uid://dw2kfbg15qqeu" path="res://controllers/controller_l.fbx" id="3_y2kpf"]
 [ext_resource type="PackedScene" uid="uid://doel0ns5nc6bm" path="res://controllers/controller_r.fbx" id="4_5ti0a"]
+[ext_resource type="Script" path="res://scripts/camera_collision.gd" id="5_dknlb"]
 [ext_resource type="Script" path="res://scripts/Door.gd" id="6_dubqk"]
 [ext_resource type="Texture2D" uid="uid://corehclq0bswx" path="res://textures/sand.webp" id="6_idf5b"]
 [ext_resource type="Script" path="res://scripts/Path.gd" id="7_ctd0p"]
@@ -131,6 +132,7 @@ script = ExtResource("2_kvn2k")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="XRUser"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 shape = SubResource("BoxShape3D_nj0ms")
+script = ExtResource("5_dknlb")
 
 [node name="XROrigin3D" type="XROrigin3D" parent="XRUser"]
 
