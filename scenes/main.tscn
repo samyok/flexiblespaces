@@ -120,6 +120,7 @@ script = ExtResource("2_42an5")
 [node name="wall_template" type="CSGMesh3D" parent="."]
 unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.1, 0, 1.505, 0)
+visible = false
 mesh = SubResource("BoxMesh_b2ccx")
 
 [node name="XRUser" type="Area3D" parent="."]
