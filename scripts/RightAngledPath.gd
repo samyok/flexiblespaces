@@ -4,6 +4,8 @@ class_name RightAngledPath
 enum Direction { UP = 0, DOWN = 2, LEFT = 3, RIGHT = 1 }
 
 var points: Array[Vector2] = []
+
+# points that belong to the left hand side wall
 var left_side: Array[Vector2] = []
 var right_side: Array[Vector2] = []
 var width: float = 1.0
@@ -11,6 +13,7 @@ var wall_nodes: Array[Node3D] = []
 
 const HORIZONTAL_DIRECTIONS = [Direction.LEFT, Direction.RIGHT]
 const VERTICAL_DIRECTIONS = [Direction.UP, Direction.DOWN]
+
 const DIRECTIONS = {
 	Direction.UP: Vector2(0, 1),
 	Direction.DOWN: Vector2(0, -1),
@@ -46,11 +49,12 @@ func _init(_points: Array[Vector2]):
 	# create a path between two rooms
 	points = _points
 
-
+# util function to transpose a vector (couldn't find something builtin)
 func transpose(v: Vector2) -> Vector2:
 	return Vector2(v.y, v.x)
 
-
+# figure out what direction a->b is going -- useful for figuring out which
+# wall is the LHS
 func find_direction(point: Vector2, next_point: Vector2) -> Direction:
 	if point.x == next_point.x:
 		if point.y < next_point.y:
@@ -63,7 +67,7 @@ func find_direction(point: Vector2, next_point: Vector2) -> Direction:
 		else:
 			return Direction.LEFT
 
-
+# find the correct LHS wall point
 func left_side_endpoint(point: Vector2, direction: Direction) -> Vector2:
 	var delta = width / 2
 	if direction == Direction.UP:
@@ -79,8 +83,8 @@ func left_side_endpoint(point: Vector2, direction: Direction) -> Vector2:
 		return Vector2(0, 0)
 
 
+# compute the length of the path (sum of the lengths of the segments)
 func length() -> float:
-	# compute the length of the path (sum of the lengths of the segments)
 	var n = points.size()
 	var total = 0
 	for i in range(n - 1):
@@ -89,8 +93,8 @@ func length() -> float:
 	return total
 
 
+# if a -> b -> c are on the same line, remove b
 func remove_redundant_points():
-	# if a -> b -> c are on the same line, remove b
 	var n = points.size()
 	var i = 0
 	while i < n - 2:
@@ -107,7 +111,7 @@ func remove_redundant_points():
 		else:
 			i += 1
 
-
+# compute the wall points needed for a certain path
 func compute_path():
 	left_side.clear()
 	right_side.clear()
@@ -145,10 +149,13 @@ func compute_path():
 		right_side.append(2 * points[i] - left_side[i])
 
 
+# custom sort by length of paths
 static func lensort(a: RightAngledPath, b: RightAngledPath) -> float:
 	return a.length() - b.length()
 
-
+# generate a set of points found by bfs-ing, from one room to another. 
+# it starts/ends from the points outside the doors to allow for path walls to
+# not break the immersiveness 
 static func generate_flexible_bfs_points(start: FlexibleRoom, end: FlexibleRoom) -> Array[Vector2]:
 	var queue = []
 

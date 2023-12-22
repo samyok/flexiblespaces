@@ -75,7 +75,7 @@ func _physics_process(delta):
 # func process_room(camera):
 # 	# we're currently in a room, check if we're in the portal
 
-
+# entrypoint for the virtual environment
 func _ready():
 	# create a room at 2, 8 (where the user is initially)
 	State.add_room(FlexibleRoom.new(get_parent(), start_pos))
@@ -106,7 +106,7 @@ func _ready():
 
 # helpers
 
-
+# create a ramdom room (adds room + path to get there to state)
 func create_room():
 	# create a room in a random lattice point within the bounds of TRACKABLE_AREA_BOUNDS
 	var TAG = State.TRACKABLE_AREA_BOUNDS
@@ -160,7 +160,8 @@ func render_wall(point1: Vector2, point2: Vector2) -> CSGMesh3D:
 	new_wall.visible = true
 	return new_wall
 
-
+# renders a door, seperate from the rendering a room to allow for a door to be
+# rendered but not the walls of the room
 # only render doors if they don't already exist
 func render_door(room) -> Area3D:
 	if room.door != null:
@@ -188,20 +189,20 @@ func render_door(room) -> Area3D:
 	room.door = new_door
 	return new_door
 
-
+# deletes a door
 func hide_door(room: FlexibleRoom):
 	if room.door != null:
 		room.door.queue_free()
 		room.door = null
 
-
+# deletes a room's walls
 func hide_room(room: FlexibleRoom):
 	for wall in room.wall_nodes:
 		wall.queue_free()
 
 	room.wall_nodes.clear()
 
-
+# deletes a path's walls 
 func hide_path(path: RightAngledPath):
 	if path == null:
 		return

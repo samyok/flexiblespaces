@@ -15,7 +15,8 @@ var door_direction: Vector2
 
 var door_size = 1
 
-
+# create a flexible room that gets added to the speicfied parent with the
+# specified position and size
 func _init(_parent: Node3D, _position: Vector2 = Vector2(0, 0), _size = 4) -> void:
 	self.position = _position
 	# create coordinates of the walls based on the size of the room, where the position is the center of the room
@@ -52,12 +53,14 @@ func _init(_parent: Node3D, _position: Vector2 = Vector2(0, 0), _size = 4) -> vo
 
 	# self.create_door(Vector2(1, 0))
 
-
+# compute the distance between a point and a line segment
 func distance_to_segment(point: Vector2, segment_start: Vector2, segment_end: Vector2) -> float:
 	var closest_point = closest_point_on_segment_to_point(point, segment_start, segment_end)
 	return point.distance_to(closest_point)
 
 
+# compute the closest point on a line segment to another point (probably off the segment)
+# returns: just the point
 func closest_point_on_segment_to_point(
 	point: Vector2, segment_start: Vector2, segment_end: Vector2
 ) -> Vector2:
@@ -76,7 +79,8 @@ func closest_point_on_segment_to_point(
 	var pb = segment_start + v * b
 	return pb
 
-
+# find the wall that has the point that is the closest to another specified point
+# this is used when finding a door closest to the intermediate point I. 
 func wall_segment_closest_to_a_point(point: Vector2) -> Array:
 	var closest_segment = 0
 
@@ -133,7 +137,7 @@ func wall_segment_closest_to_a_point(point: Vector2) -> Array:
 # 	self.parent.add_child(new_wall)
 # 	new_wall.visible = true
 
-
+# just return the bounding box for the room
 func bounds() -> Array[Vector2]:
 	var mnx = INF
 	var mny = INF
@@ -148,7 +152,7 @@ func bounds() -> Array[Vector2]:
 
 	return [Vector2(mnx, mny), Vector2(mxx, mxy)]
 
-
+# create a hole in the wall [door frame] closest to a point
 func create_door(point) -> Vector2:
 	# creates a hole in the wall closest to a point
 	var wall_seg = self.wall_segment_closest_to_a_point(point)
@@ -183,31 +187,30 @@ func create_door(point) -> Vector2:
 # 	for wall in self.walls:
 # 		self._create_wall(wall[0], wall[1])
 
-
+# stubs for potential features
 func activate() -> void:
 	print("FlexibleRoom activated at " + str(position))
 	self.change()
 
-
+# stub for future feature
 func change() -> void:
 	print("FlexibleRoom changed at " + str(position))
 
-
+# hide room [excl door though]
 func hide() -> void:
 	print("FlexibleRoom hidden at " + str(position))
 	for wall in self.wall_nodes:
 		wall.visible = false
 
-
+# show room [excl door]
 func show() -> void:
 	print("FlexibleRoom shown at " + str(position))
 	for wall in self.wall_nodes:
 		wall.visible = true
 
-
+# create a door that faces the "most open direction"
 func create_most_open_door() -> Vector2:
 	# check all four directions to see which has the most open space
-
 	var TAB = State.TRACKABLE_AREA_BOUNDS
 	var north = TAB[1].y - bounds()[1].y
 	var south = bounds()[0].y - TAB[0].y
@@ -228,20 +231,21 @@ func create_most_open_door() -> Vector2:
 	return create_door(direction + position)
 
 
+# utility function to determine if a point is inside the room
 func is_point_inside(point: Vector2) -> bool:
 	var mins = bounds()[0]
 	var maxs = bounds()[1]
 
 	return point.x >= mins.x and point.x <= maxs.x and point.y >= mins.y and point.y <= maxs.y
 
-
+# utility function to determine if _any_ point is inside the room
 func is_any_point_inside(points: Array[Vector2]) -> bool:
 	for point in points:
 		if is_point_inside(point):
 			return true
 	return false
 
-
+# create a point that is 1m outside the door 
 func point_outside_door() -> Vector2:
 	# add a point 1m in each direction orthogonal to the wall the door is on
 	var pointA = door_point + door_direction.orthogonal()
