@@ -13,8 +13,8 @@ func _process(_delta):
 
 func create_most_open_door(room: FlexibleRoom) -> Vector2:
 	# check all four directions to see which has the most open space
-	var north = TRACKABLE_AREA_BOUNDS[1].z - room.bounds()[1].z
-	var south = room.bounds()[0].z - TRACKABLE_AREA_BOUNDS[0].z
+	var north = TRACKABLE_AREA_BOUNDS[1].y - room.bounds()[1].y
+	var south = room.bounds()[0].y - TRACKABLE_AREA_BOUNDS[0].y
 	var east = TRACKABLE_AREA_BOUNDS[1].x - room.bounds()[1].x
 	var west = room.bounds()[0].x - TRACKABLE_AREA_BOUNDS[0].x
 
@@ -32,51 +32,105 @@ func create_most_open_door(room: FlexibleRoom) -> Vector2:
 	return room.create_door(direction + room.position)
 
 
+func is_any_point_in_room(points: Array, room: FlexibleRoom) -> bool:
+	for point in points:
+		if is_point_in_room(point, room):
+			return true
+
+	return false
+
+
 func generate_flexible_bfs_points(start: FlexibleRoom, end: FlexibleRoom) -> Array[Vector2]:
 	var queue = []
 
 	var startpoint = find_point_outside_door(start)
-	queue.append({"point": startpoint, "path": [startpoint]})
+	var startpath: Array[Vector2] = [startpoint]
+	queue.append({"point": startpoint, "path": startpath})
 	var endpoint = find_point_outside_door(end)
 
-	# make sure that the first three points are not inside the original room.
+	var prefix: Array[Vector2] = [start.door_point]
+	var suffix: Array[Vector2] = [end.door_point]
+
+	# make sure that the first three points are not inside the
 	# in addition, make sure that only valid moves are being made. ie, don't do
 	# the opposite of the last move.
 
 	while queue.size() > 0:
 		var current = queue.pop_front()
 		var point = current["point"]
-		var path = current["path"]
+		var path: Array[Vector2] = current["path"]
 
 		if point == endpoint:
-			return path
+			# don't let the last three points be in the end room
+			print("checking path ", path)
+			var last_three = []
+			for i in range(max(0, path.size() - 3), path.size()):
+				last_three.append(path[i])
+
+			if is_any_point_in_room(last_three, end):
+				continue
+			return prefix + path + suffix
 
 		var directions = [Vector2(0, 1), Vector2(0, -1), Vector2(1, 0), Vector2(-1, 0)]
+		# so that each path is somewhat random but is still the shortest valid path
+		directions.shuffle()
+
 		for direction in directions:
+			# check if the direction is opposite of the last direction
+			if path.size() > 1:
+				var last_direction = path[path.size() - 1] - path[path.size() - 2]
+				if last_direction == -direction:
+					continue
+
+			# don't let the first three points be in the inital room
 			var new_point = point + direction
-			if is_valid_point(new_point.x, new_point.y):
-				var new_path = path.copy()
-				new_path.append(new_point)
-				queue.append({"point": new_point, "path": new_path})
+			if path.size() <= 3:
+				if is_point_in_room(new_point, start):
+					continue
+
+			var new_path = path.duplicate()
+			new_path.append(new_point)
+			queue.append({"point": new_point, "path": new_path})
+
+	return []
 
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	# create room at [2, 2]
-	var r1 = FlexibleRoom.new(self.get_parent(), Vector2(2, 2))
+	var c1 = Vector2(2, 8)
+	var r1 = FlexibleRoom.new(self.get_parent(), c1)
 	# put a door on the side
-	var _d1 = r1.create_door(Vector2(2, 6))
+	var d1 = r1.create_door(Vector2(2, 6))
 
 	# create another room at [5, 4]
-	var r2 = FlexibleRoom.new(self.get_parent(), Vector2(5, 4))
+	var c2 = Vector2(5, 4)
+	var r2 = FlexibleRoom.new(self.get_parent(), c2)
 	# put a door on the side facing the most open space in the trackable area
-	var _d2 = create_most_open_door(r2)
+	var d2 = create_most_open_door(r2)
 
-	var points = generate_flexible_bfs_points(r1, r2)
+	# var points = generate_flexible_bfs_points(r1, r2)
 
-	var starting_point = find_point_outside_door(r1)
+	# var starting_point = find_point_outside_door(r1)
 
-	var ending_point = find_point_outside_door(r2)
+	# var ending_point = find_point_outside_door(r2)
+
+	var path = generate_flexible_bfs_points(r1, r2)
+
+	print("creating path from points: ", path)
+	var rapath = RightAngledPath.new()
+	rapath.points = path
+
+	# generate the path for walls
+	rapath.compute_path()
+
+	print("rendering rooms")
+	# render the rooms
+	# room_walls(r1)
+	# room_walls(r2)
+
+	# render the path
+	draw_path(rapath)
 
 	# var path: RightAngledPath = RightAngledPath.new()
 
@@ -106,7 +160,7 @@ func _ready():
 	# draw_path(path)
 
 	# create a room in the current location
-	var r1 = FlexibleRoom.new(self.get_parent(), Vector2(0, 0))
+	# var r1 = FlexibleRoom.new(self.get_parent(), Vector2(0, 0))
 	# var _d1 = r1.create_door(Vector2(0, -1))
 	# room_walls(r1)
 	# active_rooms.append(r1)
@@ -130,7 +184,7 @@ class RightAngledPath:
 	var points: Array[Vector2] = []
 	var left_side: Array[Vector2] = []
 	var right_side: Array[Vector2] = []
-	var width: float = 2.0
+	var width: float = 1.0
 	const HORIZONTAL_DIRECTIONS = [Direction.LEFT, Direction.RIGHT]
 	const VERTICAL_DIRECTIONS = [Direction.UP, Direction.DOWN]
 	const DIRECTIONS = {
@@ -201,9 +255,31 @@ class RightAngledPath:
 
 		return total
 
+	func remove_redundant_points():
+		# if a -> b -> c are on the same line, remove b
+		var n = points.size()
+		var i = 0
+		while i < n - 2:
+			var a = points[i]
+			var b = points[i + 1]
+			var c = points[i + 2]
+
+			var ab = b - a
+			var bc = c - b
+
+			if ab.normalized() == bc.normalized():
+				points.pop_at(i + 1)
+				n -= 1
+			else:
+				i += 1
+
 	func compute_path():
 		left_side.clear()
 		right_side.clear()
+
+		remove_redundant_points()
+		print("cleaned up points: ", points)
+
 		# first point is easy
 		var delta = width / 2
 		var n = points.size()
@@ -215,11 +291,14 @@ class RightAngledPath:
 		for i in range(1, n - 1):
 			var prev_direction = find_direction(points[i - 1], points[i])
 			print("prev direction from ", points[i - 1], " to ", points[i], " is ", prev_direction)
+
 			var next_direction = find_direction(points[i], points[i + 1])
+			print("next direction from ", points[i], " to ", points[i + 1], " is ", next_direction)
+
 			# create all the connectors for the left side
-			print("prev: ", prev_direction, " next: ", next_direction)
 			var left_connector = LEFT_CONNECTORS[prev_direction][next_direction]
 			print("using connector ", left_connector)
+
 			var left_point = points[i] + delta * left_connector
 			left_side.append(left_point)
 
@@ -345,7 +424,7 @@ func generate_possible_path(start: FlexibleRoom, end: FlexibleRoom):
 	var si = Vector2(i.x, start.y)
 	var ie = Vector2(end.x, i.y)
 
-	path.points = [start, si, i, ie, end]
+	# path.points = [start, si, i, ie, end]
 	path.width = 1
 	path.compute_path()
 
