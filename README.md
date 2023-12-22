@@ -4,6 +4,8 @@ and links to any 3rd party libraries or code that you used. You may also include
 # CSCI 5619 Final Project
 **Samyok Nepal and Jasmine DeGuzman**
 
+![flexiblespaces.png](./flexiblespaces.png)
+
 For our final project, we decided that we wanted to create an implementation of [Flexible Spaces](https://ieeexplore.ieee.org/document/6549386#full-text-section). 
 This is redirection technique extends the the previous work done on Impossible Spaces and change blindness by generalizing the algorithm for dynamic layout generation by automatic rerouting through the 
 virtual environment. 
