@@ -203,3 +203,50 @@ func show() -> void:
 	print("FlexibleRoom shown at " + str(position))
 	for wall in self.wall_nodes:
 		wall.visible = true
+
+
+func create_most_open_door() -> Vector2:
+	# check all four directions to see which has the most open space
+
+	var TAB = State.TRACKABLE_AREA_BOUNDS
+	var north = TAB[1].y - bounds()[1].y
+	var south = bounds()[0].y - TAB[0].y
+	var east = TAB[1].x - bounds()[1].x
+	var west = bounds()[0].x - TAB[0].x
+
+	var direction = Vector2(0, 0)
+	var max_open = max(north, south, east, west)
+	if max_open == north:
+		direction = Vector2(0, 1)
+	elif max_open == south:
+		direction = Vector2(0, -1)
+	elif max_open == east:
+		direction = Vector2(1, 0)
+	elif max_open == west:
+		direction = Vector2(-1, 0)
+
+	return create_door(direction + position)
+
+
+func is_point_inside(point: Vector2) -> bool:
+	var mins = bounds()[0]
+	var maxs = bounds()[1]
+
+	return point.x >= mins.x and point.x <= maxs.x and point.y >= mins.y and point.y <= maxs.y
+
+
+func is_any_point_inside(points: Array[Vector2]) -> bool:
+	for point in points:
+		if is_point_inside(point):
+			return true
+	return false
+
+
+func point_outside_door() -> Vector2:
+	# add a point 1m in each direction orthogonal to the wall the door is on
+	var pointA = door_point + door_direction.orthogonal()
+	var pointB = door_point - door_direction.orthogonal()
+
+	if not is_point_inside(pointA):
+		return pointA
+	return pointB
