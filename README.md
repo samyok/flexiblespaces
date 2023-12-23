@@ -1,6 +1,3 @@
-description of the work you performed (what specifically you built), a clear description of your development environment, 
-and links to any 3rd party libraries or code that you used. You may also include screenshots or pictures of your implementation working, where appropriate
-
 # CSCI 5619 Final Project
 **Samyok Nepal and Jasmine DeGuzman**
 
@@ -16,13 +13,10 @@ The rerouting algorithm randomly selects an intermediate point I between the sta
 end position E, defined by the door of the destination room. In order to connect these points, additional randomly selected points are defined between S and I,
 as well as I and E.
 
-We found that trying to follow this algorithm outlined in the Flexible Spaces literature did not create a valid path. Instead, we came up with new criteria to create
-the shortest possible path between the target
+We found that trying to follow this algorithm outlined in the Flexible Spaces literature did not create a valid path because of how the path would intersect the rooms. We instead used a classic breadth-first search in order to find the shortest path between rooms which were represented as integer lattice points. There were some other criteria that was needed for a path to be considered valid. The first point of the hallway was 1 unit out from the door fo the current room in order to guarantee a point where the hallway and room walls do not intersect. The first three points of the path could not be in the current room and the last three points could not be in the destination room, otherwise it would break the illusion. Our implementation also utilizes portals for transitioning between the rooms and the hallway. By doing so, we were able to associate crossing through the portal with the spawning/despawning of walls. 
 
 ## Development Environment
-This project was created using 
----
-of the shortest paths, criteria: classic BFS with 
-last three points cannot be in destination room, first three meters cannot be in the end room
-start one meter out from the door, guaranteed point -- that way when path is made hallway and room walls do not intersect
-bfs cannot go int directions oppostie to where it last took, points aren't allowed to go right behind the portal
+This project was created using Godot 4.3.0 and the XR tools plugin. It was developed for the Meta Quest 2 headset.
+
+## Third Party Assets
+We used a Minecraft theme for the Flexible Space demo. All of our textures were taken from the [Minecraft Wiki]{https://minecraft.fandom.com/wiki/Minecraft_Wiki).
