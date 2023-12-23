@@ -19,4 +19,4 @@ We found that trying to follow this algorithm outlined in the Flexible Spaces li
 This project was created using Godot 4.3.0 and the XR tools plugin. It was developed for the Meta Quest 2 headset.
 
 ## Third Party Assets
-We used a Minecraft theme for the Flexible Space demo. All of our textures were taken from the [Minecraft Wiki]{https://minecraft.fandom.com/wiki/Minecraft_Wiki).
+We used a Minecraft theme for the Flexible Space demo. All of our textures were taken from the [Minecraft Wiki]{https://minecraft.fandom.com/wiki/Minecraft_Wiki). Specifically we used the [Nether Portal](https://minecraft.fandom.com/wiki/Nether_portal) for the door of each room and [Iron Ingot](https://minecraft.fandom.com/wiki/Iron_Ingot) for the walls.
