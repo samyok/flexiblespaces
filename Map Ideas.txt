@@ -1,0 +1,81 @@
+ Base functionality for manipulating the map
+ - map starts at the right hip
+ - when hand presses grip_trigger
+   - map flies to the hand that first presses grip_trigger
+ - while hand is pressing grip_trigger
+   - stick movement is paused
+   - map is stowed if touches the hip hitbox (if not during flight between the hands)
+   - orientation of map
+     - looks at the camera if held
+     - can be changed by position of the off-hand if in two-handed mode
+   - dimensions of map 
+     - scaled by the stick 
+
+
+Map Interface
+ - map is a tablet that starts turned off
+ - map's power is toggled when the hand that is holding it presses front_trigger
+ - map turns off when stowed
+ - when map is on, the map is displayed and map building is possible
+
+
+2D Interface 
+ - a cursor is used to opperate the map in 2d
+   - cursor position 
+     - controlled by the tilt of the controller relative to the screen if in one-handed mode
+     - controlled by the opposite hand's position projected onto the screen plane if in two-handed mode
+   - cursor click
+     - controlled by either button in one-handed mode
+     - controlled by either trigger in two-handed mode
+ - map building interface
+   - 30x30 grid by default
+     - 10x30 area on the right side for staging new rooms
+   - click and drag to move rooms in the map grid
+     - while dragging, rooms snap to the cursor's nearest valid grid-position
+       - rooms cannot be dragged within a one grid-dimension border of each other
+       - rooms cannot be dragged ontop of a line
+       - dragging a room adjusts its lines
+         - if a line becomes invalid while dragging, it is deleted
+   - double-click (or click on a room/line that is already selected)
+     - on a room to open resize menu
+       - triangle shaped buttons for up and down, a digit representing the size, and an X for exit(top right)
+     - on a line to open delete menu
+       - prompt with: "🗑?", check mark button for delete, and an X for exit (top right)
+   - when hovering over a room or within a half grid-dimension border of a room, the attachment points are made visible
+     - dragging from an attachment point draws a line through the grid until another attachment point is reached
+
+
+Screen properties
+ - default and minimum tablet screen is 4000x3000 pixels
+ - left 3000x3000 is dedicated to the map grid
+ - right 1000x3000 pixels are for displaying collected but unmapped tokens 
+ - 1 grid-dimension is 100x100 pixels
+ - rooms are square and start with a side length of 1 grid-dimension with 4 adjacencies
+   - can be resized to a side length of n grid-dimensions with 4n adjacencies
+ - while dragging, rooms snap to the cursor's nearest valid grid-position
+ - grid squares have 3 adjacencies on each side for line attachments
+   - when used for lines, the grid's 100x100 pixels is used as a 10x10 grid of enlargened pixels
+   - each line is 2 enlargened pixels wide and seperated by 1 enlargened pixel
+   - lines are black, but smear into 3 progressively lighter shades of gray when they go under an existing line
+
+
+Map appearance
+ - screen with a bezel of brown with some wires or stuff
+
+Room collection
+ - when entering a room, there will be a pedestal with a token in the center
+   - tokens are spheres with a unique shading pattern, color, and symbol
+ - upon getting close to the pedestal, if the user has space for it, the token lerps into the tablet
+   - user can store 52 rooms
+
+Extensions
+ - tutorial for controlling the map and map-building interface 
+ - instead of the token flying into the tablet
+   - the user grabs the token and inserts it into a hemisphere-shaped cup in the bezel
+   - an animation plays that shrinks and moves the token into the tablet, and then it is deleted
+ - map bobs with steps taken
+   - step occurs repeatedly through continuous motion
+     - step cycle advances based on the magnitude of the input vector
+     - step cycle resets when the input vector has magnitude of zero
+     - if the input vector has a magnitude > .4 then footstep sounds are played
+       - volume of the footstep increases slightly for faster movement

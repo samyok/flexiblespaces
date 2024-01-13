@@ -181,7 +181,7 @@ func is_valid_point(x, z):
 
 # 	if not room.is_point_inside(pointA):
 # 		return pointA
-# 	return pointB
+# 	return point
 
 
 func find_helper_i(room):
