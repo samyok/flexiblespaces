@@ -75,6 +75,7 @@ func _physics_process(delta):
 # func process_room(camera):
 # 	# we're currently in a room, check if we're in the portal
 
+
 # entrypoint for the virtual environment
 func _ready():
 	# create a room at 2, 8 (where the user is initially)
@@ -105,6 +106,7 @@ func _ready():
 
 
 # helpers
+
 
 # create a ramdom room (adds room + path to get there to state)
 func create_room():
@@ -146,10 +148,13 @@ func get_room_from_door(door: Area3D) -> int:
 func render_wall(point1: Vector2, point2: Vector2) -> CSGMesh3D:
 	var template = get_node("%wall_template")
 	var new_wall = template.duplicate()
-	new_wall.position.x = (point1.x + point2.x) / 2
+
+	# add some jitter to the wall position to avoid z-fighting
+	var zjitter = randf_range(-0.1, 0.1) * 0.01
+	new_wall.position.x = (point1.x + point2.x) / 2 + zjitter
+	new_wall.position.z = (point1.y + point2.y) / 2 + zjitter
 	# UNCOMMENT THIS LINE TO SHOW ALL THE WALLS
 	# new_wall.position.y = 0  # TODO: remove [debugging walls]
-	new_wall.position.z = (point1.y + point2.y) / 2
 	# var length = direction.length()
 	if point1.x == point2.x:
 		new_wall.rotation_degrees = Vector3(0, 90, 0)
@@ -159,6 +164,7 @@ func render_wall(point1: Vector2, point2: Vector2) -> CSGMesh3D:
 	add_child(new_wall)
 	new_wall.visible = true
 	return new_wall
+
 
 # renders a door, seperate from the rendering a room to allow for a door to be
 # rendered but not the walls of the room
@@ -189,11 +195,13 @@ func render_door(room) -> Area3D:
 	room.door = new_door
 	return new_door
 
+
 # deletes a door
 func hide_door(room: FlexibleRoom):
 	if room.door != null:
 		room.door.queue_free()
 		room.door = null
+
 
 # deletes a room's walls
 func hide_room(room: FlexibleRoom):
@@ -202,7 +210,8 @@ func hide_room(room: FlexibleRoom):
 
 	room.wall_nodes.clear()
 
-# deletes a path's walls 
+
+# deletes a path's walls
 func hide_path(path: RightAngledPath):
 	if path == null:
 		return
