@@ -12,21 +12,16 @@
      - scaled by the stick 
 
 
-Map Interface
- - map is a tablet that starts turned off
- - map's power is toggled when the hand that is holding it presses front_trigger
- - map turns off when stowed
- - when map is on, the map is displayed and map building is possible
-
 
 2D Interface 
+ - starts hidden
+   - revealed when brought to a hand
+   - hidden when stowed at the hip
  - a cursor is used to opperate the map in 2d
    - cursor position 
-     - controlled by the tilt of the controller relative to the screen if in one-handed mode
      - controlled by the opposite hand's position projected onto the screen plane if in two-handed mode
    - cursor click
-     - controlled by either button in one-handed mode
-     - controlled by either trigger in two-handed mode
+     - controlled by front trigger in two-handed mode
  - map building interface
    - 30x30 grid by default
      - 10x30 area on the right side for staging new rooms
