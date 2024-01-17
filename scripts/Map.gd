@@ -54,8 +54,8 @@ func _ready():
 	node_currently_tracking = null
 	path_multi_mesh = find_child("PathMultiMesh")
 	corner_multi_mesh = find_child("CornerMultiMesh")
-	rooms = [find_child("Room1"), find_child("Room2"), find_child("Room3"), find_child("Room4"), find_child("Room5")]
-	paths = []
+	rooms = {}
+	paths = {}
 	cursor = find_child("") # TODO: instanciate
 	
 
@@ -109,19 +109,37 @@ func _process(delta):
 				double_click_timing = false
 		
 		# Dragging
-		if 
+		if dragging:
+			if 
+			#Dragging Ghost
 		
 		# Pathing
+		if pathing:
 
-		# Dragging or room queued ghost
+			#Pathing Ghost
 
-		# Path start or pathing ghost
+		# Room queued ghost
+		
+
+		# Pathing ghost
+
+# Returns true or false based on if this block is available for drawing
+func valid_block():
+	# Check if it has a path
+
+	# Check if it has a room
+
 
 # Attempts to place a room in the location from the queue
 func place_room():
+	if valid_block():
+
 
 # Attempts to start dragging the current block
 func start_drag():
+	var room = rooms.get(cursor_block)
+	if room != null:
+		
 
 # Attempts to start pathing at the current block
 func start_path():
@@ -151,13 +169,14 @@ func _on_left_controller_button_pressed(name):
 		node_currently_tracking = left_controller
 		pause_stick_movement.emit()
 	elif name = "trigger_click":
-		if double_click_timing and double_click_start_block == cursor_block:
+		if node_currently_tracking == right and double_click_timing and double_click_start_block == cursor_block:
 			delete_section()
 		else:
 			double_click_timer = 0.0
 			double_click_timing = true
 			double_click_start_block = cursor_block
 			# place room
+
 			# start path
 			# start drag
 		
@@ -179,6 +198,7 @@ func _on_left_controller_button_released(name):
 		grip_pressed = false
 		self.hide()
 		resume_stick_movement.emit()
+		node_currently_tracking = null
 	elif name = "trigger_click":
 		
 
@@ -188,6 +208,7 @@ func _on_right_controller_button_released(name):
 		grip_pressed = false
 		self.hide()
 		resume_stick_movement.emit()
+		node_currently_tracking = null
 	elif name = "trigger_click":
 		
 
