@@ -1,6 +1,6 @@
 extends Node3D
 
-var node_currently_tracking # updates the position and rotation of the Map to this node's transform in _process
+var node_currently_tracking = null # updates the position and rotation of the Map to this node's transform in _process
 var camera
 var left_controller
 var right_controller
@@ -15,9 +15,9 @@ var cursor_block
 var active
 var path_multi_mesh
 var corner_multi_mesh
-var rooms # Room array (Vector2 -> Room node dictionary)
-var paths # Path array (Vector2 -> instance id)
-var corners # Path corner array (Vector2 -> instance id)
+var rooms = {} # Room array (Vector2 -> Room node dictionary)
+var paths = {} # Path array (Vector2 -> instance id)
+var corners = {} # Path corner array (Vector2 -> instance id)
 var adjacencies # Vector3 array (path index, room id1, room id 2)
 var dragging_room # null or the room being currently dragged
 var dragging_room_ghost # null or the ghost of the room being currently dragged
@@ -36,12 +36,19 @@ var rooms_queued = false
 var room_index = 0
 var drawing_plane
 var block_height_offset = .5 # TODO: calibrate with starting scale
-var left_top_rotation = Vector3(0, 0, 0) # default # TODO: tune these rotation offsets
-var top_right_rotation = Vector3(0, 0, -PI/2) # right 90 degrees
-var right_bottom_rotation = Vector3(0, 0, PI) # 180 degree rotation
-var bottom_left_rotation = Vector3(0, 0, PI/2) # left 90 degrees 
+var left_top_rotation = 0.0 # default # TODO: tune these rotation offsets
+var top_right_rotation = -PI/2 # right 90 degrees
+var right_bottom_rotation = PI # 180 degree rotation
+var bottom_left_rotation = PI/2 # left 90 degrees 
+var vertical_rotation = 0 # default
+var horizontal_rotation = PI/2
 var delete_mesh_color = Color(0, 0, 0, 0)
 var ghost_mesh_color = Color(1, 1, 1, .4)
+var grid_offset = Vector3(-0.5, -0.5, 0.0)
+var current_path = {} # Dictionary of Vector2 -> Vector2 (value x is key into mesh, and y is 0 for paths and 1 for corners)
+var temp_path_ghost # true or false based on if a temp path ghost is currently being generated
+var temp_path_ghost_i
+
 
 
 
@@ -56,11 +63,8 @@ func _ready():
 	left_controller = %LeftController
 	right_controller = %RightController
 	camera = %XRCamera3D
-	node_currently_tracking = null
 	path_multi_mesh = find_child("PathMultiMesh")
 	corner_multi_mesh = find_child("CornerMultiMesh")
-	rooms = {}
-	paths = {}
 	cursor = find_child("") # TODO: instanciate
 	
 
@@ -117,7 +121,9 @@ func _process(delta):
 		if dragging:
 			dragging_room.global_position = cursor.global_position + Vector3(0, 0, dragging_float_height)
 			#Dragging Ghost
-			dragging_room_ghost.global_position = cursor_block + block_height_offset + grid_to_world(cursor_block)
+			if valid_block():
+				dragging_room_ghost.hide()
+				dragging_room_ghost.position = cursor_block + block_height_offset + grid_offset
 		
 		# Pathing
 		elif pathing:
@@ -133,34 +139,155 @@ func _process(delta):
 							var i = corners.size()
 							corners[current_path_last_block] = i
 							corner_multi_mesh.instance_count += 1
-							corner_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(current_path_last_block - Vector3(-0.5, -0.5, 0.0))))
+							corner_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, left_top_rotation))
 							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
+							current_path[current_path_last_block] = Vector2(i, 1)
 							# Spawn straight path at cursor_block with correct orientation
-							if (cursor_block - current_path_last_block).x ==
+							if (cursor_block - current_path_last_block).x == 0:
+								var i = paths.size()
+								paths[cursor_block] = i 
+								paths.instance_count += 1
+								path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+								path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+								current_path[cursor_block] = Vector2(i, 0)
+							else:
+								var i = paths.size()
+								paths[cursor_block] = i 
+								paths.instance_count += 1
+								path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+								path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+								current_path[cursor_block] = Vector2(i, 0)
 						# Top and Right
 						if (current_path_second_to_last_block - current_path_last_block == Vector2(0, 1) or cursor_block - current_path_last_block == Vector2(0, 1)) and (current_path_second_to_last_block - current_path_last_block == Vector2(1, 0) or cursor_block - current_path_last_block == Vector2(1, 0)):
+							# Hide current_path_last_block
+							path_multi_mesh.set_instance_color(paths.get(current_path_last_block), delete_mesh_color)
+							# Spawn current_path_last_block as a corner with correct orientation
+							var i = corners.size()
+							corners[current_path_last_block] = i
+							corner_multi_mesh.instance_count += 1
+							corner_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, top_right_rotation))
+							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
+							current_path[current_path_last_block] = Vector2(i, 1)
+							# Spawn straight path at cursor_block with correct orientation
+							if (cursor_block - current_path_last_block).x == 0:
+								var i = paths.size()
+								paths[cursor_block] = i 
+								paths.instance_count += 1
+								path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+								path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+								current_path[cursor_block] = Vector2(i, 0)
+							else:
+								var i = paths.size()
+								paths[cursor_block] = i 
+								paths.instance_count += 1
+								path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+								path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+								current_path[cursor_block] = Vector2(i, 0)
 						# Right and Bottom
 						if (current_path_second_to_last_block - current_path_last_block == Vector2(1, 0) or cursor_block - current_path_last_block == Vector2(1, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector2(0, -1) or cursor_block - current_path_last_block == Vector2(0, -1)):
+							# Hide current_path_last_block
+							path_multi_mesh.set_instance_color(paths.get(current_path_last_block), delete_mesh_color)
+							# Spawn current_path_last_block as a corner with correct orientation
+							var i = corners.size()
+							corners[current_path_last_block] = i
+							corner_multi_mesh.instance_count += 1
+							corner_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, right_bottom_rotation))
+							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
+							current_path[current_path_last_block] = Vector2(i, 1)
+							# Spawn straight path at cursor_block with correct orientation
+							if (cursor_block - current_path_last_block).x == 0:
+								var i = paths.size()
+								paths[cursor_block] = i 
+								paths.instance_count += 1
+								path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+								path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+								current_path[cursor_block] = Vector2(i, 0)
+							else:
+								var i = paths.size()
+								paths[cursor_block] = i 
+								paths.instance_count += 1
+								path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+								path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+								current_path[cursor_block] = Vector2(i, 0)
 						# Bottom and Left
 						if (current_path_second_to_last_block - current_path_last_block == Vector2(0, -1) or cursor_block - current_path_last_block == Vector2(0, -1)) and (current_path_second_to_last_block - current_path_last_block == Vector2(-1, 0) or cursor_block - current_path_last_block == Vector2(-1, 0)):
+							# Hide current_path_last_block
+							path_multi_mesh.set_instance_color(paths.get(current_path_last_block), delete_mesh_color)
+							# Spawn current_path_last_block as a corner with correct orientation
+							var i = corners.size()
+							corners[current_path_last_block] = i
+							corner_multi_mesh.instance_count += 1
+							corner_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, bottom_left_rotation))
+							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
+							current_path[current_path_last_block] = Vector2(i, 1)
+							# Spawn straight path at cursor_block with correct orientation
+							if (cursor_block - current_path_last_block).x == 0:
+								var i = paths.size()
+								paths[cursor_block] = i 
+								paths.instance_count += 1
+								path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+								path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+								current_path[cursor_block] = Vector2(i, 0)
+							else:
+								var i = paths.size()
+								paths[cursor_block] = i 
+								paths.instance_count += 1
+								path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+								path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+								current_path[cursor_block] = Vector2(i, 0)
 					# Normal path creation case
 					else:
-
-
+						if (cursor_block - current_path_last_block).x == 0:
+							var i = paths.size()
+							paths[cursor_block] = i 
+							paths.instance_count += 1
+							path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+							path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+							current_path[cursor_block] = Vector2(i, 0)
+						else:
+							var i = paths.size()
+							paths[cursor_block] = i 
+							paths.instance_count += 1
+							path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+							path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+							current_path[cursor_block] = Vector2(i, 0)
 		# Room queued ghost
+		elif rooms_queued:
+			room_queue.front.position = cursor_position + block_height_offset
 		
-
 		# Pathing ghost
+		else:
+			var adjacencies = [cursor_block + Vector2.UP, cursor_block + Vector2.DOWN, cursor_block + Vector2.LEFT, cursor_block + Vector2.RIGHT]
+			var i = 0
+			var spotted = false
+			for x in adjacencies:
+				if rooms.has(x):
+					spotted = true
+					if i < 2:
+						var i = paths.size()
+						temp_path_ghost_i = i 
+						temp_path_ghost = true
+						paths.instance_count += 1
+						path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+						path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+					else:
+						var i = paths.size()
+						temp_path_ghost_i = i 
+						temp_path_ghost = true
+						paths.instance_count += 1
+						path_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+						path_multi_mesh.set_instance_color(i, ghost_mesh_color)
+
+				i += 1
+			if spotted = false and temp_path_ghost = true:
+				path_multi_mesh.set_instance_color(temp_path_ghost_i, delete_mesh_color)
+				temp_path_ghost = false
+				temp_path_ghost_i = null
+
 
 # Returns true or false based on if this block is available for drawing
 func valid_block():
-	# Check if it has a path
-	# TODO: implement
-	# Check if it has a room
-
-# Converts a grid position to world coordinates
-func grid_to_world(Vector2):
-	# TODO: implement
+	return !(paths.has(cursor_block) or rooms.has(cursor_block))
 
 # Attempts to place a room in the location from the queue
 func place_room():
