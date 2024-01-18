@@ -10,6 +10,8 @@ func _on_xr_user_area_entered(area: Area3D):
 		print("door not found")
 		return
 
+	get_node("%StartMenu").visible = false
+
 	if State.location == State.LOCATION.ROOM:
 		print("entering path from room ", door_num)
 		State.location = State.LOCATION.PATH
