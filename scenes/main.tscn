@@ -1,4 +1,4 @@
-[gd_scene load_steps=43 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=49 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/GameController.gd" id="2_42an5"]
@@ -33,6 +33,26 @@ size = Vector3(0.2, 0.2, 0.2)
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7o7er"]
 transparency = 1
 albedo_color = Color(1, 1, 1, 0.196078)
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_x4sjt"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_aewtc"]
+material = SubResource("ShaderMaterial_x4sjt")
+size = Vector2(1, 1)
+
+[sub_resource type="MultiMesh" id="MultiMesh_8l6sb"]
+transform_format = 1
+mesh = SubResource("PlaneMesh_aewtc")
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_r40be"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_8nhfb"]
+material = SubResource("ShaderMaterial_r40be")
+size = Vector2(1, 1)
+
+[sub_resource type="MultiMesh" id="MultiMesh_saubh"]
+transform_format = 1
+mesh = SubResource("PlaneMesh_8nhfb")
 
 [sub_resource type="SphereMesh" id="SphereMesh_td3q0"]
 radius = 0.3
@@ -203,20 +223,24 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 light_energy = 2.0
 
 [node name="Map" type="Node3D" parent="."]
-transform = Transform3D(0.1, 0, 0, 0, 0.0785749, -0.0618545, 0, 0.0618545, 0.0785749, 1.70429, 1.43416, 3.93306)
+transform = Transform3D(0.05, 0, 0, 0, 0.0392875, -0.0309273, 0, 0.0309273, 0.0392875, 1.70429, 1.43416, 3.93306)
 script = ExtResource("8_ct64q")
 
 [node name="Room1" type="MeshInstance3D" parent="Map"]
+visible = false
 mesh = SubResource("BoxMesh_yr38u")
 surface_material_override/0 = SubResource("StandardMaterial3D_stxle")
 
 [node name="GhostRoom1" type="MeshInstance3D" parent="Map"]
+visible = false
 mesh = SubResource("BoxMesh_ku1ag")
 surface_material_override/0 = SubResource("StandardMaterial3D_7o7er")
 
 [node name="Paths" type="MultiMeshInstance3D" parent="Map"]
+multimesh = SubResource("MultiMesh_8l6sb")
 
 [node name="Corners" type="MultiMeshInstance3D" parent="Map"]
+multimesh = SubResource("MultiMesh_saubh")
 
 [node name="Cursor" type="Node3D" parent="Map"]
 
@@ -228,7 +252,8 @@ surface_material_override/0 = SubResource("StandardMaterial3D_88qy7")
 mesh = SubResource("BoxMesh_t47kd")
 surface_material_override/0 = SubResource("StandardMaterial3D_srtc7")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Map"]
+[node name="Background" type="MeshInstance3D" parent="Map"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, 1, 0, -1, -4.37114e-08, 0, 0, 0)
 mesh = SubResource("PlaneMesh_5j7vv")
 surface_material_override/0 = SubResource("StandardMaterial3D_r55n5")
 

@@ -45,7 +45,7 @@ var delete_mesh_color = Color(0, 0, 0, 0)
 var ghost_mesh_color = Color(1, 1, 1, .4)
 var grid_offset = Vector3(-0.5, -0.5, 0.0)
 var current_path = {} # Dictionary of Vector2 -> Vector3 (value x is key into mesh, y is 0 for paths and 1 for corners, z is the rotation of the path/corner: 0 for vertical, 1 for horizontal and 0 for left&top, 1 for top&right, 2 for right&bottom, and 3 for bottom&left)
-var temp_path_ghost = null # block location of currently rendered path ghost (null if not rendering path ghost)
+var temp_path_ghost # block location of currently rendered path ghost (null if not rendering path ghost)
 var temp_path_ghost_i
 var path_accums = [] # List of Dictionaries of Paths (Path dictionaries are Vecotr2 -> Vector2)
 var room_list
@@ -66,8 +66,8 @@ func _ready():
 	left_controller = %LeftController
 	right_controller = %RightController
 	camera = %XRCamera3D
-	path_multi_mesh = find_child("Paths")
-	corner_multi_mesh = find_child("Corners")
+	path_multi_mesh = find_child("Paths").multimesh
+	corner_multi_mesh = find_child("Corners").multimesh
 	cursor = find_child("Cursor") # TODO: instanciate
 	laser = find_child("Laser")
 	room_list = [find_child("Room1")]#, find_child(""), find_child(""), find_child(""), find_child(""), find_child(""), find_child(""), find_child(""), find_child("")] # TODO: instanciate
@@ -141,7 +141,7 @@ func _process(delta):
 		elif pathing:
 			delete_path_ghost()
 			if current_path_last_block != cursor_block:
-				if valid_block() and cursor_block.is_adjacent(current_path_last_block):
+				if valid_block() and is_adjacent(current_path_last_block, cursor_block):
 					# Corner revision case
 					if (current_path_last_block - current_path_second_to_last_block) + current_path_last_block == cursor_block:
 						# Left and Top
@@ -271,7 +271,7 @@ func _process(delta):
 		# Room queued ghost
 		elif rooms_queued and valid_block():
 			delete_path_ghost()
-			room_queue.front().position = cursor_block + block_height_offset + grid_offset
+			room_ghost_map[room_queue.front()].position = cursor_block + block_height_offset + grid_offset
 		
 		# Pathing ghost
 		else:
@@ -302,6 +302,11 @@ func _process(delta):
 							path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 							path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 
+func is_adjacent(vec3_1, vec3_2):
+	for x in [Vector3.UP, Vector3.DOWN, Vector3.LEFT, Vector3.RIGHT]:
+		if vec3_1 + x == vec3_2:
+			return true
+	return false
 
 # Returns true or false based on if this block is available for drawing
 func valid_block():
@@ -309,8 +314,10 @@ func valid_block():
 
 # Attempts to place a room in the location from the queue
 func place_room():
-	rooms[cursor_block] = room_queue.pop_front()
 	room_queue.front().position = cursor_block + block_height_offset + grid_offset
+	rooms[cursor_block] = room_queue.pop_front()
+	if room_queue.is_empty():
+		rooms_queued = false
 		
 
 # Attempts to start pathing at the current block
@@ -392,7 +399,7 @@ func delete_selection():
 func delete_path_ghost():
 	if temp_path_ghost != null:
 		path_multi_mesh.set_instance_color(temp_path_ghost_i, delete_mesh_color)
-		temp_path_ghost = false
+		temp_path_ghost = null
 		temp_path_ghost_i = null
 
 # Attempts to start dragging the current block
