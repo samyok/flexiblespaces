@@ -1,4 +1,4 @@
-[gd_scene load_steps=32 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=43 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/GameController.gd" id="2_42an5"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://scripts/Door.gd" id="6_dubqk"]
 [ext_resource type="Texture2D" uid="uid://corehclq0bswx" path="res://textures/sand.webp" id="6_idf5b"]
 [ext_resource type="Script" path="res://scripts/Path.gd" id="7_ctd0p"]
+[ext_resource type="Script" path="res://scripts/Map.gd" id="8_ct64q"]
 [ext_resource type="Texture2D" uid="uid://cle2sjkres0xo" path="res://textures/netherportal_crop.png" id="9_30ele"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blgdw"]
@@ -22,6 +23,38 @@ size = Vector3(1, 3, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nj0ms"]
 size = Vector3(0.2, 0.2, 0.2)
+
+[sub_resource type="BoxMesh" id="BoxMesh_yr38u"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stxle"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_ku1ag"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7o7er"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.196078)
+
+[sub_resource type="SphereMesh" id="SphereMesh_td3q0"]
+radius = 0.3
+height = 0.6
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_88qy7"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.196078)
+
+[sub_resource type="BoxMesh" id="BoxMesh_t47kd"]
+size = Vector3(0.05, 0.05, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_srtc7"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.196078)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_5j7vv"]
+size = Vector2(10, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r55n5"]
+transparency = 1
+albedo_color = Color(0.65098, 0.678431, 0.529412, 0.117647)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_osj4q"]
 sky_horizon_color = Color(0.64625, 0.65575, 0.67075, 1)
@@ -159,9 +192,45 @@ pose = &"aim"
 [node name="RightControllerMesh" parent="XRUser/XROrigin3D/RightController" instance=ExtResource("4_5ti0a")]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0.05)
 
+[node name="LeftHip" type="Node3D" parent="XRUser/XROrigin3D"]
+unique_name_in_owner = true
+
+[node name="RightHip" type="Node3D" parent="XRUser/XROrigin3D"]
+unique_name_in_owner = true
+
 [node name="OmniLight3D" type="OmniLight3D" parent="XRUser"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 light_energy = 2.0
+
+[node name="Map" type="Node3D" parent="."]
+transform = Transform3D(0.1, 0, 0, 0, 0.0785749, -0.0618545, 0, 0.0618545, 0.0785749, 1.70429, 1.43416, 3.93306)
+script = ExtResource("8_ct64q")
+
+[node name="Room1" type="MeshInstance3D" parent="Map"]
+mesh = SubResource("BoxMesh_yr38u")
+surface_material_override/0 = SubResource("StandardMaterial3D_stxle")
+
+[node name="GhostRoom1" type="MeshInstance3D" parent="Map"]
+mesh = SubResource("BoxMesh_ku1ag")
+surface_material_override/0 = SubResource("StandardMaterial3D_7o7er")
+
+[node name="Paths" type="MultiMeshInstance3D" parent="Map"]
+
+[node name="Corners" type="MultiMeshInstance3D" parent="Map"]
+
+[node name="Cursor" type="Node3D" parent="Map"]
+
+[node name="Ball" type="MeshInstance3D" parent="Map/Cursor"]
+mesh = SubResource("SphereMesh_td3q0")
+surface_material_override/0 = SubResource("StandardMaterial3D_88qy7")
+
+[node name="Laser" type="MeshInstance3D" parent="Map/Cursor"]
+mesh = SubResource("BoxMesh_t47kd")
+surface_material_override/0 = SubResource("StandardMaterial3D_srtc7")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Map"]
+mesh = SubResource("PlaneMesh_5j7vv")
+surface_material_override/0 = SubResource("StandardMaterial3D_r55n5")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_pi0m0")
@@ -291,6 +360,8 @@ mesh = SubResource("BoxMesh_qei3g")
 [connection signal="area_entered" from="XRUser" to="GameController" method="_on_xr_user_area_entered"]
 [connection signal="area_exited" from="XRUser" to="GameController" method="_on_xr_user_area_exited"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/LeftController" to="XRUser" method="button_pressed"]
+[connection signal="button_pressed" from="XRUser/XROrigin3D/LeftController" to="Map" method="_on_left_controller_button_pressed"]
 [connection signal="input_vector2_changed" from="XRUser/XROrigin3D/LeftController" to="XRUser" method="process_input"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/RightController" to="XRUser" method="button_pressed"]
+[connection signal="button_pressed" from="XRUser/XROrigin3D/RightController" to="Map" method="_on_right_controller_button_pressed"]
 [connection signal="input_vector2_changed" from="XRUser/XROrigin3D/RightController" to="XRUser" method="process_input"]
