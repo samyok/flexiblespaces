@@ -53,9 +53,6 @@ var room_ghost_map # Dictionary of Room -> Room
 
 
 
-
-
-signal size_changed # TODO: add parameter and link to the drawing pane if necessary
 signal pause_stick_movement # TODO: link to locomotion.gd
 signal resume_stick_movement # TODO: link to locomotion.gd
 
@@ -126,9 +123,11 @@ func _process(delta):
 			delete_path_ghost()
 			dragging_room.global_position = cursor.global_position + Vector3(0, 0, dragging_float_height)
 			#Dragging Ghost
+			dragging_room_ghost.position = cursor_block + block_height_offset + grid_offset
 			if valid_block():
+				dragging_room_ghost.show()
+			else:
 				dragging_room_ghost.hide()
-				dragging_room_ghost.position = cursor_block + block_height_offset + grid_offset
 		
 		# Pathing
 		elif pathing:
@@ -262,9 +261,9 @@ func _process(delta):
 							path_multi_mesh.set_instance_color(i, ghost_mesh_color)
 							current_path[cursor_block] = Vector2(i, 0)
 		# Room queued ghost
-		elif rooms_queued and not rooms.has(cursor_block):
+		elif rooms_queued and valid_block():
 			delete_path_ghost()
-			room_queue.front.position = cursor_position + block_height_offset
+			room_queue.front().position = cursor_block + block_height_offset + grid_offset
 		
 		# Pathing ghost
 		else:
@@ -302,7 +301,8 @@ func valid_block():
 
 # Attempts to place a room in the location from the queue
 func place_room():
-	if valid_block():
+	rooms[cursor_block] = room_queue.pop_front()
+	room_queue.front().position = cursor_block + block_height_offset + grid_offset
 		
 
 # Attempts to start pathing at the current block
@@ -389,18 +389,18 @@ func delete_path_ghost():
 func start_drag():
 	dragging = true
 	dragging_room = rooms.get(cursor_block)
-	dragging_room_ghost = 
+	dragging_room_ghost = room_ghost_map[dragging_room]
 
 # Cleans up room dragging
 func dragging_clean_up():
-	# Invalid call case
-	if dragging_path == null && dragging_room == null:
-	   return
-	# Path case
-	elif dragging_room == null:
-		# If current cursor block is next to a room then 
-	# Room case
+	if valid_block:
+		dragging_room.position = dragging_room_ghost.position
 	else:
+		room_queue.push_front(dragging_room)
+	dragging_room = null
+	dragging_room_ghost.hide()
+	dragging_room_ghost = null
+	dragging = false
 
 # TODO: attach signal from left controller
 func _on_left_controller_button_pressed(name):
@@ -438,6 +438,22 @@ func _on_right_controller_button_pressed(name):
 		node_currently_tracking = right_controller
 		pause_stick_movement.emit()
 	elif name = "trigger_click":
+		if node_currently_tracking == left_controller:
+			if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block) ):
+				delete_section()
+			else:
+				double_click_timer = 0.0
+				double_click_timing = true
+				double_click_start_block = cursor_block
+				# place room
+				if valid_block and rooms_queued and !dragging and !pathing:
+					place_room()
+				# start drag
+				elif rooms.has(cursor_block) and !dragging and !pathing:
+					start_drag()
+				# start path
+				else temp_path_ghost != null:
+					start_path()
 
 
 # TODO: attach signal from left controller
@@ -448,6 +464,11 @@ func _on_left_controller_button_released(name):
 		resume_stick_movement.emit()
 		node_currently_tracking = null
 	elif name = "trigger_click":
+		if node_currently_tracking == right_controller:
+			if dragging:
+				dragging_clean_up()
+			elif pathing:
+				pathing_clean_up()
 		
 
 # TODO: attach signal from right controller
@@ -458,6 +479,11 @@ func _on_right_controller_button_released(name):
 		resume_stick_movement.emit()
 		node_currently_tracking = null
 	elif name = "trigger_click":
+		if node_currently_tracking == left_controller:
+			if dragging:
+				dragging_clean_up()
+			elif pathing:
+				pathing_clean_up()
 		
 
 # TODO: attach signal from left controller
@@ -480,5 +506,5 @@ func _on_right_controller_input_vector_2_changed(name, value):
 func _on_room_explored():
 	if room_index != 5:
 		rooms_queued = true
-		room_queue.push_front(room_list[room_index])
+		room_queue.push_back(room_list[room_index])
 		room_index += 1
