@@ -8,8 +8,8 @@ var grip_pressed = false
 var last_cursor_position = Vector2(0.0, 0.0)
 var input_vector = Vector2(0.0, 0.0)
 var scaling_deadzone = .2
-var scaling_speed = 1.0
-var max_scale = 4.0
+var scaling_speed = 0.2
+var max_scale = 1.0
 var cursor
 var cursor_block
 var active
@@ -20,11 +20,13 @@ var paths # Path array (Vector2 -> instance id)
 var corners # Path corner array (Vector2 -> instance id)
 var adjacencies # Vector3 array (path index, room id1, room id 2)
 var dragging_room # null or the room being currently dragged
+var dragging_room_ghost # null or the ghost of the room being currently dragged
 var dragging_path # null or the path being currently dragged
-var path_ghost_transparency = .4 # Transparency (0 to 1) of the pending path
+var dragging_float_height = 1.0
 var valid_path_start
 var current_path_origin
 var current_path_last_block
+var current_path_second_to_last_block
 var double_click_timer = 0
 var double_click_timing = false
 var double_click_start_block
@@ -32,18 +34,21 @@ var double_click_window = .4 # Maximum time (in seconds) between first and secon
 var room_queue = []
 var rooms_queued = false
 var room_index = 0
+var drawing_plane
+var block_height_offset = .5 # TODO: calibrate with starting scale
+var left_top_rotation = Vector3(0, 0, 0) # default # TODO: tune these rotation offsets
+var top_right_rotation = Vector3(0, 0, -PI/2) # right 90 degrees
+var right_bottom_rotation = Vector3(0, 0, PI) # 180 degree rotation
+var bottom_left_rotation = Vector3(0, 0, PI/2) # left 90 degrees 
+var delete_mesh_color = Color(0, 0, 0, 0)
+var ghost_mesh_color = Color(1, 1, 1, .4)
+
 
 
 
 signal size_changed # TODO: add parameter and link to the drawing pane if necessary
 signal pause_stick_movement # TODO: link to locomotion.gd
 signal resume_stick_movement # TODO: link to locomotion.gd
-signal cursor_position_changed # TODO: add parameter and link to the drawing pane
-signal cursor_click_started  # TODO: link to the drawing pane
-signal cursor_click_ended # TODO: link to the drawing pane
-signal cursor_double_click # TODO: link to the drawing pane
-signal show_screen # TODO: link to the drawing pane
-signal hide_screen # TODO: link to the drawing pane
 
 
 # Called when the node enters the scene tree for the first time.
@@ -90,17 +95,17 @@ func _process(delta):
 
 		# Right controller cursor update
 		if node_currently_tracking == left_controller:
-			var drawing_plane = Plane((left_controller.position - camera.position).normalized(), left_controller.position)
-			cursor.position = drawing_plane.project(right_controller.position)
+			drawing_plane = Plane((left_controller.global_position - camera.global_position).normalized(), left_controller.global_position)
+			cursor.global_position = drawing_plane.project(right_controller.global_position)
 			cursor.find_child("Laser").global_scale = cursor_position.distance_to(right_controller)
-			block_position  = (cursor.position - left_controller.position).ceil()
+			block_position  = (cursor.global_position - left_controller.global_position).ceil()
 
 		# Left controller cursor update
 		else:
-			var drawing_plane = Plane((right_controller.position - camera.position).normalized(), right_controller.position)
-			cursor.position = drawing_plane.project(left_controller.position)
+			drawing_plane = Plane((right_controller.global_position - camera.global_position).normalized(), right_controller.global_position)
+			cursor.global_position = drawing_plane.project(left_controller.global_position)
 			cursor.find_child("Laser").global_scale = cursor_position.distance_to(left_controller)
-			block_position  = (cursor.position - right_controller.position).ceil()
+			block_position  = (cursor.global_position - right_controller.global_position).ceil()
 
 		# Double click timing
 		if double_click_timing:
@@ -110,13 +115,37 @@ func _process(delta):
 		
 		# Dragging
 		if dragging:
-			if 
+			dragging_room.global_position = cursor.global_position + Vector3(0, 0, dragging_float_height)
 			#Dragging Ghost
+			dragging_room_ghost.global_position = cursor_block + block_height_offset + grid_to_world(cursor_block)
 		
 		# Pathing
-		if pathing:
+		elif pathing:
+			if current_path_last_block != cursor_position:
+				if valid_block() and cursor_block.is_adjacent(current_path_last_block):
+					# Corner revision case
+					if (current_path_last_block - current_path_second_to_last_block) + current_path_last_block == cursor_block:
+						# Left and Top
+						if (current_path_second_to_last_block - current_path_last_block == Vector2(-1, 0) or cursor_block - current_path_last_block == Vector2(-1, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector2(0, 1) or cursor_block - current_path_last_block == Vector2(0, 1)):
+							# Hide current_path_last_block
+							path_multi_mesh.set_instance_color(paths.get(current_path_last_block), delete_mesh_color)
+							# Spawn current_path_last_block as a corner with correct orientation
+							var i = corners.size()
+							corners[current_path_last_block] = i
+							corner_multi_mesh.instance_count += 1
+							corner_multi_mesh.set_instance_transform(i, cursor.transform.translated_local(current_path_last_block - Vector3(-0.5, -0.5, 0.0))))
+							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
+							# Spawn straight path at cursor_block with correct orientation
+							if (cursor_block - current_path_last_block).x ==
+						# Top and Right
+						if (current_path_second_to_last_block - current_path_last_block == Vector2(0, 1) or cursor_block - current_path_last_block == Vector2(0, 1)) and (current_path_second_to_last_block - current_path_last_block == Vector2(1, 0) or cursor_block - current_path_last_block == Vector2(1, 0)):
+						# Right and Bottom
+						if (current_path_second_to_last_block - current_path_last_block == Vector2(1, 0) or cursor_block - current_path_last_block == Vector2(1, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector2(0, -1) or cursor_block - current_path_last_block == Vector2(0, -1)):
+						# Bottom and Left
+						if (current_path_second_to_last_block - current_path_last_block == Vector2(0, -1) or cursor_block - current_path_last_block == Vector2(0, -1)) and (current_path_second_to_last_block - current_path_last_block == Vector2(-1, 0) or cursor_block - current_path_last_block == Vector2(-1, 0)):
+					# Normal path creation case
+					else:
 
-			#Pathing Ghost
 
 		# Room queued ghost
 		
@@ -126,9 +155,12 @@ func _process(delta):
 # Returns true or false based on if this block is available for drawing
 func valid_block():
 	# Check if it has a path
-
+	# TODO: implement
 	# Check if it has a room
 
+# Converts a grid position to world coordinates
+func grid_to_world(Vector2):
+	# TODO: implement
 
 # Attempts to place a room in the location from the queue
 func place_room():
