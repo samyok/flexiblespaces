@@ -54,6 +54,12 @@ var dragging = false
 var pathing = false
 var rooms_total = 1 # Change when adding rooms
 var laser
+var test1
+var test2
+var test3
+var test35
+var test4
+var test45
 
 
 
@@ -106,8 +112,8 @@ func _process(delta):
 		if node_currently_tracking == left_controller:
 			drawing_plane = Plane((left_controller.global_position - camera.global_position).normalized(), left_controller.global_position)
 			cursor.global_position = drawing_plane.project(right_controller.global_position)
-			laser.scale = Vector3(1, 1, cursor.position.distance_to(right_controller.position))
-			laser.position = Vector3(0, 0, cursor.position.distance_to(right_controller.position)/2)
+			laser.scale = Vector3(1, 1, cursor.global_position.distance_to(right_controller.global_position)/self.scale.z)
+			laser.position = Vector3(0, 0, cursor.global_position.distance_to(right_controller.global_position)/(-2*self.scale.z))
 			cursor_block = cursor.position.ceil()
 			cursor_block.z = 0
 
@@ -115,8 +121,8 @@ func _process(delta):
 		else:
 			drawing_plane = Plane((right_controller.global_position - camera.global_position).normalized(), right_controller.global_position)
 			cursor.global_position = drawing_plane.project(left_controller.global_position)
-			laser.scale = Vector3(1, 1, cursor.position.distance_to(left_controller.position))
-			laser.position = Vector3(0, 0, -cursor.position.distance_to(left_controller.position)/2)
+			laser.scale = Vector3(1, 1, cursor.global_position.distance_to(left_controller.global_position)/self.scale.z)
+			laser.position = Vector3(0, 0, cursor.global_position.distance_to(left_controller.global_position)/(-2*self.scale.z))
 			cursor_block = cursor.position.ceil()
 			cursor_block.z = 0
 
@@ -326,6 +332,9 @@ func start_path():
 	# Initialize path variables
 	current_path_last_block = cursor_block
 	current_path_origin = cursor_block
+	for x in [cursor_block + Vector3.UP, cursor_block + Vector3.DOWN, cursor_block + Vector3.LEFT, cursor_block + Vector3.RIGHT]:
+		if rooms.has(x):
+			current_path_second_to_last_block = x
 	# Co-opt ghost path into current path
 	paths[cursor_block] = temp_path_ghost_i
 

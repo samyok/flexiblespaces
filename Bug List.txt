@@ -1,0 +1,2 @@
+  - Map not disappearing when grip trigger is released
+  - Map not swapping hands
