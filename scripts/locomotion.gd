@@ -17,6 +17,7 @@ enum TurnMethod {snap, smooth}
 
 var input_vector:= Vector2.ZERO
 var camera: XRCamera3D
+var movement_paused = false
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -114,13 +115,20 @@ func _process(delta):
 	# if is_touching_enemy():
 	# 	reset_user_position()
 	# 	return
-	
-	if locomtion_method == LocomotionMethod.controller_turn:
-		controller_turn(delta)
-	elif locomtion_method == LocomotionMethod.controller_direction:
-		controller_direction(delta)
+	if not movement_paused:
+		if locomtion_method == LocomotionMethod.controller_turn:
+			controller_turn(delta)
+		elif locomtion_method == LocomotionMethod.controller_direction:
+			controller_direction(delta)
 	
 func _physics_process(_delta): 
 	if is_touching_enemy():
 		reset_user_position()
 		return
+
+func _on_map_pause_stick_movement():
+	movement_paused = true
+
+
+func _on_map_resume_stick_movement():
+	movement_paused = false

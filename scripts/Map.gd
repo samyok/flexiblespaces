@@ -4,25 +4,22 @@ var node_currently_tracking = null # updates the position and rotation of the Ma
 var camera
 var left_controller
 var right_controller
-var grip_pressed = false
 var last_cursor_position = Vector3(0.0, 0.0, 0.0)
 var input_vector = Vector2(0.0, 0.0)
 var scaling_deadzone = .2
-var scaling_speed = 0.2
-var max_scale = 1.0
+var scaling_speed = 0.005
+var min_scale = .01
+var max_scale = .1
 var cursor
 var cursor_block
-var active
 var path_multi_mesh
 var corner_multi_mesh
 var rooms = {} # Room array (Vector2 -> Room node dictionary)
 var paths = {} # Path array (Vector2 -> instance id)
 var corners = {} # Path corner array (Vector2 -> instance id)
-var adjacencies # Vector3 array (path index, room id1, room id 2)
 var dragging_room # null or the room being currently dragged
 var dragging_room_ghost # null or the ghost of the room being currently dragged
-var dragging_path # null or the path being currently dragged
-var dragging_float_height = 1.0
+var dragging_float_height = Vector3(0, 0, -1.0)
 var current_path_origin
 var current_path_last_block
 var current_path_second_to_last_block
@@ -33,8 +30,7 @@ var double_click_window = .4 # Maximum time (in seconds) between first and secon
 var room_queue = []
 var rooms_queued = false
 var room_index = 0
-var drawing_plane
-var block_height_offset = Vector3(0, 0.5, 0)
+var block_height_offset = Vector3(0, 0, -0.5)
 var left_top_rotation = 0.0 # default # TODO: tune these rotation offsets
 var top_right_rotation = -PI/2 # right 90 degrees
 var right_bottom_rotation = PI # 180 degree rotation
@@ -44,15 +40,16 @@ var horizontal_rotation = PI/2
 var delete_mesh_color = Color(0, 0, 0, 0)
 var ghost_mesh_color = Color(1, 1, 1, .4)
 var grid_offset = Vector3(-0.5, -0.5, 0.0)
-var current_path = {} # Dictionary of Vector2 -> Vector3 (value x is key into mesh, y is 0 for paths and 1 for corners, z is the rotation of the path/corner: 0 for vertical, 1 for horizontal and 0 for left&top, 1 for top&right, 2 for right&bottom, and 3 for bottom&left)
+var current_path = {} # Dictionary of Vector3 -> Vector3 (value x is key into mesh, y is 0 for paths and 1 for corners, z is the rotation of the path/corner: 0 for vertical, 1 for horizontal and 0 for left&top, 1 for top&right, 2 for right&bottom, and 3 for bottom&left)
 var temp_path_ghost # block location of currently rendered path ghost (null if not rendering path ghost)
 var temp_path_ghost_i
-var path_accums = [] # List of Dictionaries of Paths (Path dictionaries are Vecotr2 -> Vector2)
+var path_accums = [] # List of Dictionaries of Paths (Path dictionaries are Vector3 -> Vector2)
 var room_list
 var room_ghost_map # Dictionary of Room -> Room
 var dragging = false
 var pathing = false
 var rooms_total = 1 # Change when adding rooms
+var paths_z_fighting_offset
 var laser
 var test1
 var test2
@@ -83,35 +80,20 @@ func _ready():
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	# (Transform)
-	# If grip_pressed:
-	#   Position update to node_currently_tracking
-	# 	Rotation update to look at XR_Camera
-	#   If grip_pressed and input is recieved from active controller's stick:
-	#     Scale the map by the input_vector multiplied by the scaling speed vector
-	#   Move the cursor
-	#   Time the double click if we are currently doing so
-	#   If dragging
-	#     Float the block the user is dragging above the others and create a transparent clone where it would go when released
-	#     Draggin ghost
-	#   Elif pathing
-	#     If just moved to a new block, update the path
-	#     Pathing ghost
-	#   Else (not pathing)
-	#     Room queued ghost
-	#     Start path ghost
-
-
-	if grip_pressed:
+	if node_currently_tracking != null:
 		self.global_position = node_currently_tracking.global_position
 		self.look_at(camera.global_position)
-		if grip_pressed and input_vector.length() > scaling_deadzone and (self.scale.x < self.max_scale.x and self.scale.y < self.max_):
+		if input_vector.length() > scaling_deadzone:
 			self.scale = self.scale + Vector3(scaling_speed * input_vector.y, scaling_speed * input_vector.y, scaling_speed * input_vector.y)
+			if self.scale.x < min_scale:
+				self.scale = Vector3(min_scale, min_scale, min_scale)
+			elif self.scale.x > max_scale:
+				self.scale = Vector3(max_scale, max_scale, max_scale)
 
 		# Right controller cursor update
 		if node_currently_tracking == left_controller:
-			drawing_plane = Plane((left_controller.global_position - camera.global_position).normalized(), left_controller.global_position)
-			cursor.global_position = drawing_plane.project(right_controller.global_position)
+			var map_plane = Plane((left_controller.global_position - camera.global_position).normalized(), left_controller.global_position)
+			cursor.global_position = map_plane.project(right_controller.global_position)
 			laser.scale = Vector3(1, 1, cursor.global_position.distance_to(right_controller.global_position)/self.scale.z)
 			laser.position = Vector3(0, 0, cursor.global_position.distance_to(right_controller.global_position)/(-2*self.scale.z))
 			cursor_block = cursor.position.ceil()
@@ -119,8 +101,8 @@ func _process(delta):
 
 		# Left controller cursor update
 		else:
-			drawing_plane = Plane((right_controller.global_position - camera.global_position).normalized(), right_controller.global_position)
-			cursor.global_position = drawing_plane.project(left_controller.global_position)
+			var map_plane = Plane((right_controller.global_position - camera.global_position).normalized(), right_controller.global_position)
+			cursor.global_position = map_plane.project(left_controller.global_position)
 			laser.scale = Vector3(1, 1, cursor.global_position.distance_to(left_controller.global_position)/self.scale.z)
 			laser.position = Vector3(0, 0, cursor.global_position.distance_to(left_controller.global_position)/(-2*self.scale.z))
 			cursor_block = cursor.position.ceil()
@@ -135,7 +117,7 @@ func _process(delta):
 		# Dragging
 		if dragging:
 			delete_path_ghost()
-			dragging_room.global_position = cursor.global_position + Vector3(0, 0, dragging_float_height)
+			dragging_room.global_position = cursor.global_position + dragging_float_height
 			#Dragging Ghost
 			dragging_room_ghost.position = cursor_block + block_height_offset + grid_offset
 			if valid_block():
@@ -161,7 +143,7 @@ func _process(delta):
 							corner_multi_mesh.instance_count += 1
 							corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, left_top_rotation))
 							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
-							current_path[current_path_last_block] = Vector2(i, 1)
+							current_path[current_path_last_block] = Vector3(i, 1, 0)
 							# Spawn straight path at cursor_block with correct orientation
 							if (cursor_block - current_path_last_block).x == 0:
 								var j = path_multi_mesh.instance_count
@@ -169,14 +151,14 @@ func _process(delta):
 								path_multi_mesh.instance_count += 1
 								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-								current_path[cursor_block] = Vector2(j, 0)
+								current_path[cursor_block] = Vector3(j, 0, 0)
 							else:
 								var j = path_multi_mesh.instance_count
 								paths[cursor_block] = j 
 								path_multi_mesh.instance_count += 1
 								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-								current_path[cursor_block] = Vector2(j, 0)
+								current_path[cursor_block] = Vector3(j, 0, 1)
 						# Top and Right
 						if (current_path_second_to_last_block - current_path_last_block == Vector3(0, 1, 0) or cursor_block - current_path_last_block == Vector3(0, 1, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(1, 0, 0) or cursor_block - current_path_last_block == Vector3(1, 0, 0)):
 							# Hide current_path_last_block
@@ -188,7 +170,7 @@ func _process(delta):
 							corner_multi_mesh.instance_count += 1
 							corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, top_right_rotation))
 							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
-							current_path[current_path_last_block] = Vector2(i, 1)
+							current_path[current_path_last_block] = Vector3(i, 1, 1)
 							# Spawn straight path at cursor_block with correct orientation
 							if (cursor_block - current_path_last_block).x == 0:
 								var j = path_multi_mesh.instance_count
@@ -196,14 +178,14 @@ func _process(delta):
 								path_multi_mesh.instance_count += 1
 								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-								current_path[cursor_block] = Vector2(j, 0)
+								current_path[cursor_block] = Vector3(j, 0, 0)
 							else:
 								var j = path_multi_mesh.instance_count
 								paths[cursor_block] = j
 								path_multi_mesh.instance_count += 1
 								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-								current_path[cursor_block] = Vector2(j, 0)
+								current_path[cursor_block] = Vector3(j, 0, 1)
 						# Right and Bottom
 						if (current_path_second_to_last_block - current_path_last_block == Vector3(1, 0, 0) or cursor_block - current_path_last_block == Vector3(1, 0, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(0, -1, 0) or cursor_block - current_path_last_block == Vector3(0, -1, 0)):
 							# Hide current_path_last_block
@@ -215,7 +197,7 @@ func _process(delta):
 							corner_multi_mesh.instance_count += 1
 							corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, right_bottom_rotation))
 							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
-							current_path[current_path_last_block] = Vector2(i, 1)
+							current_path[current_path_last_block] = Vector3(i, 1, 2)
 							# Spawn straight path at cursor_block with correct orientation
 							if (cursor_block - current_path_last_block).x == 0:
 								var j = path_multi_mesh.instance_count
@@ -223,14 +205,14 @@ func _process(delta):
 								path_multi_mesh.instance_count += 1
 								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-								current_path[cursor_block] = Vector2(j, 0)
+								current_path[cursor_block] = Vector3(j, 0, 0)
 							else:
 								var j = path_multi_mesh.instance_count
 								paths[cursor_block] = j
 								path_multi_mesh.instance_count += 1
 								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-								current_path[cursor_block] = Vector2(j, 0)
+								current_path[cursor_block] = Vector3(j, 0, 1)
 						# Bottom and Left
 						if (current_path_second_to_last_block - current_path_last_block == Vector3(0, -1, 0) or cursor_block - current_path_last_block == Vector3(0, -1, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(-1, 0, 0) or cursor_block - current_path_last_block == Vector3(-1, 0, 0)):
 							# Hide current_path_last_block
@@ -242,7 +224,7 @@ func _process(delta):
 							corner_multi_mesh.instance_count += 1
 							corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, bottom_left_rotation))
 							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
-							current_path[current_path_last_block] = Vector2(i, 1)
+							current_path[current_path_last_block] = Vector3(i, 1, 3)
 							# Spawn straight path at cursor_block with correct orientation
 							if (cursor_block - current_path_last_block).x == 0:
 								var j = path_multi_mesh.instance_count
@@ -250,14 +232,14 @@ func _process(delta):
 								path_multi_mesh.instance_count += 1
 								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-								current_path[cursor_block] = Vector2(j, 0)
+								current_path[cursor_block] = Vector3(j, 0, 0)
 							else:
 								var j = path_multi_mesh.instance_count
 								paths[cursor_block] = j
 								path_multi_mesh.instance_count += 1
 								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-								current_path[cursor_block] = Vector2(j, 0)
+								current_path[cursor_block] = Vector3(j, 0, 1)
 					# Normal path creation case
 					else:
 						if (cursor_block - current_path_last_block).x == 0:
@@ -266,14 +248,16 @@ func _process(delta):
 							path_multi_mesh.instance_count += 1
 							path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 							path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-							current_path[cursor_block] = Vector2(j, 0)
+							current_path[cursor_block] = Vector3(j, 0, 0)
 						else:
 							var j = path_multi_mesh.instance_count
 							paths[cursor_block] = j 
 							path_multi_mesh.instance_count += 1
 							path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 							path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-							current_path[cursor_block] = Vector2(j, 0)
+							current_path[cursor_block] = Vector3(j, 0, 1)
+					current_path_second_to_last_block = current_path_last_block
+					current_path_last_block = cursor_block
 		# Room queued ghost
 		elif rooms_queued and valid_block():
 			delete_path_ghost()
@@ -428,9 +412,20 @@ func dragging_clean_up():
 	dragging_room_ghost = null
 	dragging = false
 
+# Cleans up drawing pane and hides it, hiding all elements and terminating all pathing, dragging, or ghosts
+func cancel_everything():
+	self.hide()
+	resume_stick_movement.emit()
+	node_currently_tracking = null
+	if dragging:
+		dragging_clean_up()
+	elif pathing:
+		pathing_clean_up()
+	else:
+		delete_path_ghost()
+	
 func _on_left_controller_button_pressed(name):
-	if name == "grip_click" and grip_pressed != true:
-		grip_pressed = true
+	if name == "grip_click" and node_currently_tracking != left_controller:
 		self.show()
 		node_currently_tracking = left_controller
 		pause_stick_movement.emit()
@@ -456,8 +451,7 @@ func _on_left_controller_button_pressed(name):
 		on_room_explored()
 
 func _on_right_controller_button_pressed(name):
-	if name == "grip_click" and grip_pressed != true:
-		grip_pressed = true
+	if name == "grip_click" and node_currently_tracking != right_controller:
 		self.show()
 		node_currently_tracking = right_controller
 		pause_stick_movement.emit()
@@ -483,13 +477,9 @@ func _on_right_controller_button_pressed(name):
 		on_room_explored()
 
 
-# TODO: attach signal from left controller
 func _on_left_controller_button_released(name):
-	if name == "grip_click":
-		grip_pressed = false
-		self.hide()
-		resume_stick_movement.emit()
-		node_currently_tracking = null
+	if name == "grip_click" and node_currently_tracking == left_controller:
+		cancel_everything()
 	elif name == "trigger_click":
 		if node_currently_tracking == right_controller:
 			if dragging:
@@ -498,13 +488,9 @@ func _on_left_controller_button_released(name):
 				pathing_clean_up()
 		
 
-# TODO: attach signal from right controller
 func _on_right_controller_button_released(name):
-	if name == "grip_click":
-		grip_pressed = false
-		self.hide()
-		resume_stick_movement.emit()
-		node_currently_tracking = null
+	if name == "grip_click" and node_currently_tracking == right_controller:
+		cancel_everything()
 	elif name == "trigger_click":
 		if node_currently_tracking == left_controller:
 			if dragging:
@@ -516,7 +502,7 @@ func _on_right_controller_button_released(name):
 # TODO: attach signal from left controller
 func _on_left_controller_input_vector_2_changed(name, value):
 	if name == "primary":
-		if grip_pressed == true and node_currently_tracking == left_controller and value.length() > scaling_deadzone:
+		if node_currently_tracking == left_controller and value.length() > scaling_deadzone:
 			input_vector = value
 		else:
 			input_vector = Vector2(0, 0)
@@ -524,7 +510,7 @@ func _on_left_controller_input_vector_2_changed(name, value):
 # TODO: attach signal from right controller
 func _on_right_controller_input_vector_2_changed(name, value):
 	if name == "primary":
-		if grip_pressed == true and node_currently_tracking == right_controller and value.length() > scaling_deadzone:
+		if node_currently_tracking == right_controller and value.length() > scaling_deadzone:
 			input_vector = value
 		else:
 			input_vector = Vector2(0, 0)

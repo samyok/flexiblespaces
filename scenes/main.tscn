@@ -34,25 +34,24 @@ size = Vector3(0.2, 0.2, 0.2)
 transparency = 1
 albedo_color = Color(1, 1, 1, 0.196078)
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_x4sjt"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qekfq"]
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_aewtc"]
-material = SubResource("ShaderMaterial_x4sjt")
-size = Vector2(1, 1)
+[sub_resource type="BoxMesh" id="BoxMesh_rnk5p"]
+material = SubResource("StandardMaterial3D_qekfq")
 
 [sub_resource type="MultiMesh" id="MultiMesh_8l6sb"]
 transform_format = 1
-mesh = SubResource("PlaneMesh_aewtc")
+mesh = SubResource("BoxMesh_rnk5p")
 
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_r40be"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xu1te"]
+albedo_color = Color(1, 0.556863, 0.490196, 1)
 
-[sub_resource type="PlaneMesh" id="PlaneMesh_8nhfb"]
-material = SubResource("ShaderMaterial_r40be")
-size = Vector2(1, 1)
+[sub_resource type="BoxMesh" id="BoxMesh_haaqs"]
+material = SubResource("StandardMaterial3D_xu1te")
 
 [sub_resource type="MultiMesh" id="MultiMesh_saubh"]
 transform_format = 1
-mesh = SubResource("PlaneMesh_8nhfb")
+mesh = SubResource("BoxMesh_haaqs")
 
 [sub_resource type="SphereMesh" id="SphereMesh_td3q0"]
 radius = 0.3
@@ -73,7 +72,6 @@ albedo_color = Color(1, 1, 1, 0.196078)
 size = Vector2(10, 10)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_r55n5"]
-transparency = 1
 albedo_color = Color(0.65098, 0.678431, 0.529412, 0.117647)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_osj4q"]
@@ -227,12 +225,10 @@ transform = Transform3D(0.05, 0, 0, 0, 0.0392875, -0.0309273, 0, 0.0309273, 0.03
 script = ExtResource("8_ct64q")
 
 [node name="Room1" type="MeshInstance3D" parent="Map"]
-visible = false
 mesh = SubResource("BoxMesh_yr38u")
 surface_material_override/0 = SubResource("StandardMaterial3D_stxle")
 
 [node name="GhostRoom1" type="MeshInstance3D" parent="Map"]
-visible = false
 mesh = SubResource("BoxMesh_ku1ag")
 surface_material_override/0 = SubResource("StandardMaterial3D_7o7er")
 
@@ -386,7 +382,13 @@ mesh = SubResource("BoxMesh_qei3g")
 [connection signal="area_exited" from="XRUser" to="GameController" method="_on_xr_user_area_exited"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/LeftController" to="XRUser" method="button_pressed"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/LeftController" to="Map" method="_on_left_controller_button_pressed"]
+[connection signal="button_released" from="XRUser/XROrigin3D/LeftController" to="Map" method="_on_left_controller_button_released"]
 [connection signal="input_vector2_changed" from="XRUser/XROrigin3D/LeftController" to="XRUser" method="process_input"]
+[connection signal="input_vector2_changed" from="XRUser/XROrigin3D/LeftController" to="Map" method="_on_left_controller_input_vector_2_changed"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/RightController" to="XRUser" method="button_pressed"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/RightController" to="Map" method="_on_right_controller_button_pressed"]
+[connection signal="button_released" from="XRUser/XROrigin3D/RightController" to="Map" method="_on_right_controller_button_released"]
 [connection signal="input_vector2_changed" from="XRUser/XROrigin3D/RightController" to="XRUser" method="process_input"]
+[connection signal="input_vector2_changed" from="XRUser/XROrigin3D/RightController" to="Map" method="_on_right_controller_input_vector_2_changed"]
+[connection signal="pause_stick_movement" from="Map" to="XRUser" method="_on_map_pause_stick_movement"]
+[connection signal="resume_stick_movement" from="Map" to="XRUser" method="_on_map_resume_stick_movement"]
