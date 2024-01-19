@@ -41,6 +41,7 @@ material = SubResource("StandardMaterial3D_qekfq")
 
 [sub_resource type="MultiMesh" id="MultiMesh_8l6sb"]
 transform_format = 1
+use_colors = true
 mesh = SubResource("BoxMesh_rnk5p")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xu1te"]
@@ -51,6 +52,7 @@ material = SubResource("StandardMaterial3D_xu1te")
 
 [sub_resource type="MultiMesh" id="MultiMesh_saubh"]
 transform_format = 1
+use_colors = true
 mesh = SubResource("BoxMesh_haaqs")
 
 [sub_resource type="SphereMesh" id="SphereMesh_td3q0"]
@@ -225,10 +227,12 @@ transform = Transform3D(0.05, 0, 0, 0, 0.0392875, -0.0309273, 0, 0.0309273, 0.03
 script = ExtResource("8_ct64q")
 
 [node name="Room1" type="MeshInstance3D" parent="Map"]
+visible = false
 mesh = SubResource("BoxMesh_yr38u")
 surface_material_override/0 = SubResource("StandardMaterial3D_stxle")
 
 [node name="GhostRoom1" type="MeshInstance3D" parent="Map"]
+visible = false
 mesh = SubResource("BoxMesh_ku1ag")
 surface_material_override/0 = SubResource("StandardMaterial3D_7o7er")
 

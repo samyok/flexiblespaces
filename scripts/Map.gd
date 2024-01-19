@@ -261,6 +261,7 @@ func _process(delta):
 		# Room queued ghost
 		elif rooms_queued and valid_block():
 			delete_path_ghost()
+			room_ghost_map[room_queue.front()].show()
 			room_ghost_map[room_queue.front()].position = cursor_block + block_height_offset + grid_offset
 		
 		# Pathing ghost
@@ -305,6 +306,8 @@ func valid_block():
 # Attempts to place a room in the location from the queue
 func place_room():
 	room_queue.front().position = cursor_block + block_height_offset + grid_offset
+	room_queue.front().show()
+	room_ghost_map[room_queue.front()].hide()
 	rooms[cursor_block] = room_queue.pop_front()
 	if room_queue.is_empty():
 		rooms_queued = false
@@ -441,14 +444,13 @@ func _on_left_controller_button_pressed(name):
 				if valid_block and rooms_queued and !dragging and !pathing:
 					place_room()
 				# start drag
-				elif rooms.has(cursor_block) and !dragging and !pathing:
+				elif rooms.has(cursor_block) and !dragging and !pathing and !rooms_queued:
 					start_drag()
 				# start path
-				elif temp_path_ghost != null:
+				elif temp_path_ghost != null and !rooms_queued:
 					start_path()
 	elif name == "ax_button" or name == "by_button":
-		print(str("left", name))
-		on_room_explored()
+		on_room_explored(null)
 
 func _on_right_controller_button_pressed(name):
 	if name == "grip_click" and node_currently_tracking != right_controller:
@@ -467,14 +469,13 @@ func _on_right_controller_button_pressed(name):
 				if valid_block and rooms_queued and !dragging and !pathing:
 					place_room()
 				# start drag
-				elif rooms.has(cursor_block) and !dragging and !pathing:
+				elif rooms.has(cursor_block) and !dragging and !pathing and !rooms_queued:
 					start_drag()
 				# start path
-				elif temp_path_ghost != null:
+				elif temp_path_ghost != null and !rooms_queued:
 					start_path()
 	elif name == "ax_button" or name == "by_button":
-		print(str("right", name))
-		on_room_explored()
+		on_room_explored(null)
 
 
 func _on_left_controller_button_released(name):
@@ -516,7 +517,7 @@ func _on_right_controller_input_vector_2_changed(name, value):
 			input_vector = Vector2(0, 0)
 
 # TODO: attach signal from somewhere
-func on_room_explored():
+func on_room_explored(Room):
 	if room_index != rooms_total:
 		rooms_queued = true
 		room_queue.push_back(room_list[room_index])
