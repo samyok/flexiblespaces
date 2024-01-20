@@ -1,4 +1,4 @@
-[gd_scene load_steps=52 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=57 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/GameController.gd" id="2_42an5"]
@@ -15,6 +15,7 @@
 [ext_resource type="Texture2D" uid="uid://b04vuqvmxt8lj" path="res://textures/stone_bricks-export-export.png" id="9_77kk3"]
 [ext_resource type="Texture2D" uid="uid://dl5lbdrn64u5w" path="res://textures/path.png" id="9_231wj"]
 [ext_resource type="Texture2D" uid="uid://da1iaow2md2o2" path="res://textures/corner.png" id="10_x8c70"]
+[ext_resource type="Texture2D" uid="uid://bbhvn0vijyuku" path="res://textures/structure3.png" id="12_cji01"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_blgdw"]
 albedo_texture = ExtResource("3_na154")
@@ -183,6 +184,20 @@ uv1_scale = Vector3(10, 10, 10)
 material = SubResource("StandardMaterial3D_ts01c")
 size = Vector3(1, 3, 1)
 
+[sub_resource type="PlaneMesh" id="PlaneMesh_in6q0"]
+flip_faces = true
+size = Vector2(10, 10)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kwgxo"]
+albedo_texture = ExtResource("12_cji01")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m6sai"]
+albedo_texture = ExtResource("9_77kk3")
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_6nwyr"]
+material = SubResource("StandardMaterial3D_m6sai")
+size = Vector2(1, 1)
+
 [node name="Main" type="Node3D"]
 script = ExtResource("1_xecma")
 
@@ -248,7 +263,55 @@ script = ExtResource("8_ct64q")
 visible = false
 mesh = SubResource("BoxMesh_yr38u")
 
+[node name="Room2" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_yr38u")
+
+[node name="Room3" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_yr38u")
+
+[node name="Room4" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_yr38u")
+
+[node name="Room5" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_yr38u")
+
+[node name="Room6" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_yr38u")
+
+[node name="Room7" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_yr38u")
+
 [node name="GhostRoom1" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_ku1ag")
+
+[node name="GhostRoom2" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_ku1ag")
+
+[node name="GhostRoom3" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_ku1ag")
+
+[node name="GhostRoom4" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_ku1ag")
+
+[node name="GhostRoom5" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_ku1ag")
+
+[node name="GhostRoom6" type="MeshInstance3D" parent="Map"]
+visible = false
+mesh = SubResource("BoxMesh_ku1ag")
+
+[node name="GhostRoom7" type="MeshInstance3D" parent="Map"]
 visible = false
 mesh = SubResource("BoxMesh_ku1ag")
 
@@ -398,6 +461,48 @@ shape = SubResource("BoxShape3D_pv6da")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.1, 0, 1.495, 0)
 mesh = SubResource("BoxMesh_qei3g")
 
+[node name="Overlay" type="Node3D" parent="."]
+unique_name_in_owner = true
+transform = Transform3D(0.05, 0, 0, 0, 0.0500001, 0, 0, 0, 0.0500001, 0, 0, 0)
+visible = false
+
+[node name="Overlay_Mesh" type="MeshInstance3D" parent="Overlay"]
+transform = Transform3D(1, 0, 3.82137e-15, 3.82137e-15, 4.37114e-08, -1, 0, 1, 4.37114e-08, 0, 5, 0)
+mesh = SubResource("PlaneMesh_in6q0")
+skeleton = NodePath("../../Map")
+surface_material_override/0 = SubResource("StandardMaterial3D_kwgxo")
+
+[node name="Signs" type="Node3D" parent="."]
+visible = false
+
+[node name="Sign1" type="MeshInstance3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("PlaneMesh_6nwyr")
+
+[node name="Sign2" type="MeshInstance3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("PlaneMesh_6nwyr")
+
+[node name="Sign3" type="MeshInstance3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("PlaneMesh_6nwyr")
+
+[node name="Sign4" type="MeshInstance3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("PlaneMesh_6nwyr")
+
+[node name="Sign5" type="MeshInstance3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("PlaneMesh_6nwyr")
+
+[node name="Sign6" type="MeshInstance3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("PlaneMesh_6nwyr")
+
+[node name="Sign7" type="MeshInstance3D" parent="Signs"]
+transform = Transform3D(1, 0, 0, 0, -4.37114e-08, -1, 0, 1, -4.37114e-08, 0, 0, 0)
+mesh = SubResource("PlaneMesh_6nwyr")
+
 [connection signal="area_entered" from="XRUser" to="GameController" method="_on_xr_user_area_entered"]
 [connection signal="area_exited" from="XRUser" to="GameController" method="_on_xr_user_area_exited"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/LeftController" to="XRUser" method="button_pressed"]
@@ -410,5 +515,3 @@ mesh = SubResource("BoxMesh_qei3g")
 [connection signal="button_released" from="XRUser/XROrigin3D/RightController" to="Map" method="_on_right_controller_button_released"]
 [connection signal="input_vector2_changed" from="XRUser/XROrigin3D/RightController" to="XRUser" method="process_input"]
 [connection signal="input_vector2_changed" from="XRUser/XROrigin3D/RightController" to="Map" method="_on_right_controller_input_vector_2_changed"]
-[connection signal="pause_stick_movement" from="Map" to="XRUser" method="_on_map_pause_stick_movement"]
-[connection signal="resume_stick_movement" from="Map" to="XRUser" method="_on_map_resume_stick_movement"]
