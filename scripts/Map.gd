@@ -4,7 +4,6 @@ var node_currently_tracking = null # updates the position and rotation of the Ma
 var camera
 var left_controller
 var right_controller
-var last_cursor_position = Vector3(0.0, 0.0, 0.0)
 var input_vector = Vector2(0.0, 0.0)
 var scaling_deadzone = .2
 var scaling_speed = 0.005
@@ -19,7 +18,6 @@ var paths = {} # Path array (Vector2 -> instance id)
 var corners = {} # Path corner array (Vector2 -> instance id)
 var dragging_room # null or the room being currently dragged
 var dragging_room_ghost # null or the ghost of the room being currently dragged
-var dragging_room_old_position
 var dragging_float_height = Vector3(0, 0, -1.0)
 var current_path_origin
 var current_path_last_block
@@ -27,7 +25,7 @@ var current_path_second_to_last_block
 var double_click_timer = 0
 var double_click_timing = false
 var double_click_start_block
-var double_click_window = 1 # Maximum time (in seconds) between first and second click when double clicking
+var double_click_window = .4 # Maximum time (in seconds) between first and second click when double clicking
 var room_queue = []
 var rooms_queued = false
 var room_index = 0
@@ -53,7 +51,7 @@ var room_list
 var room_ghost_map # Dictionary of Room -> Room
 var dragging = false
 var pathing = false
-var rooms_total = 1 # Change when adding rooms
+var rooms_total = 7 # Change when adding rooms
 var paths_z_fighting_offset = Vector3(0, 0, -.01)
 var corners_z_fighting_offset = Vector3(0, 0, -0.02)
 var path_instance_count = 0
@@ -66,11 +64,8 @@ var test35
 var test4
 var test45
 
-
-
 signal pause_stick_movement # TODO: link to locomotion.gd
 signal resume_stick_movement # TODO: link to locomotion.gd
-
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -83,8 +78,6 @@ func _ready():
 	laser = find_child("Laser")
 	room_list = [find_child("Room1")]#, find_child(""), find_child(""), find_child(""), find_child(""), find_child(""), find_child(""), find_child(""), find_child("")] # TODO: instanciate
 	room_ghost_map = {room_list[0]: find_child("GhostRoom1")}#, } # TODO: instanciate
-	
-
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -312,6 +305,7 @@ func _process(delta):
 							path_instance_count += 1
 							path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 							path_multi_mesh.set_instance_color(j, ghost_mesh_color)
+					i += 1
 
 func is_adjacent(vec3_1, vec3_2):
 	for x in [Vector3.UP, Vector3.DOWN, Vector3.LEFT, Vector3.RIGHT]:
@@ -355,14 +349,14 @@ func pathing_clean_up():
 	pathing = false
 	var valid_path = false
 	var end_room
-	if current_path.get(cursor_block).z == 0:
+	if current_path.get(cursor_block) != null and current_path.get(cursor_block).z == 0:
 		if rooms.has(cursor_block + Vector3.UP):
 			valid_path = true
 			end_room = rooms.get(cursor_block + Vector3.UP)
 		elif rooms.has(cursor_block + Vector3.DOWN):
 			valid_path = true
 			end_room = rooms.get(cursor_block + Vector3.DOWN)
-	else:
+	elif current_path.get(cursor_block) != null:
 		if rooms.has(cursor_block + Vector3.LEFT):
 			valid_path = true
 			end_room = rooms.get(cursor_block + Vector3.LEFT)
@@ -465,15 +459,14 @@ func delete_path_ghost():
 func start_drag():
 	dragging = true
 	dragging_room = rooms.get(cursor_block)
+	rooms.erase(cursor_block)
 	dragging_room_ghost = room_ghost_map[dragging_room]
-	dragging_room_old_position = cursor_block
 	for i in path_accums.size():
 		if path_starts[i] == dragging_room or path_ends[1] == dragging_room:
 			delete_selection(path_accums[i].keys().front())
 
 # Cleans up room dragging
 func dragging_clean_up():
-	rooms.erase(dragging_room_old_position)
 	if valid_block:
 		dragging_room.position = dragging_room_ghost.position
 		rooms[cursor_block] = dragging_room

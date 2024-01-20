@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=52 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/GameController.gd" id="2_42an5"]
@@ -12,6 +12,7 @@
 [ext_resource type="Script" path="res://scripts/Path.gd" id="7_ctd0p"]
 [ext_resource type="Script" path="res://scripts/Map.gd" id="8_ct64q"]
 [ext_resource type="Texture2D" uid="uid://cle2sjkres0xo" path="res://textures/netherportal_crop.png" id="9_30ele"]
+[ext_resource type="Texture2D" uid="uid://b04vuqvmxt8lj" path="res://textures/stone_bricks-export-export.png" id="9_77kk3"]
 [ext_resource type="Texture2D" uid="uid://dl5lbdrn64u5w" path="res://textures/path.png" id="9_231wj"]
 [ext_resource type="Texture2D" uid="uid://da1iaow2md2o2" path="res://textures/corner.png" id="10_x8c70"]
 
@@ -26,15 +27,19 @@ size = Vector3(1, 3, 1)
 [sub_resource type="BoxShape3D" id="BoxShape3D_nj0ms"]
 size = Vector3(0.2, 0.2, 0.2)
 
-[sub_resource type="BoxMesh" id="BoxMesh_yr38u"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_epsi7"]
+albedo_texture = ExtResource("9_77kk3")
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_stxle"]
+[sub_resource type="BoxMesh" id="BoxMesh_yr38u"]
+material = SubResource("StandardMaterial3D_epsi7")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mff8t"]
+transparency = 1
+albedo_color = Color(1, 1, 1, 0.392157)
+albedo_texture = ExtResource("9_77kk3")
 
 [sub_resource type="BoxMesh" id="BoxMesh_ku1ag"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7o7er"]
-transparency = 1
-albedo_color = Color(1, 1, 1, 0.196078)
+material = SubResource("StandardMaterial3D_mff8t")
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dyux6"]
 albedo_texture = ExtResource("9_231wj")
@@ -242,12 +247,10 @@ script = ExtResource("8_ct64q")
 [node name="Room1" type="MeshInstance3D" parent="Map"]
 visible = false
 mesh = SubResource("BoxMesh_yr38u")
-surface_material_override/0 = SubResource("StandardMaterial3D_stxle")
 
 [node name="GhostRoom1" type="MeshInstance3D" parent="Map"]
 visible = false
 mesh = SubResource("BoxMesh_ku1ag")
-surface_material_override/0 = SubResource("StandardMaterial3D_7o7er")
 
 [node name="Paths" type="MultiMeshInstance3D" parent="Map"]
 multimesh = SubResource("MultiMesh_8l6sb")
