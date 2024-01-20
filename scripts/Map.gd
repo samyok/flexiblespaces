@@ -19,6 +19,7 @@ var paths = {} # Path array (Vector2 -> instance id)
 var corners = {} # Path corner array (Vector2 -> instance id)
 var dragging_room # null or the room being currently dragged
 var dragging_room_ghost # null or the ghost of the room being currently dragged
+var dragging_room_old_position
 var dragging_float_height = Vector3(0, 0, -1.0)
 var current_path_origin
 var current_path_last_block
@@ -26,7 +27,7 @@ var current_path_second_to_last_block
 var double_click_timer = 0
 var double_click_timing = false
 var double_click_start_block
-var double_click_window = .4 # Maximum time (in seconds) between first and second click when double clicking
+var double_click_window = 1 # Maximum time (in seconds) between first and second click when double clicking
 var room_queue = []
 var rooms_queued = false
 var room_index = 0
@@ -37,19 +38,26 @@ var right_bottom_rotation = PI # 180 degree rotation
 var bottom_left_rotation = PI/2 # left 90 degrees 
 var vertical_rotation = 0 # default
 var horizontal_rotation = PI/2
-var delete_mesh_color = Color(0, 0, 0, 0)
+var delete_mesh_scale = Vector3.ZERO
 var ghost_mesh_color = Color(1, 1, 1, .4)
 var grid_offset = Vector3(-0.5, -0.5, 0.0)
 var current_path = {} # Dictionary of Vector3 -> Vector3 (value x is key into mesh, y is 0 for paths and 1 for corners, z is the rotation of the path/corner: 0 for vertical, 1 for horizontal and 0 for left&top, 1 for top&right, 2 for right&bottom, and 3 for bottom&left)
+var current_path_start_room # Null or the Room that the current path started from
 var temp_path_ghost # block location of currently rendered path ghost (null if not rendering path ghost)
 var temp_path_ghost_i
+var temp_path_ghost_r
 var path_accums = [] # List of Dictionaries of Paths (Path dictionaries are Vector3 -> Vector2)
+var path_starts = [] # List of Room nodes that start the paths in path_accums
+var path_ends = [] # List of Room nodes that end the paths in path_accums
 var room_list
 var room_ghost_map # Dictionary of Room -> Room
 var dragging = false
 var pathing = false
 var rooms_total = 1 # Change when adding rooms
-var paths_z_fighting_offset
+var paths_z_fighting_offset = Vector3(0, 0, -.01)
+var corners_z_fighting_offset = Vector3(0, 0, -0.02)
+var path_instance_count = 0
+var corner_instance_count = 0
 var laser
 var test1
 var test2
@@ -117,7 +125,7 @@ func _process(delta):
 		# Dragging
 		if dragging:
 			delete_path_ghost()
-			dragging_room.global_position = cursor.global_position + dragging_float_height
+			dragging_room.position = cursor.position + dragging_float_height
 			#Dragging Ghost
 			dragging_room_ghost.position = cursor_block + block_height_offset + grid_offset
 			if valid_block():
@@ -131,129 +139,137 @@ func _process(delta):
 			if current_path_last_block != cursor_block:
 				if valid_block() and is_adjacent(current_path_last_block, cursor_block):
 					# Corner revision case
-					if (current_path_last_block - current_path_second_to_last_block) + current_path_last_block == cursor_block:
+					if (current_path_last_block - current_path_second_to_last_block) + current_path_last_block != cursor_block:
+						print("revising a corner")
+						print(str("second2last: ", current_path_second_to_last_block))
+						print(str("last: ", current_path_last_block))
+						print(str("current: ", cursor_block))
 						# Left and Top
 						if (current_path_second_to_last_block - current_path_last_block == Vector3(-1, 0, 0) or cursor_block - current_path_last_block == Vector3(-1, 0, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(0, 1, 0) or cursor_block - current_path_last_block == Vector3(0, 1, 0)):
+							print("left and top")
 							# Hide current_path_last_block
-							path_multi_mesh.set_instance_color(paths.get(current_path_last_block), delete_mesh_color)
+							path_multi_mesh.set_instance_transform(paths.get(current_path_last_block), Transform3D().scaled(delete_mesh_scale))
 							paths.erase(current_path_last_block)
 							# Spawn current_path_last_block as a corner with correct orientation
-							var i = corner_multi_mesh.instance_count
+							var i = corner_instance_count
 							corners[current_path_last_block] = i
-							corner_multi_mesh.instance_count += 1
-							corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, left_top_rotation))
+							corner_instance_count += 1
+							corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, left_top_rotation))
 							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
 							current_path[current_path_last_block] = Vector3(i, 1, 0)
 							# Spawn straight path at cursor_block with correct orientation
 							if (cursor_block - current_path_last_block).x == 0:
-								var j = path_multi_mesh.instance_count
+								var j = path_instance_count
 								paths[cursor_block] = j 
-								path_multi_mesh.instance_count += 1
-								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+								path_instance_count += 1
+								path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 								current_path[cursor_block] = Vector3(j, 0, 0)
 							else:
-								var j = path_multi_mesh.instance_count
+								var j = path_instance_count
 								paths[cursor_block] = j 
-								path_multi_mesh.instance_count += 1
-								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+								path_instance_count += 1
+								path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 								current_path[cursor_block] = Vector3(j, 0, 1)
 						# Top and Right
 						if (current_path_second_to_last_block - current_path_last_block == Vector3(0, 1, 0) or cursor_block - current_path_last_block == Vector3(0, 1, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(1, 0, 0) or cursor_block - current_path_last_block == Vector3(1, 0, 0)):
+							print("top and right")
 							# Hide current_path_last_block
-							path_multi_mesh.set_instance_color(paths.get(current_path_last_block), delete_mesh_color)
+							path_multi_mesh.set_instance_transform(paths.get(current_path_last_block), Transform3D().scaled(delete_mesh_scale))
 							paths.erase(current_path_last_block)
 							# Spawn current_path_last_block as a corner with correct orientation
-							var i = corner_multi_mesh.instance_count
+							var i = corner_instance_count
 							corners[current_path_last_block] = i
-							corner_multi_mesh.instance_count += 1
-							corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, top_right_rotation))
+							corner_instance_count += 1
+							corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, top_right_rotation))
 							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
 							current_path[current_path_last_block] = Vector3(i, 1, 1)
 							# Spawn straight path at cursor_block with correct orientation
 							if (cursor_block - current_path_last_block).x == 0:
-								var j = path_multi_mesh.instance_count
+								var j = path_instance_count
 								paths[cursor_block] = j
-								path_multi_mesh.instance_count += 1
-								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+								path_instance_count += 1
+								path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 								current_path[cursor_block] = Vector3(j, 0, 0)
 							else:
-								var j = path_multi_mesh.instance_count
+								var j = path_instance_count
 								paths[cursor_block] = j
-								path_multi_mesh.instance_count += 1
-								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+								path_instance_count += 1
+								path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 								current_path[cursor_block] = Vector3(j, 0, 1)
 						# Right and Bottom
 						if (current_path_second_to_last_block - current_path_last_block == Vector3(1, 0, 0) or cursor_block - current_path_last_block == Vector3(1, 0, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(0, -1, 0) or cursor_block - current_path_last_block == Vector3(0, -1, 0)):
+							print("right and bottom")
 							# Hide current_path_last_block
-							path_multi_mesh.set_instance_color(paths.get(current_path_last_block), delete_mesh_color)
+							path_multi_mesh.set_instance_transform(paths.get(current_path_last_block), Transform3D().scaled(delete_mesh_scale))
 							paths.erase(current_path_last_block)
 							# Spawn current_path_last_block as a corner with correct orientation
-							var i = corner_multi_mesh.instance_count
+							var i = corner_instance_count
 							corners[current_path_last_block] = i
-							corner_multi_mesh.instance_count += 1
-							corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, right_bottom_rotation))
+							corner_instance_count += 1
+							corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, right_bottom_rotation))
 							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
 							current_path[current_path_last_block] = Vector3(i, 1, 2)
 							# Spawn straight path at cursor_block with correct orientation
 							if (cursor_block - current_path_last_block).x == 0:
-								var j = path_multi_mesh.instance_count
+								var j = path_instance_count
 								paths[cursor_block] = j 
-								path_multi_mesh.instance_count += 1
-								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+								path_instance_count += 1
+								path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 								current_path[cursor_block] = Vector3(j, 0, 0)
 							else:
-								var j = path_multi_mesh.instance_count
+								var j = path_instance_count
 								paths[cursor_block] = j
-								path_multi_mesh.instance_count += 1
-								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+								path_instance_count += 1
+								path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 								current_path[cursor_block] = Vector3(j, 0, 1)
 						# Bottom and Left
 						if (current_path_second_to_last_block - current_path_last_block == Vector3(0, -1, 0) or cursor_block - current_path_last_block == Vector3(0, -1, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(-1, 0, 0) or cursor_block - current_path_last_block == Vector3(-1, 0, 0)):
+							print("bottom and left")
 							# Hide current_path_last_block
-							path_multi_mesh.set_instance_color(paths.get(current_path_last_block), delete_mesh_color)
+							path_multi_mesh.set_instance_transform(paths.get(current_path_last_block), Transform3D().scaled(delete_mesh_scale))
 							paths.erase(current_path_last_block)
 							# Spawn current_path_last_block as a corner with correct orientation
-							var i = corner_multi_mesh.instance_count
+							var i = corner_instance_count
 							corners[current_path_last_block] = i
-							corner_multi_mesh.instance_count += 1
-							corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, bottom_left_rotation))
+							corner_instance_count += 1
+							corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, bottom_left_rotation))
 							corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
 							current_path[current_path_last_block] = Vector3(i, 1, 3)
 							# Spawn straight path at cursor_block with correct orientation
 							if (cursor_block - current_path_last_block).x == 0:
-								var j = path_multi_mesh.instance_count
+								var j = path_instance_count
 								paths[cursor_block] = j
-								path_multi_mesh.instance_count += 1
-								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+								path_instance_count += 1
+								path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 								current_path[cursor_block] = Vector3(j, 0, 0)
 							else:
-								var j = path_multi_mesh.instance_count
+								var j = path_instance_count
 								paths[cursor_block] = j
-								path_multi_mesh.instance_count += 1
-								path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+								path_instance_count += 1
+								path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 								current_path[cursor_block] = Vector3(j, 0, 1)
 					# Normal path creation case
 					else:
 						if (cursor_block - current_path_last_block).x == 0:
-							var j = path_multi_mesh.instance_count
+							var j = path_instance_count
 							paths[cursor_block] = j 
-							path_multi_mesh.instance_count += 1
-							path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+							path_instance_count += 1
+							path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 							path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 							current_path[cursor_block] = Vector3(j, 0, 0)
 						else:
-							var j = path_multi_mesh.instance_count
+							var j = path_instance_count
 							paths[cursor_block] = j 
-							path_multi_mesh.instance_count += 1
-							path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+							path_instance_count += 1
+							path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 							path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 							current_path[cursor_block] = Vector3(j, 0, 1)
 					current_path_second_to_last_block = current_path_last_block
@@ -271,6 +287,8 @@ func _process(delta):
 				delete_path_ghost()
 			else:
 				skip = true
+			if not valid_block():
+				skip = true
 			if not skip:
 				var adjacencies = [cursor_block + Vector3.UP, cursor_block + Vector3.DOWN, cursor_block + Vector3.LEFT, cursor_block + Vector3.RIGHT]
 				var i = 0
@@ -279,18 +297,20 @@ func _process(delta):
 					if rooms.has(x):
 						spotted = true
 						if i < 2:
-							var j = path_multi_mesh.instance_count
+							var j = path_instance_count
 							temp_path_ghost_i = j
 							temp_path_ghost = cursor_block
-							path_multi_mesh.instance_count += 1
-							path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+							temp_path_ghost_r = 0
+							path_instance_count += 1
+							path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
 							path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 						else:
-							var j = path_multi_mesh.instance_count
+							var j = path_instance_count
 							temp_path_ghost_i = j
 							temp_path_ghost = cursor_block
-							path_multi_mesh.instance_count += 1
-							path_multi_mesh.set_instance_transform(j, self.transform.translated_local(cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+							temp_path_ghost_r = 1
+							path_instance_count += 1
+							path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
 							path_multi_mesh.set_instance_color(j, ghost_mesh_color)
 
 func is_adjacent(vec3_1, vec3_2):
@@ -305,6 +325,7 @@ func valid_block():
 
 # Attempts to place a room in the location from the queue
 func place_room():
+	print(str("placing: ", cursor_block))
 	room_queue.front().position = cursor_block + block_height_offset + grid_offset
 	room_queue.front().show()
 	room_ghost_map[room_queue.front()].hide()
@@ -322,13 +343,32 @@ func start_path():
 	for x in [cursor_block + Vector3.UP, cursor_block + Vector3.DOWN, cursor_block + Vector3.LEFT, cursor_block + Vector3.RIGHT]:
 		if rooms.has(x):
 			current_path_second_to_last_block = x
+			current_path_start_room = rooms.get(x)
 	# Co-opt ghost path into current path
+	temp_path_ghost = null
 	paths[cursor_block] = temp_path_ghost_i
+	current_path[cursor_block] = Vector3(temp_path_ghost_i, 0, temp_path_ghost_r)
 
 # Cleans up pathing
 func pathing_clean_up():
 	double_click_timing = false
 	pathing = false
+	var valid_path = false
+	var end_room
+	if current_path.get(cursor_block).z == 0:
+		if rooms.has(cursor_block + Vector3.UP):
+			valid_path = true
+			end_room = rooms.get(cursor_block + Vector3.UP)
+		elif rooms.has(cursor_block + Vector3.DOWN):
+			valid_path = true
+			end_room = rooms.get(cursor_block + Vector3.DOWN)
+	else:
+		if rooms.has(cursor_block + Vector3.LEFT):
+			valid_path = true
+			end_room = rooms.get(cursor_block + Vector3.LEFT)
+		elif rooms.has(cursor_block + Vector3.RIGHT):
+			valid_path = true
+			end_room = rooms.get(cursor_block + Vector3.RIGHT)
 	# Replicate dictionary with new multimesh indices of non-ghosted paths and corners
 	var path_accum = {}
 	for k in current_path.keys():
@@ -336,79 +376,109 @@ func pathing_clean_up():
 		var i = v.x
 		var p = v.y
 		var r = v.z
-		# Path replication
+		print("deleting path at: ", i)
+		# Path handling
 		if p == 0:
 			# Delete ghost path
-			path_multi_mesh.set_instance_color(i, delete_mesh_color)
-			# Spawn opaque path in its place
-			i = path_multi_mesh.instance_count
-			path_multi_mesh.instance_count += 1
-			# Vertical path creation
-			if r == 0:
-				path_multi_mesh.set_instance_transform(i, self.transform.translated_local(k + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
-			# Horizontal path creation
+			path_multi_mesh.set_instance_transform(i, Transform3D().scaled(delete_mesh_scale))
+			if valid_path:
+				# Spawn opaque path in its place
+				i = path_instance_count
+				print("spawning path with i: ", i)
+				path_instance_count += 1
+				# Vertical path creation
+				if r == 0:
+					path_multi_mesh.set_instance_transform(i, Transform3D().translated_local(paths_z_fighting_offset + k + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+				# Horizontal path creation
+				else:
+					path_multi_mesh.set_instance_transform(i, Transform3D().translated_local(paths_z_fighting_offset + k + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+				paths[k] = i
 			else:
-				path_multi_mesh.set_instance_transform(i, self.transform.translated_local(k + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+				paths.erase(k)
 		# Corner replication
 		else:
 			# Delete ghost corner
-			corner_multi_mesh.set_instance_color(i, delete_mesh_color)
-			# Spawn opaque corner in its place
-			i = corner_multi_mesh.instance_count
-			corner_multi_mesh.instance_count += 1
-			# Left Top corner creation
-			if r == 0:
-				corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(k + grid_offset).rotated_local(Vector3.FORWARD, left_top_rotation))
-			# Top Right corner creation
-			elif r == 1:
-				corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(k + grid_offset).rotated_local(Vector3.FORWARD, top_right_rotation))
-			# Right Bottom corner creation
-			elif r == 2:
-				corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(k + grid_offset).rotated_local(Vector3.FORWARD, right_bottom_rotation))
-			# Bottom Left corner creation
+			corner_multi_mesh.set_instance_transform(i, Transform3D().scaled(delete_mesh_scale))
+			if valid_path:
+				# Spawn opaque corner in its place
+				i = corner_instance_count
+				print("spawning corner with i: ", i)
+				corner_instance_count += 1
+				# Left Top corner creation
+				if r == 0:
+					corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + k + grid_offset).rotated_local(Vector3.FORWARD, left_top_rotation))
+				# Top Right corner creation
+				elif r == 1:
+					corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + k + grid_offset).rotated_local(Vector3.FORWARD, top_right_rotation))
+				# Right Bottom corner creation
+				elif r == 2:
+					corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + k + grid_offset).rotated_local(Vector3.FORWARD, right_bottom_rotation))
+				# Bottom Left corner creation
+				else:
+					corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + k + grid_offset).rotated_local(Vector3.FORWARD, bottom_left_rotation))
+				corners[k] = i
 			else:
-				corner_multi_mesh.set_instance_transform(i, self.transform.translated_local(k + grid_offset).rotated_local(Vector3.FORWARD, bottom_left_rotation))
-
-		path_accum[k] = Vector2(i, p)
-	path_accums.push_front(current_path)
+				corners.erase(k)
+		if valid_path:
+			path_accum[k] = Vector2(i, p)
+			
+			print("recording path component with i: ", i)
+	if valid_path:
+		path_accums.push_front(path_accum)
+		path_starts.push_front(current_path_start_room)
+		path_ends.push_front(end_room)
 	current_path = {}
+	current_path_start_room = null
 
 # Deletes a completed path
-func delete_selection():
+func delete_selection(target):
 	# Loop through all path dictionaries
+	var i = 0
 	for d in path_accums:
 		# Find the path dictionary that has the currently hovered block
-		if d.has(cursor_block):
+		if d.has(target):
+			path_starts.erase(path_starts[i])
+			path_ends.erase(path_ends[i])
 			# Loop through its entries
 			for k in d.keys():
 				var v = d.get(k)
 				# Path deletion
 				if v.y == 0:
 					paths.erase(k)
-					path_multi_mesh.set_instance_color(v.x, delete_mesh_color)
+					path_multi_mesh.set_instance_transform(v.x, Transform3D().scaled(delete_mesh_scale))
 				# Corner deletion
 				else:
 					corners.erase(k)
-					corner_multi_mesh.set_instance_color(v.x, delete_mesh_color)
+					corner_multi_mesh.set_instance_transform(v.x, Transform3D().scaled(delete_mesh_scale))
+			# Erase it from the list of paths that exist
+			path_accums.erase(d)
+		i += 1
+	
 
 # Unrenders path ghost if it is being rendered
 func delete_path_ghost():
 	if temp_path_ghost != null:
-		path_multi_mesh.set_instance_color(temp_path_ghost_i, delete_mesh_color)
+		path_multi_mesh.set_instance_transform(temp_path_ghost_i, Transform3D().scaled(delete_mesh_scale))
 		temp_path_ghost = null
-		temp_path_ghost_i = null
 
 # Attempts to start dragging the current block
 func start_drag():
 	dragging = true
 	dragging_room = rooms.get(cursor_block)
 	dragging_room_ghost = room_ghost_map[dragging_room]
+	dragging_room_old_position = cursor_block
+	for i in path_accums.size():
+		if path_starts[i] == dragging_room or path_ends[1] == dragging_room:
+			delete_selection(path_accums[i].keys().front())
 
 # Cleans up room dragging
 func dragging_clean_up():
+	rooms.erase(dragging_room_old_position)
 	if valid_block:
 		dragging_room.position = dragging_room_ghost.position
+		rooms[cursor_block] = dragging_room
 	else:
+		dragging_room.hide()
 		room_queue.push_front(dragging_room)
 	dragging_room = null
 	dragging_room_ghost.hide()
@@ -435,7 +505,7 @@ func _on_left_controller_button_pressed(name):
 	elif name == "trigger_click":
 		if node_currently_tracking == right_controller:
 			if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block) ):
-				delete_selection()
+				delete_selection(cursor_block)
 			else:
 				double_click_timer = 0.0
 				double_click_timing = true
@@ -459,8 +529,9 @@ func _on_right_controller_button_pressed(name):
 		pause_stick_movement.emit()
 	elif name == "trigger_click":
 		if node_currently_tracking == left_controller:
-			if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block) ):
-				delete_selection()
+			if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block)):
+				print("double_clicked")
+				delete_selection(cursor_block)
 			else:
 				double_click_timer = 0.0
 				double_click_timing = true

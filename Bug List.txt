@@ -1,1 +1,4 @@
-Make Multimeshes work
+
+
+features to add:
+ - corner replacemetn for when pathing ends next to a block but the last path isn't facing it
