@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://ccat1q03tybd7"]
+
+[ext_resource type="Texture2D" uid="uid://hhhl0nkxjnxk" path="res://textures/cobblestone1-export-export.png" id="1_7kqya"]
+
+[resource]
+cull_mode = 2
+albedo_texture = ExtResource("1_7kqya")
+uv1_scale = Vector3(1, 6, 1)

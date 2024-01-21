@@ -43,14 +43,6 @@ func _ready():
 func _process(delta):
 	pass
 
-func shuffle_array(array):
-	for i in array.size():
-		for j in array.size():
-			if i != j:
-				var k = array[i]
-				array[i] = array[j]
-				array[j] = k
-
 func change_context(door):
 	# If currently in a room
 	if current_room > -1:
@@ -66,13 +58,16 @@ func change_context(door):
 				next_door = i
 		doors[last_door].show()
 		doors[next_door].show()
-		entered_hallway.emit(last_room, next_room)
+		entered_hallway.emit(last_door, next_door)
 		current_room = -1
 	# If in a hallway
 	else:
 		# Came back the same way
 		if last_door == door:
 			current_room = last_room
+			swap_room()
+			exited_hallway.emit()
+			self.show()
 		# Went to the other door
 		elif next_door == door:
 			current_room = next_room

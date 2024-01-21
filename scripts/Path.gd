@@ -13,7 +13,7 @@ func draw_path(start_door, end_door):
 		# Rotate
 		self.rotation.y = 0
 		# Right
-		if end_door == 1:
+		if end_door == 3:
 			if rand == 0:
 				current_path = paths[0]
 			elif rand == 1:
@@ -25,7 +25,7 @@ func draw_path(start_door, end_door):
 		# Straight
 		elif end_door == 2:
 			if rand == 0:
-				current_path = paths[4]
+				current_path = paths[8]
 			elif rand == 1:
 				current_path = paths[5]
 			elif rand == 2:
@@ -33,9 +33,9 @@ func draw_path(start_door, end_door):
 			else:
 				current_path = paths[7]
 		# Left
-		else: # end_door == 3
+		else: # end_door == 1
 			if rand == 0:
-				current_path = paths[8]
+				current_path = paths[4]
 			elif rand == 1:
 				current_path = paths[9]
 			elif rand == 2:
@@ -48,7 +48,7 @@ func draw_path(start_door, end_door):
 		# Rotate
 		self.rotation.y = -PI/2
 		# Right
-		if end_door == 2:
+		if end_door == 0:
 			if rand == 0:
 				current_path = paths[0]
 			elif rand == 1:
@@ -60,7 +60,7 @@ func draw_path(start_door, end_door):
 		# Straight
 		elif end_door == 3:
 			if rand == 0:
-				current_path = paths[4]
+				current_path = paths[8]
 			elif rand == 1:
 				current_path = paths[5]
 			elif rand == 2:
@@ -68,9 +68,9 @@ func draw_path(start_door, end_door):
 			else:
 				current_path = paths[7]
 		# Left
-		else: # end_door == 0
+		else: # end_door == 2
 			if rand == 0:
-				current_path = paths[8]
+				current_path = paths[4]
 			elif rand == 1:
 				current_path = paths[9]
 			elif rand == 2:
@@ -83,7 +83,7 @@ func draw_path(start_door, end_door):
 		# Rotate
 		self.rotation.y = PI
 		# Right
-		if end_door == 3:
+		if end_door == 1:
 			if rand == 0:
 				current_path = paths[0]
 			elif rand == 1:
@@ -95,7 +95,7 @@ func draw_path(start_door, end_door):
 		# Straight
 		elif end_door == 0:
 			if rand == 0:
-				current_path = paths[4]
+				current_path = paths[8]
 			elif rand == 1:
 				current_path = paths[5]
 			elif rand == 2:
@@ -103,9 +103,9 @@ func draw_path(start_door, end_door):
 			else:
 				current_path = paths[7]
 		# Left
-		else: # end_door == 1
+		else: # end_door == 3
 			if rand == 0:
-				current_path = paths[8]
+				current_path = paths[4]
 			elif rand == 1:
 				current_path = paths[9]
 			elif rand == 2:
@@ -118,7 +118,7 @@ func draw_path(start_door, end_door):
 		# Rotate
 		self.rotation.y = PI/2
 		# Right
-		if end_door == 0:
+		if end_door == 2:
 			if rand == 0:
 				current_path = paths[0]
 			elif rand == 1:
@@ -130,7 +130,7 @@ func draw_path(start_door, end_door):
 		# Straight
 		elif end_door == 1:
 			if rand == 0:
-				current_path = paths[4]
+				current_path = paths[8]
 			elif rand == 1:
 				current_path = paths[5]
 			elif rand == 2:
@@ -138,9 +138,9 @@ func draw_path(start_door, end_door):
 			else:
 				current_path = paths[7]
 		# Left
-		else: # end_door == 2
+		else: # end_door == 0
 			if rand == 0:
-				current_path = paths[8]
+				current_path = paths[4]
 			elif rand == 1:
 				current_path = paths[9]
 			elif rand == 2:

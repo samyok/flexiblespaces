@@ -2,9 +2,9 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://dxpehp58s560m"
-path.s3tc="res://.godot/imported/cactus_side-export-export.png-c1a4912249d40bb739c7b969c5d2fcda.s3tc.ctex"
-path.etc2="res://.godot/imported/cactus_side-export-export.png-c1a4912249d40bb739c7b969c5d2fcda.etc2.ctex"
+uid="uid://hhhl0nkxjnxk"
+path.s3tc="res://.godot/imported/cobblestone1-export-export.png-00206b9026205ba75bf60f2e848f9160.s3tc.ctex"
+path.etc2="res://.godot/imported/cobblestone1-export-export.png-00206b9026205ba75bf60f2e848f9160.etc2.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc", "etc2_astc"],
 "vram_texture": true
@@ -12,8 +12,8 @@ metadata={
 
 [deps]
 
-source_file="res://textures/cactus_side-export-export.png"
-dest_files=["res://.godot/imported/cactus_side-export-export.png-c1a4912249d40bb739c7b969c5d2fcda.s3tc.ctex", "res://.godot/imported/cactus_side-export-export.png-c1a4912249d40bb739c7b969c5d2fcda.etc2.ctex"]
+source_file="res://textures/cobblestone1-export-export.png"
+dest_files=["res://.godot/imported/cobblestone1-export-export.png-00206b9026205ba75bf60f2e848f9160.s3tc.ctex", "res://.godot/imported/cobblestone1-export-export.png-00206b9026205ba75bf60f2e848f9160.etc2.ctex"]
 
 [params]
 

@@ -1,9 +1,9 @@
 [gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://cdxt5pvmjvh0b"]
 
-[ext_resource type="Texture2D" uid="uid://cle2sjkres0xo" path="res://textures/netherportal_crop.png" id="1_bl6o5"]
+[ext_resource type="Texture2D" uid="uid://dbe3jx5jkihau" path="res://textures/nether_portal-export.png" id="1_8qd0q"]
 
 [resource]
 cull_mode = 2
 albedo_color = Color(0.947905, 0.00073255, 0.947899, 1)
-albedo_texture = ExtResource("1_bl6o5")
-uv1_scale = Vector3(10, 10, 10)
+albedo_texture = ExtResource("1_8qd0q")
+uv1_scale = Vector3(5, 5, 5)

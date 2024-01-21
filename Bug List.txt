@@ -5,3 +5,4 @@ features to add:
  - Tokens
  - Illusion of choice / forced path
  - signs
+ - Add a way to track which doorways have been seen
