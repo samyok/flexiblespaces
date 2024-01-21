@@ -1,22 +1,21 @@
-[gd_scene load_steps=108 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=107 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
-[ext_resource type="Script" path="res://scripts/locomotion.gd" id="2_kvn2k"]
 [ext_resource type="PackedScene" uid="uid://dw2kfbg15qqeu" path="res://controllers/controller_l.fbx" id="3_y2kpf"]
 [ext_resource type="PackedScene" uid="uid://doel0ns5nc6bm" path="res://controllers/controller_r.fbx" id="4_5ti0a"]
 [ext_resource type="Script" path="res://scripts/camera_collision.gd" id="5_dknlb"]
-[ext_resource type="Material" uid="uid://bptyhy4sm170u" path="res://textures/packed_ice.tres" id="7_3gso7"]
+[ext_resource type="Material" path="res://textures/packed_ice.tres" id="7_3gso7"]
 [ext_resource type="Script" path="res://scripts/Path.gd" id="7_ctd0p"]
 [ext_resource type="Script" path="res://scripts/Map.gd" id="8_ct64q"]
-[ext_resource type="BoxMesh" uid="uid://dqvjld24dl1y0" path="res://textures/clay.tres" id="8_x7l15"]
+[ext_resource type="BoxMesh" uid="uid://d07ikf0m43lm7" path="res://textures/clay.tres" id="8_x7l15"]
 [ext_resource type="Texture2D" uid="uid://b04vuqvmxt8lj" path="res://textures/stone_bricks-export-export.png" id="9_77kk3"]
 [ext_resource type="Texture2D" uid="uid://dl5lbdrn64u5w" path="res://textures/path.png" id="9_231wj"]
-[ext_resource type="Material" uid="uid://c4e1wtyess76b" path="res://textures/green_terracotta.tres" id="9_oxv1f"]
-[ext_resource type="BoxMesh" uid="uid://c613ov7q6i77y" path="res://textures/lapis_ore.tres" id="10_11v5s"]
+[ext_resource type="Material" path="res://textures/green_terracotta.tres" id="9_oxv1f"]
+[ext_resource type="BoxMesh" uid="uid://cwodsheyy5fu5" path="res://textures/lapis_ore.tres" id="10_11v5s"]
 [ext_resource type="Texture2D" uid="uid://da1iaow2md2o2" path="res://textures/corner.png" id="10_x8c70"]
 [ext_resource type="Texture2D" uid="uid://bbhvn0vijyuku" path="res://textures/structure3.png" id="12_cji01"]
 [ext_resource type="Material" uid="uid://bqdqmmfyn7trp" path="res://textures/stone_bricks.tres" id="14_842n3"]
-[ext_resource type="Material" uid="uid://183c2s2svdg" path="res://textures/cactus.tres" id="15_66snh"]
+[ext_resource type="Material" path="res://textures/cactus.tres" id="15_66snh"]
 [ext_resource type="Material" uid="uid://cdxt5pvmjvh0b" path="res://textures/portal.tres" id="15_qvas2"]
 [ext_resource type="Script" path="res://scripts/FlexibleRoom.gd" id="16_37bvc"]
 [ext_resource type="Texture2D" uid="uid://bn4v7gvljcl0g" path="res://textures/green_terracotta-export-export.png" id="16_t3fh3"]
@@ -27,8 +26,8 @@
 [ext_resource type="Texture2D" uid="uid://brqlpiwbndiye" path="res://textures/clay-export-export.png" id="20_iwwja"]
 [ext_resource type="Texture2D" uid="uid://dn4nd8umfk1rp" path="res://textures/sand-export-export.png" id="21_yeni2"]
 [ext_resource type="Script" path="res://scenes/EndPrompt.gd" id="25_vrx2i"]
-[ext_resource type="Material" uid="uid://cs4wviig816" path="res://textures/cobblestone.tres" id="27_kcs2v"]
-[ext_resource type="Material" uid="uid://ccat1q03tybd7" path="res://textures/half_cobblestone.tres" id="28_bycep"]
+[ext_resource type="Material" path="res://textures/cobblestone.tres" id="27_kcs2v"]
+[ext_resource type="Material" path="res://textures/half_cobblestone.tres" id="28_bycep"]
 [ext_resource type="Texture2D" uid="uid://hhhl0nkxjnxk" path="res://textures/cobblestone1-export-export.png" id="28_mw5ce"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nj0ms"]
@@ -364,7 +363,6 @@ script = ExtResource("1_xecma")
 
 [node name="XRUser" type="Area3D" parent="."]
 unique_name_in_owner = true
-script = ExtResource("2_kvn2k")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="XRUser"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
@@ -372,7 +370,6 @@ shape = SubResource("BoxShape3D_nj0ms")
 script = ExtResource("5_dknlb")
 
 [node name="XROrigin3D" type="XROrigin3D" parent="XRUser"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 
 [node name="XRCamera3D" type="XRCamera3D" parent="XRUser/XROrigin3D"]
 unique_name_in_owner = true
@@ -686,6 +683,7 @@ script = ExtResource("25_vrx2i")
 [node name="Sprite2D" type="Sprite2D" parent="Room/Room7/EndPrompt/CanvasLayer/SubViewport"]
 
 [node name="BFSButton" type="Area3D" parent="Room/Room7/EndPrompt"]
+transform = Transform3D(1, 0, 0, 0, 1, -2.98023e-08, 0, 2.98023e-08, 1, 0, 0, 0)
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Room7/EndPrompt/BFSButton"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.125, 0, -0.125)
