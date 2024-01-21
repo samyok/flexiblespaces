@@ -75,9 +75,25 @@ func _physics_process(delta):
 # func process_room(camera):
 # 	# we're currently in a room, check if we're in the portal
 
+# create an adjacency matrix for the rooms
 
+
+func door_code(room1, room2):
+	return room1 + "->" + room2
+
+func create_map():
+	var map = {}
+	for room in State.adj:
+		map[room] = FlexibleRoom.new(get_parent(), coords[room], len(adj[room]))
+		map[room].create_doors()
+		for idx in range(len(adj[room])):
+			const next = adj[room][idx]
+			State.add_door(door_code(room, next), map[room].doors[idx])
+
+		
 # entrypoint for the virtual environment
 func _ready():
+	
 	# create a room at 2, 8 (where the user is initially)
 	State.add_room(FlexibleRoom.new(get_parent(), start_pos))
 
@@ -120,7 +136,8 @@ func create_room():
 	print("-> creating room at ", x, ", ", y)
 
 	var room = FlexibleRoom.new(get_parent(), Vector2(x, y))
-	room.create_most_open_door()
+	# room.create_most_open_door()
+	room.create_doors()
 
 	var points: Array[Vector2] = RightAngledPath.generate_flexible_bfs_points(
 		State.rooms.back(), room
