@@ -28,7 +28,6 @@ var double_click_start_block
 var double_click_window = .4 # Maximum time (in seconds) between first and second click when double clicking
 var room_queue = []
 var rooms_queued = false
-var room_index = 0
 var block_height_offset = Vector3(0, 0, -0.5)
 var left_top_rotation = 0.0 # default
 var top_right_rotation = PI/2 # left 90 degrees
@@ -76,6 +75,8 @@ func _ready():
 	laser = find_child("Laser")
 	room_list = [find_child("Room1"), find_child("Room2"), find_child("Room3"), find_child("Room4"), find_child("Room5"), find_child("Room6"), find_child("Room7")]
 	room_ghost_map = {room_list[0]: find_child("GhostRoom1"), room_list[1]: find_child("GhostRoom2"), room_list[2]: find_child("GhostRoom3"), room_list[3]: find_child("GhostRoom4"), room_list[4]: find_child("GhostRoom5"), room_list[5]: find_child("GhostRoom6"), room_list[6]: find_child("GhostRoom7")} 
+	room_queue.push_front(room_list[0])
+	rooms_queued = true
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -462,7 +463,7 @@ func start_drag():
 	rooms.erase(cursor_block)
 	dragging_room_ghost = room_ghost_map[dragging_room]
 	for i in path_accums.size():
-		if path_starts[i] == dragging_room or path_ends[1] == dragging_room:
+		if path_starts[i] == dragging_room or path_ends[i] == dragging_room:
 			delete_selection(path_accums[i].keys().front())
 
 # Cleans up room dragging
@@ -611,9 +612,6 @@ func _on_right_controller_input_vector_2_changed(name, value):
 		else:
 			input_vector = Vector2(0, 0)
 
-# TODO: attach signal from somewhere and change to use that Room instead of interating through all rooms
-func _on_room_explored(Room):
-	if room_index != rooms_total:
-		rooms_queued = true
-		room_queue.push_back(room_list[room_index])
-		room_index += 1
+func _on_room_explored(room):
+	rooms_queued = true
+	room_queue.push_back(room_list[room])

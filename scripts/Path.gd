@@ -1,16 +1,13 @@
 extends Node3D
 
-const FLEXIBLE_ROOM_SIDE_LENGTH = 10
-const TRACKABLE_AREA_BOUNDS = [Vector2(0, 0), Vector2(10, 10)]  # mins  # maxs
-const ROOM_WIDTH = 4
 var paths
 var current_path
 
 func _ready():
-	paths = [self.find_child("Path1"), self.find_child("Path2"), self.find_child("Path3"), self.find_child("Path4"), self.find_child("Path5"), self.find_child("Path6"), self.find_child("Path7"), self.find_child("Path8"), self.find_child("Path9"), self.find_child("Path10"), self.find_child("Path11"), self.find_child("Path12")]
+	paths = [self.find_child("Path1"), self.find_child("Path5"), self.find_child("Path3"), self.find_child("Path4"), self.find_child("Path2"), self.find_child("Path6"), self.find_child("Path7"), self.find_child("Path8"), self.find_child("Path12"), self.find_child("Path10"), self.find_child("Path11"), self.find_child("Path9")]
 
 func draw_path(start_door, end_door):
-	var rand = randi_range(0, 3)
+	var rand = 0
 	# North
 	if start_door == 0:
 		# Rotate
@@ -45,7 +42,6 @@ func draw_path(start_door, end_door):
 				current_path = paths[10]
 			else:
 				current_path = paths[12]
-		current_path.show()
 
 	# East
 	elif start_door == 1:
@@ -81,7 +77,6 @@ func draw_path(start_door, end_door):
 				current_path = paths[10]
 			else:
 				current_path = paths[12]
-		current_path.show()
 
 	# South
 	elif start_door == 2:
@@ -117,7 +112,6 @@ func draw_path(start_door, end_door):
 				current_path = paths[10]
 			else:
 				current_path = paths[12]
-		current_path.show()
 
 	# West
 	else:
@@ -153,7 +147,7 @@ func draw_path(start_door, end_door):
 				current_path = paths[10]
 			else:
 				current_path = paths[12]
-		current_path.show()
+	current_path.show()
 
 
 func _on_entered_hallway(start_door, end_door):

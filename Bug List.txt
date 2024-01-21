@@ -1,4 +1,7 @@
-
+paths of length one have undefined behaviour when a block they started or ended at is dragged. this is due to path_starts being based on current_path_start_room, which is assigned on line 334
 
 features to add:
  - corner replacemetn for when pathing ends next to a block but the last path isn't facing it
+ - Tokens
+ - Illusion of choice / forced path
+ - signs

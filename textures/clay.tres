@@ -1,0 +1,10 @@
+[gd_resource type="BoxMesh" load_steps=3 format=3 uid="uid://dqvjld24dl1y0"]
+
+[ext_resource type="Texture2D" uid="uid://brqlpiwbndiye" path="res://textures/clay-export-export.png" id="1_anmdx"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aqchm"]
+albedo_texture = ExtResource("1_anmdx")
+uv1_scale = Vector3(3, 3, 3)
+
+[resource]
+material = SubResource("StandardMaterial3D_aqchm")

@@ -16,41 +16,56 @@ var current_room = 0
 var last_room
 var next_room
 var last_door
+var next_door
 var doors # Door pointers
-var walls # Wall pointers
-var textures # Texture pointers
+var rooms # Wall pointers
 var signs # TODO: use these
-
-#           D--B--F
-#              |  |  
-#        G--C--A--E  
-# Room A has B north, E to the east, _ to the south, and C to the west
-# Room B has _ north, F to the east, A to the south, and D to the west
+ 
+# Room A has B north, E to the east, C to the south, and _ to the west
+# Room B has D north, F to the east, _ to the south, and A to the west
 # Room C has _ north, A to the east, _ to the south, and G to the west
-# Room D has _ north, B to the east, _ to the south, and _ to the west
-# Room E has F north, _ to the east, _ to the south, and A to the west
-# Room F has _ north, _ to the east, E to the south, and B to the west
+# Room D has _ north, _ to the east, _ to the south, and B to the west
+# Room E has _ north, _ to the east, F to the south, and A to the west
+# Room F has _ north, E to the east, _ to the south, and B to the west
 # Room G has _ north, C to the east, _ to the south, and _ to the west
-var adjacencies = [[1, 4, -2, 2], [-2, 5, 0, 3], [-2, 0, -2, 6], [-2, 1, -2, -2], [5, -2, -2, 0], [-2, -2, 4, 1], [-2, 2, -2, -2]]
+var adjacencies = [[1, 4, 2, -2], [3, 5, -2, 0], [-2, 0, -2, 6], [-2, -2, -2, 1], [-2, -2, 5, 0], [-2, 4, -2, 1], [-2, 2, -2, -2]]
+var explored = [true, false, false, false, false, false, false]
 
-signal entered_hallway(start_door, end_door) # TODO: link to hallway
-signal exited_hallway # TODO: link to hallway
+signal entered_hallway(start_door, end_door)
+signal exited_hallway
+signal explored_room(room)
 
 func _ready():
-	doors = [self.find_child("DoorNorth"), self.find_child("DoorEast"), self.find_child("DoorSouth"), self.find_child("DoorWest")]
-	walls = [self.find_child("WallNorth"), self.find_child("WallEast"), self.find_child("WallSouth"), self.find_child("WallWest")]
-	textures = [] # TODO: instanciate
+	doors = [%DoorNorthArea, %DoorEastArea, %DoorSouthArea, %DoorWestArea]
+	rooms = [self.find_child("Room1"), self.find_child("Room2"), self.find_child("Room3"), self.find_child("Room4"), self.find_child("Room5"), self.find_child("Room6"), self.find_child("Room7")]
+	
 
 func _process(delta):
 	pass
 
+func shuffle_array(array):
+	for i in array.size():
+		for j in array.size():
+			if i != j:
+				var k = array[i]
+				array[i] = array[j]
+				array[j] = k
+
 func change_context(door):
 	# If currently in a room
 	if current_room > -1:
+		rooms[current_room].hide()
 		self.hide()
 		last_room = current_room
 		next_room = adjacencies[current_room][door]
 		last_door = door
+		for i in 4:
+			doors[i].hide()
+		for i in 4:
+			if adjacencies[next_room][i] == last_room:
+				next_door = i
+		doors[last_door].show()
+		doors[next_door].show()
 		entered_hallway.emit(last_room, next_room)
 		current_room = -1
 	# If in a hallway
@@ -59,30 +74,27 @@ func change_context(door):
 		if last_door == door:
 			current_room = last_room
 		# Went to the other door
-		else:
+		elif next_door == door:
 			current_room = next_room
 			swap_room()
-		exited_hallway.emit()
-		self.show()
+			exited_hallway.emit()
+			self.show()
 
 func swap_room():
+	
 	var door
-	var texture = textures[current_room]
 	for i in 4:
 		door = adjacencies[current_room][i]
 		if door == -2:
 			doors[i].hide()
 		else:
 			doors[i].show()
-		walls[i].texture = texture # TODO: make this work
+	rooms[current_room].show()
+	if not explored[current_room]:
+		explored[current_room] = true
+		explored_room.emit(current_room)
 
-# TODO: Link to point hitbox on the camera
-func _on_door_entered(name):
-	if name == "DoorNorthArea":
-		change_context(0)
-	elif name == "DoorEastArea":
-		change_context(1)
-	elif name == "DoorSouthArea":
-		change_context(2)
-	elif name == "DoorWestArea":
-		change_context(3)
+func _on_door_entered(area):
+	for i in 4:
+		if area == doors[i]:
+			change_context(i)

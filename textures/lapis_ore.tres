@@ -1,0 +1,10 @@
+[gd_resource type="BoxMesh" load_steps=3 format=3 uid="uid://c613ov7q6i77y"]
+
+[ext_resource type="Texture2D" uid="uid://bxmcfm73xcqq" path="res://textures/lapis_ore1-export-export.png" id="1_y54o7"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_teiju"]
+albedo_texture = ExtResource("1_y54o7")
+uv1_scale = Vector3(3, 3, 3)
+
+[resource]
+material = SubResource("StandardMaterial3D_teiju")
