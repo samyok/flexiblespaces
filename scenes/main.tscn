@@ -1,4 +1,4 @@
-[gd_scene load_steps=51 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=60 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/GameController.gd" id="2_42an5"]
@@ -163,6 +163,41 @@ albedo_texture = ExtResource("9_77kk3")
 material = SubResource("StandardMaterial3D_m6sai")
 size = Vector2(1, 1)
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i2g53"]
+cull_mode = 2
+uv1_scale = Vector3(10, 10, 10)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_m5yqv"]
+material = SubResource("StandardMaterial3D_i2g53")
+size = Vector2(1, 3)
+orientation = 0
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u7p81"]
+cull_mode = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_67up4"]
+material = SubResource("StandardMaterial3D_u7p81")
+size = Vector2(1, 3)
+orientation = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_drdr2"]
+cull_mode = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_kfahj"]
+material = SubResource("StandardMaterial3D_drdr2")
+size = Vector2(0.5, 3)
+orientation = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_tvuxn"]
+size = Vector2(0.5, 3)
+orientation = 0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_ds8yu"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_yq7s5"]
+material = SubResource("ShaderMaterial_ds8yu")
+size = Vector2(1, 1)
+
 [node name="Main" type="Node3D"]
 script = ExtResource("1_xecma")
 
@@ -305,6 +340,7 @@ shadow_enabled = true
 [node name="Ground" type="StaticBody3D" parent="."]
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Ground"]
+visible = false
 mesh = SubResource("PlaneMesh_a8whk")
 surface_material_override/0 = SubResource("StandardMaterial3D_ym5vi")
 
@@ -324,6 +360,7 @@ skeleton = NodePath("../../Map")
 surface_material_override/0 = SubResource("StandardMaterial3D_kwgxo")
 
 [node name="Room" type="Node3D" parent="."]
+visible = false
 script = ExtResource("16_37bvc")
 
 [node name="Wall1" type="MeshInstance3D" parent="Room"]
@@ -343,6 +380,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, 0)
 mesh = SubResource("PlaneMesh_52etr")
 
 [node name="Doors" type="Node3D" parent="."]
+visible = false
 
 [node name="Door1" type="Area3D" parent="Doors"]
 unique_name_in_owner = true
@@ -451,28 +489,460 @@ mesh = SubResource("PlaneMesh_6nwyr")
 script = ExtResource("7_ctd0p")
 
 [node name="Path1" type="Node3D" parent="Paths"]
+visible = false
 
-[node name="Path2" type="Node3D" parent="Paths"]
+[node name="1X" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, -2.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X2" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, -2.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X3" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, -1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X4" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.5, -1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X5" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.5, -0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X7" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.5, 0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X9" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.5, 0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X10" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1.5, 1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X11" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1.5, 0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X12" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 1.5, -0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X6" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X8" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1Z" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -3)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z8" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.5, 0)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z2" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.5, -3)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z3" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.5, -1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z4" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.5, -1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z5" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.5, 2)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z6" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, 1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z7" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.5, 1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z9" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.5, 2)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z10" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.5, 2)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z11" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 1.5, -1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="halfZ" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.5, -2)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="halfX" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, 0.75)
+mesh = SubResource("PlaneMesh_tvuxn")
+
+[node name="halfX2" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, -0.75)
+mesh = SubResource("PlaneMesh_tvuxn")
+
+[node name="halfZ2" type="MeshInstance3D" parent="Paths/Path1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.5, -3)
+mesh = SubResource("PlaneMesh_kfahj")
 
 [node name="Path3" type="Node3D" parent="Paths"]
 
-[node name="Path4" type="Node3D" parent="Paths"]
+[node name="1X" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.5, -2.5)
+mesh = SubResource("PlaneMesh_m5yqv")
 
-[node name="Path5" type="Node3D" parent="Paths"]
+[node name="1X2" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, -2.5)
+mesh = SubResource("PlaneMesh_m5yqv")
 
-[node name="Path6" type="Node3D" parent="Paths"]
+[node name="1X3" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, -1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
 
-[node name="Path7" type="Node3D" parent="Paths"]
+[node name="1X4" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, -0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
 
-[node name="Path8" type="Node3D" parent="Paths"]
+[node name="1X5" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
 
-[node name="Path9" type="Node3D" parent="Paths"]
+[node name="1X6" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
 
-[node name="Path10" type="Node3D" parent="Paths"]
+[node name="1X7" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 2.5)
+mesh = SubResource("PlaneMesh_m5yqv")
 
-[node name="Path11" type="Node3D" parent="Paths"]
+[node name="1X8" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.5, 2.5)
+mesh = SubResource("PlaneMesh_m5yqv")
 
-[node name="Path12" type="Node3D" parent="Paths"]
+[node name="1X9" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, 0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X10" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X11" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, -0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X12" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, 1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1Z" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -3)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z4" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 3)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z2" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.5, -3)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z5" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, 3)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z7" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, 2)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z8" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, 1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z17" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, 0)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z18" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, 0)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z19" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.5, 0)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z15" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, -1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z16" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, -2)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z9" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, 1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z14" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, -1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z10" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.5, 1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z13" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.5, -1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z11" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.5, 1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z12" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 1.5, -1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z3" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.5, -3)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z6" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.5, 3)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="halfZ" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.5, -2)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="halfZ5" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.5, 2)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="halfZ7" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.5, 3)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="halfZ3" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 1.5, -2)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="halfZ6" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 1.5, 2)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="halfZ8" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 1.5, 3)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="halfZ2" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.5, -3)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="halfZ4" type="MeshInstance3D" parent="Paths/Path3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.75, 1.5, -3)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="Path2" type="Node3D" parent="Paths"]
+visible = false
+
+[node name="1X" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.5, -2.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X2" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -2.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X3" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X4" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.5, -1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X5" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.5, -0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X7" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 1.5, 0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X9" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 1.5, 0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X10" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X11" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, 0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X12" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1.5, -0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X6" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -0.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1X8" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 1.5)
+mesh = SubResource("PlaneMesh_m5yqv")
+
+[node name="1Z" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -3)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z8" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, 0)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z2" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, -3)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z3" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, -1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z4" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, -1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z5" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, 2)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z6" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 1.5, 1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z7" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, 1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z9" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1.5, 2)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z10" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.5, 2)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="1Z11" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 1.5, -1)
+mesh = SubResource("PlaneMesh_67up4")
+
+[node name="halfZ" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.5, -2)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="halfX" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, 0.75)
+mesh = SubResource("PlaneMesh_tvuxn")
+
+[node name="halfX2" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -0.75)
+mesh = SubResource("PlaneMesh_tvuxn")
+
+[node name="halfZ2" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, 1.5, -3)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="halfZ3" type="MeshInstance3D" parent="Paths/Path2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, 1.5, -3)
+mesh = SubResource("PlaneMesh_kfahj")
+
+[node name="inside1" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, 1.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="inside2" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 0.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="inside3" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.505281, 0.0224972, -0.483099)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="inside4" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, -1.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="inside5" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, -0.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="inside6" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, 1.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="inside7" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 0.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="inside8" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, -1.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="MeshInstance3D8" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, -0.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="MeshInstance3D9" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, 1.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="MeshInstance3D10" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.5, 0, 2.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="MeshInstance3D11" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 0, 2.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="MeshInstance3D12" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 2.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="MeshInstance3D13" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, 0.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="MeshInstance3D14" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.5, 0, -1.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="inside9" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 0, -2.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="inside10" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5, 0, -2.5)
+mesh = SubResource("PlaneMesh_yq7s5")
+
+[node name="inside11" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.5, 0, -2.5)
+mesh = SubResource("PlaneMesh_yq7s5")
 
 [connection signal="area_entered" from="XRUser" to="GameController" method="_on_xr_user_area_entered"]
 [connection signal="area_exited" from="XRUser" to="GameController" method="_on_xr_user_area_exited"]
