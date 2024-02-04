@@ -1,0 +1,16 @@
+features to add:
+ - Tokens
+ - Signs
+ - Paths
+ - Starting check
+ - Final panel
+ - Villager
+   - Idle animation
+   - Subtitles
+ - Map interface
+   - Explored rooms added to queue
+   - Place first room
+   - Attach future rooms to Combination
+   - Drag Combination
+   - Delete room from Combination
+   - Draw paths between nodes
