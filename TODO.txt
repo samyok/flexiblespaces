@@ -14,3 +14,6 @@ features to add:
    - Drag Combination
    - Delete room from Combination
    - Draw paths between nodes
+  
+   - Attribution
+     - https://opengameart.org/content/xbox-360-pixel-art-controller-icons
