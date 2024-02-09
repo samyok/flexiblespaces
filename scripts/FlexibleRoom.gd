@@ -45,6 +45,13 @@ var current_search_index = 0
 var adjacencies = [[1, 4, 2, -2], [3, 5, -2, 0], [-2, 0, -2, 6], [-2, -2, -2, 1], [-2, -2, 5, 0], [-2, 4, -2, 1], [-2, 2, -2, -2]]
 var explored = [true, false, false, false, false, false, false]
 
+var tokens 
+var active_token
+var lerp_start_point
+var overlay
+var lerp_alpha
+var lerp_time = 1
+
 signal entered_hallway(start_door, end_door)
 signal exited_hallway
 signal explored_room(room)
@@ -56,6 +63,9 @@ func _ready():
 	signs = self.find_child("Signs").find_children("Sign?")
 	door_guides = self.find_child("Guides").find_children("DoorGuide*")
 	floor_guides = self.find_child("Guides").find_children("FloorGuide*")
+	tokens = self.find_children("Token?")
+	tokens.push_front(null)
+	overlay = %Overlay
 	if dfs:
 		door_guides[dfs_door_guide_order[0]].show()
 		floor_guides[dfs_floor_guide_order[0]].show()
@@ -64,7 +74,19 @@ func _ready():
 		floor_guides[bfs_floor_guide_order[0]].show()
 
 func _process(delta):
-	pass
+	if active_token != null:
+		lerp_alpha += delta
+		if lerp_alpha > lerp_time:
+			active_token.hide()
+			active_token = null
+		else:
+			active_token.global_position = lerp(lerp_start_point, overlay.global_position, lerp_alpha)
+		
+
+func start_token_animation(room):
+	active_token = tokens[room]
+	lerp_start_point = active_token.global_position
+	lerp_alpha = 0
 
 func change_context(door):
 	# If currently in a room
@@ -173,6 +195,7 @@ func swap_room():
 	if not explored[current_room]:
 		explored[current_room] = true
 		explored_room.emit(current_room)
+		start_token_animation(current_room)
 
 func _on_door_entered(area):
 	for i in 4:

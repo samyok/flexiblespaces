@@ -1,16 +1,23 @@
 extends Node3D
 
 var node_currently_tracking = null # updates the position and rotation of the Map to this node's transform in _process
+var node_currently_interacting = null 
 var camera
 var left_controller
 var right_controller
+var rotation_min = 0
+var rotation_max = PI/2
 var input_vector = Vector2(0.0, 0.0)
 var scaling_deadzone = .2
 var scaling_speed = 0.005
 var min_scale = .01
 var max_scale = .1
-var cursor
+var map_cursor
 var cursor_block
+var map_x_max = 5
+var map_x_min = -5
+var map_y_min = 0
+var map_y_max = 10
 var path_multi_mesh
 var corner_multi_mesh
 var rooms = {} # Room array (Vector2 -> Room node dictionary)
@@ -18,7 +25,7 @@ var paths = {} # Path array (Vector2 -> instance id)
 var corners = {} # Path corner array (Vector2 -> instance id)
 var dragging_room # null or the room being currently dragged
 var dragging_room_ghost # null or the ghost of the room being currently dragged
-var dragging_float_height = Vector3(0, 0, -1.0)
+var dragging_float_height = Vector3(0, 0, -1.5)
 var current_path_origin
 var current_path_last_block
 var current_path_second_to_last_block
@@ -56,9 +63,31 @@ var corners_z_fighting_offset = Vector3(0, 0, -0.02)
 var path_instance_count = 0
 var corner_instance_count = 0
 var overlay
-var overlay_shown = false
-var overlay_button
-var laser
+var map_laser
+var bank
+var bank_position = Vector3(0, 3.75, 0)
+var bank_offset = Vector3(5, 0, 0)
+var bank_rotation = Vector3(0, PI/6, 0)
+var bank_panel
+var bank_panel_offset = Vector3(3.75, 0, 0)
+var over = -1 # Signifies the panel currently being interacted with: -1: no panel, 0: map panel, 1: bank panel, 2: tutorial panel
+var map_normal_guide
+var bank_normal_guide
+var bank_x_min_right = -7.5
+var bank_x_max_right = 0
+var bank_x_min_left = 0
+var bank_x_max_left = 7.5
+var bank_y_min = -3.75
+var bank_y_max = 3.75
+var bank_cursor
+var bank_laser
+var bank_room_list
+var bank_room_holder_list
+var bank_held_rooms = [true, false, false, false, false, false, false]
+var bank_room_to_cursor_proximity = 1.4
+var bank_room_holder_group
+var bank_room_holder_group_offset_left = Vector3(2.558, -0.02, 0)
+var bank_room_holder_group_offset_right = Vector3(-2.558, -0.02, 0)
 
 signal pause_stick_movement
 signal resume_stick_movement
@@ -69,46 +98,119 @@ func _ready():
 	right_controller = %RightController
 	camera = %XRCamera3D
 	overlay = %Overlay
+	bank = %RoomBank
+	bank_panel = %RoomBank/Panel
+	map_normal_guide = self.find_child("MapNormalGuide")
+	bank_normal_guide = %RoomBank/BankNormalGuide
 	path_multi_mesh = find_child("Paths").multimesh
 	corner_multi_mesh = find_child("Corners").multimesh
-	cursor = find_child("Cursor")
-	laser = find_child("Laser")
+	map_cursor = find_child("MapCursor")
+	bank_cursor = %RoomBank/BankCursor
+	map_laser = find_child("MapLaser")
+	bank_laser =  %RoomBank/BankCursor/BankLaser
 	room_list = [find_child("Room1"), find_child("Room2"), find_child("Room3"), find_child("Room4"), find_child("Room5"), find_child("Room6"), find_child("Room7")]
 	room_ghost_map = {room_list[0]: find_child("GhostRoom1"), room_list[1]: find_child("GhostRoom2"), room_list[2]: find_child("GhostRoom3"), room_list[3]: find_child("GhostRoom4"), room_list[4]: find_child("GhostRoom5"), room_list[5]: find_child("GhostRoom6"), room_list[6]: find_child("GhostRoom7")} 
-	room_queue.push_front(room_list[0])
-	rooms_queued = true
+	bank_room_list = find_children("BankRoom?")
+	bank_room_holder_list = find_children("RoomHolder?")
+	bank_room_holder_group = find_child("RoomHolderss")
+	for i in [0, 1, 2, 3, 4, 5, 6]:
+		bank_room_list[i].global_position = bank_room_holder_list[i].global_position
+		bank_room_list[i].position += block_height_offset
+		print(bank_room_list[i].position)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
 	if node_currently_tracking != null:
-		if !overlay_shown:
-			self.global_position = node_currently_tracking.global_position
-			self.look_at(camera.global_position)
-			if input_vector.length() > scaling_deadzone:
-				self.scale = self.scale + Vector3(scaling_speed * input_vector.y, scaling_speed * input_vector.y, scaling_speed * input_vector.y)
-				if self.scale.x < min_scale:
-					self.scale = Vector3(min_scale, min_scale, min_scale)
-				elif self.scale.x > max_scale:
-					self.scale = Vector3(max_scale, max_scale, max_scale)
+		self.global_position = node_currently_tracking.global_position
+		var adjusted_camera_position = camera.global_position
+		adjusted_camera_position.y = self.global_position.y
+		self.look_at(adjusted_camera_position)
+		var rotation_x = -node_currently_tracking.rotation.x + PI/4
+		if rotation_x < rotation_min:
+			rotation_x = rotation_min
+		elif rotation_x > rotation_max:
+			rotation_x = rotation_max
+		self.rotation.x = rotation_x
+		overlay.rotation.x = 0 - rotation_x
+		var map_plane = Plane((map_normal_guide.global_position - self.global_position).normalized(), self.global_position)
+		var bank_plane = Plane((bank_normal_guide.global_position - bank.global_position).normalized(), bank.global_position)
+		
+		if input_vector.length() > scaling_deadzone:
+			self.scale = self.scale + Vector3(scaling_speed * input_vector.y, scaling_speed * input_vector.y, scaling_speed * input_vector.y)
+			if self.scale.x < min_scale:
+				self.scale = Vector3(min_scale, min_scale, min_scale)
+			elif self.scale.x > max_scale:
+				self.scale = Vector3(max_scale, max_scale, max_scale)
+		
+		var bank_x_min
+		var bank_x_max
+		# Right controller panel update
+		if node_currently_interacting == right_controller:
+			bank.position = (-1 * bank_offset) + bank_position
+			bank.rotation = -1 * bank_rotation
+			bank_panel.position = -1 * bank_panel_offset
+			bank_x_min = bank_x_min_right
+			bank_x_max = bank_x_max_right
+			bank_room_holder_group.position = bank_room_holder_group_offset_right
+
+		# Left controller panel update
+		else:
+			bank.position = bank_offset + bank_position
+			bank.rotation = bank_rotation
+			bank_panel.position = bank_panel_offset
+			bank_x_min = bank_x_min_left
+			bank_x_max = bank_x_max_left
+			bank_room_holder_group.position = bank_room_holder_group_offset_left
+		
+		# If not in-bounds on any others, check for in-bounds on all of the panels
+		if over == -1:
+			map_cursor.global_position = map_plane.project(node_currently_interacting.global_position)
+			bank_cursor.global_position = bank_plane.project(node_currently_interacting.global_position)
+			if not (map_cursor.position.x > map_x_max or map_cursor.position.x < map_x_min or map_cursor.position.y > map_y_max or map_cursor.position.y < map_y_min):
+				transition_to_map()
+			elif not (bank_cursor.position.x > bank_x_max or bank_cursor.position.x < bank_x_min or bank_cursor.position.y > bank_y_max or bank_cursor.position.y < bank_y_min):
+				transition_to_bank()
+				
+		# Already tracking map panel
+		elif over == 0:
+			# Check if cursor is off of map
+			map_cursor.global_position = map_plane.project(node_currently_interacting.global_position)
+			if map_cursor.position.x > map_x_max or map_cursor.position.x < map_x_min or map_cursor.position.y > map_y_max or map_cursor.position.y < map_y_min:
+				# If so: check if on bank
+				bank_cursor.global_position = bank_plane.project(node_currently_interacting.global_position)
+				if not (bank_cursor.position.x > bank_x_max or bank_cursor.position.x < bank_x_min or bank_cursor.position.y > bank_y_max or bank_cursor.position.y < bank_y_min):
+					transition_to_bank()
+				else:
+					slip_from_map()
+					
+		# Already tracking bank panel
+		else:
+			# Check if cursor is off of bank
+			bank_cursor.global_position = bank_plane.project(node_currently_interacting.global_position)
+			if bank_cursor.position.x > bank_x_max or bank_cursor.position.x < bank_x_min or bank_cursor.position.y > bank_y_max or bank_cursor.position.y < bank_y_min:
+				# If so: check if on map
+				map_cursor.global_position = map_plane.project(node_currently_interacting.global_position)
+				if not (map_cursor.position.x > map_x_max or map_cursor.position.x < map_x_min or map_cursor.position.y > map_y_max or map_cursor.position.y < map_y_min):
+					transition_to_map()
+				else:
+					slip_from_bank()
+		
+		# Interacting with the map panel
+		if over == 0:
 			
-			# Right controller cursor update
-			if node_currently_tracking == left_controller:
-				var map_plane = Plane((left_controller.global_position - camera.global_position).normalized(), left_controller.global_position)
-				cursor.global_position = map_plane.project(right_controller.global_position)
-				laser.scale = Vector3(1, 1, cursor.global_position.distance_to(right_controller.global_position)/self.scale.z)
-				laser.position = Vector3(0, 0, cursor.global_position.distance_to(right_controller.global_position)/(-2*self.scale.z))
-				cursor_block = cursor.position.ceil()
-				cursor_block.z = 0
-
-			# Left controller cursor update
+			map_cursor.global_position = map_plane.project(node_currently_interacting.global_position)
+			map_laser.scale = Vector3(1, 1, map_cursor.global_position.distance_to(node_currently_interacting.global_position)/self.scale.z)
+			var laser_position_offset = map_cursor.global_position.distance_to(node_currently_interacting.global_position)/(-2*self.scale.z)
+			if map_plane.is_point_over(node_currently_interacting.global_position):
+				map_laser.position = Vector3(0, 0, laser_position_offset)
 			else:
-				var map_plane = Plane((right_controller.global_position - camera.global_position).normalized(), right_controller.global_position)
-				cursor.global_position = map_plane.project(left_controller.global_position)
-				laser.scale = Vector3(1, 1, cursor.global_position.distance_to(left_controller.global_position)/self.scale.z)
-				laser.position = Vector3(0, 0, cursor.global_position.distance_to(left_controller.global_position)/(-2*self.scale.z))
-				cursor_block = cursor.position.ceil()
-				cursor_block.z = 0
+				map_laser.position = Vector3(0, 0, -laser_position_offset)
 
+					
+			# Map Cursor block identification
+			cursor_block = map_cursor.position.ceil()
+			cursor_block.z = 0
+			
 			# Double click timing
 			if double_click_timing:
 				double_click_timer += delta
@@ -118,7 +220,7 @@ func _process(delta):
 			# Dragging
 			if dragging:
 				delete_path_ghost()
-				dragging_room.position = cursor.position + dragging_float_height
+				dragging_room.position = map_cursor.position + dragging_float_height
 				#Dragging Ghost
 				dragging_room_ghost.position = cursor_block + block_height_offset + grid_offset
 				if valid_block():
@@ -259,48 +361,23 @@ func _process(delta):
 								current_path[cursor_block] = Vector3(j, 0, 1)
 						current_path_second_to_last_block = current_path_last_block
 						current_path_last_block = cursor_block
-			# Room queued ghost
-			elif rooms_queued and valid_block():
-				delete_path_ghost()
-				room_ghost_map[room_queue.front()].show()
-				room_ghost_map[room_queue.front()].position = cursor_block + block_height_offset + grid_offset
-			
-			# Pathing ghost
+		# Interacting with bank panel
+		elif over == 1:
+			bank_cursor.global_position = bank_plane.project(node_currently_interacting.global_position)
+			bank_laser.scale = Vector3(1, 1, bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(self.scale.z * bank.scale.z))
+			var laser_position_offset = bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(-2*self.scale.z * bank.scale.z)
+			if bank_plane.is_point_over(node_currently_interacting.global_position):
+				bank_laser.position = Vector3(0, 0, laser_position_offset)
 			else:
-				var skip = false
-				if cursor_block != temp_path_ghost:
-					delete_path_ghost()
-				else:
-					skip = true
-				if not valid_block():
-					skip = true
-				if not skip:
-					var adjacencies = [cursor_block + Vector3.UP, cursor_block + Vector3.DOWN, cursor_block + Vector3.LEFT, cursor_block + Vector3.RIGHT]
-					var i = 0
-					var spotted = false
-					for x in adjacencies:
-						if rooms.has(x):
-							spotted = true
-							if i < 2:
-								var j = path_instance_count
-								temp_path_ghost_i = j
-								temp_path_ghost = cursor_block
-								temp_path_ghost_r = 0
-								path_instance_count += 1
-								path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
-								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-							else:
-								var j = path_instance_count
-								temp_path_ghost_i = j
-								temp_path_ghost = cursor_block
-								temp_path_ghost_r = 1
-								path_instance_count += 1
-								path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
-								path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-						i += 1
+				bank_laser.position = Vector3(0, 0, -laser_position_offset)
+			
+			#Dragging
+			if dragging: 
+				dragging_room.position = bank_cursor.position + dragging_float_height
+
+		# Interacting with no panels
 		else:
-			overlay.global_position = node_currently_tracking.global_position
-			overlay.look_at(camera.global_position)
+			pass
 
 func is_adjacent(vec3_1, vec3_2):
 	for x in [Vector3.UP, Vector3.DOWN, Vector3.LEFT, Vector3.RIGHT]:
@@ -308,18 +385,44 @@ func is_adjacent(vec3_1, vec3_2):
 			return true
 	return false
 
+func transition_to_map():
+	map_cursor.show()
+	bank_cursor.hide()
+	over = 0
+	if dragging:
+		dragging_room.hide()
+		var i = bank_room_list.bsearch(dragging_room)
+		dragging_room = room_list[i]
+		dragging_room.show()
+		dragging_room_ghost = room_ghost_map[i]
+
+func transition_to_bank():
+	map_cursor.hide()
+	bank_cursor.show()
+	over = 1
+	if dragging:
+		dragging_room.hide()
+		dragging_room = bank_room_list[room_list.bsearch(dragging_room)]
+		dragging_room.show()
+	elif pathing:
+		pathing_clean_up()
+	
+func slip_from_map():
+	map_cursor.hide()
+	over = -1
+	
+func slip_from_bank():
+	bank_cursor.hide()
+	over = -1
+	
+func put_back_room(room):
+	room.show()
+	room.position = bank_room_holder_list[bank_room_list.bsearch(room)].position
+
 # Returns true or false based on if this block is available for drawing
 func valid_block():
 	return !(paths.has(cursor_block) or corners.has(cursor_block) or rooms.has(cursor_block) or cursor_block == null)
 
-# Attempts to place a room in the location from the queue
-func place_room():
-	room_queue.front().position = cursor_block + block_height_offset + grid_offset
-	room_queue.front().show()
-	room_ghost_map[room_queue.front()].hide()
-	rooms[cursor_block] = room_queue.pop_front()
-	if room_queue.is_empty():
-		rooms_queued = false
 		
 
 # Attempts to start pathing at the current block
@@ -438,18 +541,6 @@ func delete_selection(target):
 			path_accums.erase(d)
 		i += 1
 
-# Hides map and shows overlay
-func toggle_overlay_on():
-	cancel_almost_everything()
-	overlay.show()
-	overlay_shown = true
-
-# Hides overlay and shows map
-func toggle_overlay_off():
-	self.show()
-	overlay.hide()
-	overlay_shown = false
-
 # Unrenders path ghost if it is being rendered
 func delete_path_ghost():
 	if temp_path_ghost != null:
@@ -458,144 +549,127 @@ func delete_path_ghost():
 
 # Attempts to start dragging the current block
 func start_drag():
-	dragging = true
-	dragging_room = rooms.get(cursor_block)
-	rooms.erase(cursor_block)
-	dragging_room_ghost = room_ghost_map[dragging_room]
-	for i in path_accums.size():
-		if path_starts[i] == dragging_room or path_ends[i] == dragging_room:
-			delete_selection(path_accums[i].keys().front())
+	# Interacting with room
+	if over == 0:
+		dragging = true
+		dragging_room = rooms.get(cursor_block)
+		rooms.erase(cursor_block)
+		dragging_room_ghost = room_ghost_map[dragging_room]
+		for i in path_accums.size():
+			if path_starts[i] == dragging_room or path_ends[i] == dragging_room:
+				delete_selection(path_accums[i].keys().front())
+	# Interacting with bank
+	else:
+		# For each held room
+		for x in [0, 1, 2, 3, 4, 5, 6].filter(func(i): return bank_held_rooms[i]).map(func(i):  return bank_room_list[i]):
+			if bank_cursor.position.distance_to(x.position) < bank_room_to_cursor_proximity:
+				dragging = true
+				dragging_room = x
+				bank_held_rooms[bank_room_list.bsearch(x)] = false
 
 # Cleans up room dragging
 func dragging_clean_up():
-	if valid_block:
-		dragging_room.position = dragging_room_ghost.position
-		rooms[cursor_block] = dragging_room
+	if over == 0:
+		if valid_block:
+			dragging_room.position = dragging_room_ghost.position
+			rooms[cursor_block] = dragging_room
+		else:
+			dragging_room.hide()
+			put_back_room(bank_room_list[room_list.bsearch(dragging_room)])
+		dragging_room = null
+		dragging_room_ghost.hide()
+		dragging_room_ghost = null
+		dragging = false
 	else:
-		dragging_room.hide()
-		room_queue.push_front(dragging_room)
-	dragging_room = null
-	dragging_room_ghost.hide()
-	dragging_room_ghost = null
-	dragging = false
+		put_back_room(dragging_room)
+
 
 # Cleans up drawing pane and hides it, hiding all elements and terminating all pathing, dragging, or ghosts
 func cancel_everything():
 	self.hide()
 	resume_stick_movement.emit()
 	node_currently_tracking = null
+	node_currently_interacting = null
 	if dragging:
 		dragging_clean_up()
 	elif pathing:
 		pathing_clean_up()
-	else:
-		delete_path_ghost()
-
-# Cleans up drawing pane and hides it, hiding all elements and terminating all pathing, dragging, or ghosts, but doesnt stow the map
-func cancel_almost_everything():
-	self.hide()
-	if dragging:
-		dragging_clean_up()
-	elif pathing:
-		pathing_clean_up()
-	else:
-		delete_path_ghost()
 	
 func _on_left_controller_button_pressed(name):
 	if name == "grip_click" and node_currently_tracking != left_controller:
 		self.show()
 		node_currently_tracking = left_controller
+		node_currently_interacting = right_controller
 		pause_stick_movement.emit()
 	elif name == "trigger_click":
-		if node_currently_tracking == right_controller:
-			if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block)) and not overlay_shown:
-				delete_selection(cursor_block)
-			else:
-				double_click_timer = 0.0
-				double_click_timing = true
-				double_click_start_block = cursor_block
-				# place room
-				if valid_block and rooms_queued and !dragging and !pathing:
-					place_room()
-				# start drag
-				elif rooms.has(cursor_block) and !dragging and !pathing and !rooms_queued:
+		if node_currently_interacting == left_controller:
+			if over == 0:
+				if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block)):
+					delete_selection(cursor_block)
+				else:
+					double_click_timer = 0.0
+					double_click_timing = true
+					double_click_start_block = cursor_block
+					# start drag
+					if rooms.has(cursor_block) and !dragging and !pathing and !rooms_queued:
+						start_drag()
+					# start path
+					elif temp_path_ghost != null and !rooms_queued:
+						start_path()
+						
+			elif over == 1:
+				if (not dragging):
 					start_drag()
-				# start path
-				elif temp_path_ghost != null and !rooms_queued:
-					start_path()
-	elif name == "ax_button" and not overlay_shown:
-		if node_currently_tracking != null:
-			toggle_overlay_on()
-			overlay_button = 0
-	elif name == "by_button" and not overlay_shown:
-		if node_currently_tracking != null:
-			toggle_overlay_on()
-			overlay_button = 1
 
 func _on_right_controller_button_pressed(name):
 	if name == "grip_click" and node_currently_tracking != right_controller:
 		self.show()
 		node_currently_tracking = right_controller
+		node_currently_interacting = left_controller
 		pause_stick_movement.emit()
 	elif name == "trigger_click":
-		if node_currently_tracking == left_controller:
-			if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block)) and not overlay_shown:
-				delete_selection(cursor_block)
-			else:
-				double_click_timer = 0.0
-				double_click_timing = true
-				double_click_start_block = cursor_block
-				# place room
-				if valid_block and rooms_queued and !dragging and !pathing:
-					place_room()
-				# start drag
-				elif rooms.has(cursor_block) and !dragging and !pathing and !rooms_queued:
+		if node_currently_interacting == right_controller:
+			# Interacting with Map
+			if over == 0:
+				if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block)):
+					delete_selection(cursor_block)
+				else:
+					double_click_timer = 0.0
+					double_click_timing = true
+					double_click_start_block = cursor_block
+					# start drag
+					if rooms.has(cursor_block) and !dragging and !pathing and !rooms_queued:
+						start_drag()
+					# start path
+					elif temp_path_ghost != null and !rooms_queued:
+						start_path()
+			elif over == 1:
+				if (not dragging):
 					start_drag()
-				# start path
-				elif temp_path_ghost != null and !rooms_queued:
-					start_path()
-	elif name == "ax_button" and not overlay_shown:
-		if node_currently_tracking != null:
-			toggle_overlay_on()
-			overlay_button = 2
-	elif name == "by_button" and not overlay_shown:
-		if node_currently_tracking != null:
-			toggle_overlay_on()
-			overlay_button = 3
 
 
 func _on_left_controller_button_released(name):
 	if name == "grip_click" and node_currently_tracking == left_controller:
 		cancel_everything()
 	elif name == "trigger_click":
-		if node_currently_tracking == right_controller:
+		if node_currently_interacting == right_controller:
 			if dragging:
 				dragging_clean_up()
 			elif pathing:
 				pathing_clean_up()
-	elif name == "ax_button" and overlay_shown and overlay_button == 0:
-		if node_currently_tracking != null:
-			toggle_overlay_off()
-	elif name == "by_button" and overlay_shown and overlay_button == 1:
-		if node_currently_tracking != null:
-			toggle_overlay_off()
+	elif name == "ax_button":
+		print(cursor_block)
 		
 
 func _on_right_controller_button_released(name):
 	if name == "grip_click" and node_currently_tracking == right_controller:
 		cancel_everything()
 	elif name == "trigger_click":
-		if node_currently_tracking == left_controller:
+		if node_currently_interacting == right_controller:
 			if dragging:
 				dragging_clean_up()
 			elif pathing:
 				pathing_clean_up()
-	elif name == "ax_button" and overlay_shown and overlay_button == 2:
-		if node_currently_tracking != null:
-			toggle_overlay_off()
-	elif name == "by_button" and overlay_shown and overlay_button == 3:
-		if node_currently_tracking != null:
-			toggle_overlay_off()
 		
 
 func _on_left_controller_input_vector_2_changed(name, value):
@@ -613,5 +687,5 @@ func _on_right_controller_input_vector_2_changed(name, value):
 			input_vector = Vector2(0, 0)
 
 func _on_room_explored(room):
-	rooms_queued = true
-	room_queue.push_back(room_list[room])
+	bank_held_rooms[room] = true
+	put_back_room(bank_room_list[room])
