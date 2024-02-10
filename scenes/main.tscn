@@ -475,7 +475,6 @@ omni_attenuation = 4.92458
 
 [node name="Map" type="Node3D" parent="."]
 transform = Transform3D(0.05, 0, 0, 0, 0.05, 0, 0, 0, 0.05, -0.623993, 1.43416, -0.228342)
-visible = false
 script = ExtResource("8_ct64q")
 
 [node name="Room1" type="MeshInstance3D" parent="Map"]

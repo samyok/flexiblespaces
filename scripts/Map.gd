@@ -425,6 +425,10 @@ func put_back_room(room):
 	room.show()
 	room.global_position = bank_room_holder_list[bank_room_list.bsearch(room)].global_position
 
+func recalibrate_holders():
+	for x in [0, 1, 2, 3, 4, 5, 6].filter(func(i): return bank_held_rooms[i]):
+		bank_room_list[x].global_position = bank_room_holder_list[x].global_position
+
 # Returns true or false based on if this block is available for drawing
 func valid_block():
 	return !(paths.has(cursor_block) or corners.has(cursor_block) or rooms.has(cursor_block) or cursor_block == null)
@@ -617,6 +621,7 @@ func _on_left_controller_button_pressed(name):
 		self.show()
 		node_currently_tracking = left_controller
 		node_currently_interacting = right_controller
+		node_
 		pause_stick_movement.emit()
 	elif name == "trigger_click":
 		if node_currently_interacting == left_controller:
