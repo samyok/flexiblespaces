@@ -478,22 +478,8 @@ func start_path():
 func pathing_clean_up():
 	double_click_timing = false
 	pathing = false
-	var valid_path = false
-	var end_room
-	if current_path.get(cursor_block) != null and current_path.get(cursor_block).z == 0:
-		if rooms.has(cursor_block + Vector3.UP):
-			valid_path = true
-			end_room = rooms.get(cursor_block + Vector3.UP)
-		elif rooms.has(cursor_block + Vector3.DOWN):
-			valid_path = true
-			end_room = rooms.get(cursor_block + Vector3.DOWN)
-	elif current_path.get(cursor_block) != null:
-		if rooms.has(cursor_block + Vector3.LEFT):
-			valid_path = true
-			end_room = rooms.get(cursor_block + Vector3.LEFT)
-		elif rooms.has(cursor_block + Vector3.RIGHT):
-			valid_path = true
-			end_room = rooms.get(cursor_block + Vector3.RIGHT)
+	var valid_path = rooms.has(cursor_block)
+	var end_room = cursor_block
 	# Replicate dictionary with new multimesh indices of non-ghosted paths and corners
 	var path_accum = {}
 	for k in current_path.keys():
@@ -645,27 +631,24 @@ func _on_left_controller_button_pressed(name):
 		node_currently_interacting = right_controller
 		left_bank.show()
 		pause_stick_movement.emit()
-	elif name == "trigger_click":
-		if node_currently_interacting == left_controller:
-			if over == 0:
-				if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block)):
-					delete_selection(cursor_block)
-				else:
-					double_click_timer = 0.0
-					double_click_timing = true
-					double_click_start_block = cursor_block
-					# start drag
-					if rooms.has(cursor_block) and !dragging and !pathing:
-						start_drag()
-						
-			elif over == 1:
-				if (not dragging):
-					start_drag()
-	elif name == "ax_button" or "ay_button":
+	elif name == "trigger_click" and node_currently_interacting == left_controller:
 		if over == 0:
-			# start path
-			if rooms.has(cursor_block) and !dragging and !pathing:
-				start_path()
+			if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block)):
+				delete_selection(cursor_block)
+			else:
+				double_click_timer = 0.0
+				double_click_timing = true
+				double_click_start_block = cursor_block
+				# start drag
+				if rooms.has(cursor_block) and !dragging and !pathing:
+					start_drag()
+				
+		elif over == 1:
+			if (not dragging):
+				start_drag()
+	elif (name == "ax_button" or  name == "by_button") and node_currently_interacting == left_controller and over == 0 and rooms.has(cursor_block) and !dragging and !pathing:
+		# start path
+		start_path()
 
 func _on_right_controller_button_pressed(name):
 	if name == "grip_click" and node_currently_tracking != right_controller:
@@ -674,25 +657,27 @@ func _on_right_controller_button_pressed(name):
 		node_currently_interacting = left_controller
 		right_bank.show()
 		pause_stick_movement.emit()
-	elif name == "trigger_click":
-		if node_currently_interacting == right_controller:
-			# Interacting with Map
-			if over == 0:
-				if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block)):
-					delete_selection(cursor_block)
-				else:
-					double_click_timer = 0.0
-					double_click_timing = true
-					double_click_start_block = cursor_block
-					# start drag
-					if rooms.has(cursor_block) and !dragging and !pathing:
-						start_drag()
-					# start path
-					elif temp_path_ghost != null and !rooms_queued:
-						start_path()
-			elif over == 1:
-				if (not dragging):
+	elif name == "trigger_click" and node_currently_interacting == right_controller:
+		# Interacting with Map
+		if over == 0:
+			if double_click_timing and double_click_start_block == cursor_block and (paths.has(cursor_block) or corners.has(cursor_block)):
+				delete_selection(cursor_block)
+			else:
+				double_click_timer = 0.0
+				double_click_timing = true
+				double_click_start_block = cursor_block
+				# start drag
+				if rooms.has(cursor_block) and !dragging and !pathing:
 					start_drag()
+				# start path
+				elif temp_path_ghost != null and !rooms_queued:
+					start_path()
+		elif over == 1:
+			if (not dragging):
+				start_drag()
+	elif (name == "ax_button" or  name == "by_button") and node_currently_interacting == right_controller and over == 0 and rooms.has(cursor_block) and !dragging and !pathing:
+		# start path
+		start_path()
 
 func _on_left_controller_button_released(name):
 	if name == "grip_click" and node_currently_tracking == left_controller:
@@ -708,8 +693,8 @@ func _on_left_controller_button_released(name):
 		else:
 			if dragging:
 				dragging_cancel()
-	elif name == "ax_button":
-		print(cursor_block)
+	elif (name == "ax_button" or name == "by_button") and over == 0 and pathing and node_currently_interacting == left_controller:
+		pathing_clean_up()
 
 func _on_right_controller_button_released(name):
 	if name == "grip_click" and node_currently_tracking == right_controller:
@@ -726,6 +711,8 @@ func _on_right_controller_button_released(name):
 		else:
 			if dragging:
 				dragging_cancel()
+	elif (name == "ax_button" or name == "by_button") and over == 0 and pathing and node_currently_interacting == right_controller:
+		pathing_clean_up()
 
 func _on_left_controller_input_vector_2_changed(name, value):
 	if name == "primary":
