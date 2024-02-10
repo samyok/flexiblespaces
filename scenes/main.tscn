@@ -566,7 +566,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_kwgxo")
 
 [node name="LeftBank" type="Node3D" parent="Map"]
 unique_name_in_owner = true
-transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 5, 3.5, 0)
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 5, 3.75, 0)
 visible = false
 
 [node name="LeftBankRoomss" type="Node3D" parent="Map/LeftBank"]
@@ -613,7 +613,7 @@ mesh = SubResource("BoxMesh_yr38u")
 skeleton = NodePath("../../..")
 
 [node name="Panel" type="Node3D" parent="Map/LeftBank"]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 3.5, 0, 0)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 3.75, 0, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Map/LeftBank/Panel"]
 transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, 0)
@@ -659,7 +659,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_srtc7")
 
 [node name="RightBank" type="Node3D" parent="Map"]
 unique_name_in_owner = true
-transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -5, 3.5, 0)
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -5, 3.75, 0)
 visible = false
 
 [node name="RightBankRoomss" type="Node3D" parent="Map/RightBank"]
@@ -706,7 +706,7 @@ mesh = SubResource("BoxMesh_yr38u")
 skeleton = NodePath("../../..")
 
 [node name="Panel" type="Node3D" parent="Map/RightBank"]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -3.5, 0, 0)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -3.75, 0, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Map/RightBank/Panel"]
 transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, 0)

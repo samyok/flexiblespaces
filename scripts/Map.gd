@@ -200,8 +200,7 @@ func _process(delta):
 					transition_to_map()
 				elif not (left_bank_cursor.position.x > bank_x_max or left_bank_cursor.position.x < bank_x_min or left_bank_cursor.position.y > bank_y_max or left_bank_cursor.position.y < bank_y_min):
 					transition_to_bank()
-			
-				
+
 		# Already tracking map panel
 		elif over == 0:
 			# Check if cursor is off of map
@@ -225,7 +224,7 @@ func _process(delta):
 						transition_to_bank()
 					else:
 						slip_from_map()
-					
+
 		# Already tracking bank panel
 		else:
 			# Check if cursor is off of bank
@@ -239,7 +238,7 @@ func _process(delta):
 					#slip_from_bank()
 			if node_currently_interacting == left_controller:
 				left_bank_cursor.global_position = left_bank_plane.project(node_currently_interacting.global_position)
-				if not (left_bank_cursor.position.x > bank_x_max or left_bank_cursor.position.x < bank_x_min or left_bank_cursor.position.y > bank_y_max or left_bank_cursor.position.y < bank_y_min):
+				if left_bank_cursor.position.x > bank_x_max or left_bank_cursor.position.x < bank_x_min or left_bank_cursor.position.y > bank_y_max or left_bank_cursor.position.y < bank_y_min:
 					map_cursor.global_position = map_plane.project(node_currently_interacting.global_position)
 					if not (map_cursor.position.x > map_x_max or map_cursor.position.x < map_x_min or map_cursor.position.y > map_y_max or map_cursor.position.y < map_y_min):
 						transition_to_map()
@@ -247,14 +246,13 @@ func _process(delta):
 						slip_from_bank()
 			elif node_currently_interacting == right_controller:
 				right_bank_cursor.global_position = right_bank_plane.project(node_currently_interacting.global_position)
-				if not (right_bank_cursor.position.x > bank_x_max or right_bank_cursor.position.x < bank_x_min or right_bank_cursor.position.y > bank_y_max or right_bank_cursor.position.y < bank_y_min):
+				if right_bank_cursor.position.x > bank_x_max or right_bank_cursor.position.x < bank_x_min or right_bank_cursor.position.y > bank_y_max or right_bank_cursor.position.y < bank_y_min:
 					map_cursor.global_position = map_plane.project(node_currently_interacting.global_position)
 					if not (map_cursor.position.x > map_x_max or map_cursor.position.x < map_x_min or map_cursor.position.y > map_y_max or map_cursor.position.y < map_y_min):
 						transition_to_map()
 					else:
 						slip_from_bank()
-				
-		
+
 		# Interacting with the map panel
 		if over == 0:
 			
@@ -293,11 +291,8 @@ func _process(delta):
 				if current_path_last_block != cursor_block:
 					# If the block is valid and next to the path
 					if (rooms.has(cursor_block) or valid_block()) and is_adjacent(current_path_last_block, cursor_block):
-						# Path ending case
-						if current_path_origin != cursor_block and rooms.has(cursor_block):
-							pathing_clean_up()
 						# Corner revision case
-						elif current_path_second_to_last_block != null and (current_path_last_block - current_path_second_to_last_block) + current_path_last_block != cursor_block:
+						if current_path_second_to_last_block != null and (current_path_last_block - current_path_second_to_last_block) + current_path_last_block != cursor_block:
 							# Left and Top
 							if (current_path_second_to_last_block - current_path_last_block == Vector3(-1, 0, 0) or cursor_block - current_path_last_block == Vector3(-1, 0, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(0, 1, 0) or cursor_block - current_path_last_block == Vector3(0, 1, 0)):
 								# Hide current_path_last_block
@@ -310,21 +305,24 @@ func _process(delta):
 								corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, left_top_rotation))
 								corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
 								current_path[current_path_last_block] = Vector3(i, 1, 0)
-								# Spawn straight path at cursor_block with correct orientation
-								if (cursor_block - current_path_last_block).x == 0:
-									var j = path_instance_count
-									paths[cursor_block] = j 
-									path_instance_count += 1
-									path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
-									path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-									current_path[cursor_block] = Vector3(j, 0, 0)
+								if current_path_origin != cursor_block and rooms.has(cursor_block):
+									pathing_clean_up() 
 								else:
-									var j = path_instance_count
-									paths[cursor_block] = j 
-									path_instance_count += 1
-									path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
-									path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-									current_path[cursor_block] = Vector3(j, 0, 1)
+									# Spawn straight path at cursor_block with correct orientation
+									if (cursor_block - current_path_last_block).x == 0:
+										var j = path_instance_count
+										paths[cursor_block] = j 
+										path_instance_count += 1
+										path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+										path_multi_mesh.set_instance_color(j, ghost_mesh_color)
+										current_path[cursor_block] = Vector3(j, 0, 0)
+									else:
+										var j = path_instance_count
+										paths[cursor_block] = j 
+										path_instance_count += 1
+										path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+										path_multi_mesh.set_instance_color(j, ghost_mesh_color)
+										current_path[cursor_block] = Vector3(j, 0, 1)
 							# Top and Right
 							if (current_path_second_to_last_block - current_path_last_block == Vector3(0, 1, 0) or cursor_block - current_path_last_block == Vector3(0, 1, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(1, 0, 0) or cursor_block - current_path_last_block == Vector3(1, 0, 0)):
 								# Hide current_path_last_block
@@ -337,21 +335,24 @@ func _process(delta):
 								corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, top_right_rotation))
 								corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
 								current_path[current_path_last_block] = Vector3(i, 1, 1)
-								# Spawn straight path at cursor_block with correct orientation
-								if (cursor_block - current_path_last_block).x == 0:
-									var j = path_instance_count
-									paths[cursor_block] = j
-									path_instance_count += 1
-									path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
-									path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-									current_path[cursor_block] = Vector3(j, 0, 0)
+								if current_path_origin != cursor_block and rooms.has(cursor_block):
+									pathing_clean_up() 
 								else:
-									var j = path_instance_count
-									paths[cursor_block] = j
-									path_instance_count += 1
-									path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
-									path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-									current_path[cursor_block] = Vector3(j, 0, 1)
+									# Spawn straight path at cursor_block with correct orientation
+									if (cursor_block - current_path_last_block).x == 0:
+										var j = path_instance_count
+										paths[cursor_block] = j
+										path_instance_count += 1
+										path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+										path_multi_mesh.set_instance_color(j, ghost_mesh_color)
+										current_path[cursor_block] = Vector3(j, 0, 0)
+									else:
+										var j = path_instance_count
+										paths[cursor_block] = j
+										path_instance_count += 1
+										path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+										path_multi_mesh.set_instance_color(j, ghost_mesh_color)
+										current_path[cursor_block] = Vector3(j, 0, 1)
 							# Right and Bottom
 							if (current_path_second_to_last_block - current_path_last_block == Vector3(1, 0, 0) or cursor_block - current_path_last_block == Vector3(1, 0, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(0, -1, 0) or cursor_block - current_path_last_block == Vector3(0, -1, 0)):
 								# Hide current_path_last_block
@@ -364,21 +365,24 @@ func _process(delta):
 								corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, right_bottom_rotation))
 								corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
 								current_path[current_path_last_block] = Vector3(i, 1, 2)
-								# Spawn straight path at cursor_block with correct orientation
-								if (cursor_block - current_path_last_block).x == 0:
-									var j = path_instance_count
-									paths[cursor_block] = j 
-									path_instance_count += 1
-									path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
-									path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-									current_path[cursor_block] = Vector3(j, 0, 0)
+								if current_path_origin != cursor_block and rooms.has(cursor_block):
+									pathing_clean_up() 
 								else:
-									var j = path_instance_count
-									paths[cursor_block] = j
-									path_instance_count += 1
-									path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
-									path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-									current_path[cursor_block] = Vector3(j, 0, 1)
+									# Spawn straight path at cursor_block with correct orientation
+									if (cursor_block - current_path_last_block).x == 0:
+										var j = path_instance_count
+										paths[cursor_block] = j 
+										path_instance_count += 1
+										path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+										path_multi_mesh.set_instance_color(j, ghost_mesh_color)
+										current_path[cursor_block] = Vector3(j, 0, 0)
+									else:
+										var j = path_instance_count
+										paths[cursor_block] = j
+										path_instance_count += 1
+										path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+										path_multi_mesh.set_instance_color(j, ghost_mesh_color)
+										current_path[cursor_block] = Vector3(j, 0, 1)
 							# Bottom and Left
 							if (current_path_second_to_last_block - current_path_last_block == Vector3(0, -1, 0) or cursor_block - current_path_last_block == Vector3(0, -1, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(-1, 0, 0) or cursor_block - current_path_last_block == Vector3(-1, 0, 0)):
 								# Hide current_path_last_block
@@ -391,21 +395,27 @@ func _process(delta):
 								corner_multi_mesh.set_instance_transform(i, Transform3D().translated_local(corners_z_fighting_offset + current_path_last_block + grid_offset).rotated_local(Vector3.FORWARD, bottom_left_rotation))
 								corner_multi_mesh.set_instance_color(i, ghost_mesh_color)
 								current_path[current_path_last_block] = Vector3(i, 1, 3)
-								# Spawn straight path at cursor_block with correct orientation
-								if (cursor_block - current_path_last_block).x == 0:
-									var j = path_instance_count
-									paths[cursor_block] = j
-									path_instance_count += 1
-									path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
-									path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-									current_path[cursor_block] = Vector3(j, 0, 0)
+								if current_path_origin != cursor_block and rooms.has(cursor_block):
+									pathing_clean_up() 
 								else:
-									var j = path_instance_count
-									paths[cursor_block] = j
-									path_instance_count += 1
-									path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
-									path_multi_mesh.set_instance_color(j, ghost_mesh_color)
-									current_path[cursor_block] = Vector3(j, 0, 1)
+									# Spawn straight path at cursor_block with correct orientation
+									if (cursor_block - current_path_last_block).x == 0:
+										var j = path_instance_count
+										paths[cursor_block] = j
+										path_instance_count += 1
+										path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, vertical_rotation))
+										path_multi_mesh.set_instance_color(j, ghost_mesh_color)
+										current_path[cursor_block] = Vector3(j, 0, 0)
+									else:
+										var j = path_instance_count
+										paths[cursor_block] = j
+										path_instance_count += 1
+										path_multi_mesh.set_instance_transform(j, Transform3D().translated_local(paths_z_fighting_offset + cursor_block + grid_offset).rotated_local(Vector3.FORWARD, horizontal_rotation))
+										path_multi_mesh.set_instance_color(j, ghost_mesh_color)
+										current_path[cursor_block] = Vector3(j, 0, 1)
+						# Path ending case
+						elif current_path_origin != cursor_block and rooms.has(cursor_block):
+							pathing_clean_up()
 						# Normal path creation case
 						else:
 							if (cursor_block - current_path_last_block).x == 0:
@@ -528,29 +538,31 @@ func transition_to_bank():
 	
 func slip_from_map():
 	map_cursor.hide()
-	over = -1
 	if dragging:
 		dragging_cancel()
 	elif pathing:
 		pathing_clean_up()
+	over = -1
 	
 func slip_from_bank():
 	left_bank_cursor.hide()
 	right_bank_cursor.hide()
-	over = -1
 	if dragging:
 		dragging_cancel()
+	over = -1
 	
-func put_back_room(room):
+func put_back_room(room, left):
 	room.show()
-	if node_currently_interacting == left_controller:
-		print(str("holder pos: ", left_bank_room_holder_list[left_bank_room_list.find_key(room)].global_position))
-		room.global_position = left_bank_room_holder_list[left_bank_room_list.find_key(room)].global_position
-		print(str("room pos: ", room.global_position))
-	elif node_currently_interacting == right_controller:
-		print(str("holder pos: ", right_bank_room_holder_list[right_bank_room_list.find_key(room)].global_position))
-		room.global_position = right_bank_room_holder_list[right_bank_room_list.find_key(room)].global_position
-		print(str("room pos: ", room.global_position))
+	if left:
+		var i = left_bank_room_list.find_key(room)
+		bank_held_rooms[i] = true
+		room.global_position = left_bank_room_holder_list[i].global_position
+		room.position += block_height_offset
+	else:
+		var i = right_bank_room_list.find_key(room)
+		bank_held_rooms[i] = true
+		room.global_position = right_bank_room_holder_list[i].global_position
+		room.position += block_height_offset
 
 func recalibrate_holders():
 	if node_currently_interacting == left_controller:
@@ -670,7 +682,7 @@ func start_drag():
 		rooms.erase(cursor_block)
 		dragging_room_ghost = room_ghost_map[dragging_room]
 		for i in path_accums.size():
-			if path_starts[i] == dragging_room or path_ends[i] == dragging_room:
+			if path_starts[i] == dragging_room or path_ends[i] == cursor_block:
 				delete_selection(path_accums[i].keys().front())
 	# Interacting with bank
 	else:
@@ -702,33 +714,54 @@ func dragging_clean_up():
 		else:
 			dragging_room.hide()
 			if node_currently_interacting == left_controller:
-				put_back_room(left_bank_room_list.values()[room_list.find_key(dragging_room)])
+				put_back_room(left_bank_room_list.values()[room_list.find_key(dragging_room)], true)
 			elif node_currently_interacting == right_controller:
-				put_back_room(right_bank_room_list.values()[room_list.find_key(dragging_room)])
+				put_back_room(right_bank_room_list.values()[room_list.find_key(dragging_room)], false)
 		dragging_room = null
 		dragging_room_ghost.hide()
 		dragging_room_ghost = null
 		dragging = false
 	else:
-		put_back_room(dragging_room)
+		if node_currently_tracking == left_controller:
+			var i = left_bank_room_list.find_key(dragging_room)
+			put_back_room(dragging_room, true)
+			put_back_room(right_bank_room_list.values()[i], false)
+		else:
+			var i = right_bank_room_list.find_key(dragging_room)
+			put_back_room(dragging_room, false)
+			put_back_room(left_bank_room_list.values()[i], true)
 		dragging_room = null
+		dragging = false
+		if dragging_room_ghost != null:
+			dragging_room_ghost.hide()
+		dragging_room_ghost = null
 
 # Cleans up room dragging
 func dragging_cancel():
 	if over == 0:
 		dragging_room.hide()
 		if node_currently_interacting == left_controller:
-			put_back_room(left_bank_room_list.values()[room_list.find_key(dragging_room)])
+			put_back_room(left_bank_room_list.values()[room_list.find_key(dragging_room)], true)
 		elif node_currently_interacting == right_controller:
-			put_back_room(right_bank_room_list.values()[room_list.find_key(dragging_room)])
+			put_back_room(right_bank_room_list.values()[room_list.find_key(dragging_room)], false)
 		dragging_room = null
 		dragging_room_ghost.hide()
 		dragging_room_ghost = null
 		dragging = false
 	else:
-		put_back_room(dragging_room)
+		if node_currently_interacting == left_controller:
+			var i = left_bank_room_list.find_key(dragging_room)
+			put_back_room(dragging_room, true)
+			put_back_room(right_bank_room_list.values()[i], false)
+		else:
+			var i = right_bank_room_list.find_key(dragging_room)
+			put_back_room(dragging_room, false)
+			put_back_room(left_bank_room_list.values()[i], true)
 		dragging_room = null
 		dragging = false
+		if dragging_room_ghost != null:
+			dragging_room_ghost.hide()
+		dragging_room_ghost = null
 
 # Cleans up drawing pane and hides it, hiding all elements and terminating all pathing, dragging, or ghosts
 func cancel_everything():
@@ -846,8 +879,5 @@ func _on_right_controller_input_vector_2_changed(name, value):
 			input_vector = Vector2(0, 0)
 
 func _on_room_explored(room):
-	bank_held_rooms[room] = true
-	if node_currently_interacting == left_controller:
-		put_back_room(right_bank_room_list.values()[room])
-	elif node_currently_interacting == right_controller:
-		put_back_room(left_bank_room_list.values()[room])
+	put_back_room(right_bank_room_list.values()[room], false)
+	put_back_room(left_bank_room_list.values()[room], true)
