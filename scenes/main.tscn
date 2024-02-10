@@ -566,7 +566,7 @@ surface_material_override/0 = SubResource("StandardMaterial3D_kwgxo")
 
 [node name="RoomBank" type="Node3D" parent="Map"]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.75, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
 
 [node name="BankRoomss" type="Node3D" parent="Map/RoomBank"]
 
@@ -621,6 +621,7 @@ skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_qxt7m")
 
 [node name="RoomHolderss" type="Node3D" parent="Map/RoomBank/Panel"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 0)
 
 [node name="RoomHolder1" type="Node3D" parent="Map/RoomBank/Panel/RoomHolderss"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, 0)

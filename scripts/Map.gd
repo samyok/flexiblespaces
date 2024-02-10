@@ -79,15 +79,18 @@ var bank_x_min_left = 0
 var bank_x_max_left = 7.5
 var bank_y_min = -3.75
 var bank_y_max = 3.75
-var bank_cursor
-var bank_laser
+var left_bank_cursor
+var left_bank_laser
+var right_bank_cursor
+var right_bank_laser
 var bank_room_list
 var bank_room_holder_list
 var bank_held_rooms = [true, false, false, false, false, false, false]
 var bank_room_to_cursor_proximity = 1.4
 var bank_room_holder_group
-var bank_room_holder_group_offset_left = Vector3(2.558, -0.02, 0)
-var bank_room_holder_group_offset_right = Vector3(-2.558, -0.02, 0)
+var bank_room_holder_group_offset_left = Vector3(-4.935, -0.02, 0)
+var bank_room_holder_group_offset_right = Vector3(5.08, -0.02, 0)
+var z = 0 # TODO: delete
 
 signal pause_stick_movement
 signal resume_stick_movement
@@ -108,19 +111,21 @@ func _ready():
 	bank_cursor = %RoomBank/BankCursor
 	map_laser = find_child("MapLaser")
 	bank_laser =  %RoomBank/BankCursor/BankLaser
-	room_list = [find_child("Room1"), find_child("Room2"), find_child("Room3"), find_child("Room4"), find_child("Room5"), find_child("Room6"), find_child("Room7")]
-	room_ghost_map = {room_list[0]: find_child("GhostRoom1"), room_list[1]: find_child("GhostRoom2"), room_list[2]: find_child("GhostRoom3"), room_list[3]: find_child("GhostRoom4"), room_list[4]: find_child("GhostRoom5"), room_list[5]: find_child("GhostRoom6"), room_list[6]: find_child("GhostRoom7")} 
-	bank_room_list = find_children("BankRoom?")
+	room_list = {0: find_child("Room1"), 1: find_child("Room2"), 2: find_child("Room3"), 3: find_child("Room4"), 4: find_child("Room5"), 5: find_child("Room6"), 6: find_child("Room7")}
+	room_ghost_map = {room_list.values()[0]: find_child("GhostRoom1"), room_list.values()[1]: find_child("GhostRoom2"), room_list.values()[2]: find_child("GhostRoom3"), room_list.values()[3]: find_child("GhostRoom4"), room_list.values()[4]: find_child("GhostRoom5"), room_list.values()[5]: find_child("GhostRoom6"), room_list.values()[6]: find_child("GhostRoom7")} 
+	bank_room_list = {0: find_child("BankRoom1"), 1: find_child("BankRoom2"), 2: find_child("BankRoom3"), 3: find_child("BankRoom4"), 4: find_child("BankRoom5"), 5: find_child("BankRoom6"), 6: find_child("BankRoom7")}
 	bank_room_holder_list = find_children("RoomHolder?")
 	bank_room_holder_group = find_child("RoomHolderss")
 	for i in [0, 1, 2, 3, 4, 5, 6]:
-		bank_room_list[i].global_position = bank_room_holder_list[i].global_position
-		bank_room_list[i].position += block_height_offset
-		print(bank_room_list[i].position)
+		bank_room_list.values()[i].global_position = bank_room_holder_list[i].global_position
+		if (i==4): 
+			pass
+		bank_room_list.values()[i].position += block_height_offset
+		print(bank_room_list.values()[i].position)
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
-	if node_currently_tracking != null:
+	if node_currently_tracking != null:  
 		self.global_position = node_currently_tracking.global_position
 		var adjusted_camera_position = camera.global_position
 		adjusted_camera_position.y = self.global_position.y
@@ -154,7 +159,7 @@ func _process(delta):
 			bank_room_holder_group.position = bank_room_holder_group_offset_right
 
 		# Left controller panel update
-		else:
+		elif node_currently_interacting == left_controller:
 			bank.position = bank_offset + bank_position
 			bank.rotation = bank_rotation
 			bank_panel.position = bank_panel_offset
@@ -230,8 +235,9 @@ func _process(delta):
 			
 			# Pathing
 			elif pathing:
-				delete_path_ghost()
+				# New block in path
 				if current_path_last_block != cursor_block:
+					# If the block is valid and next to the path
 					if valid_block() and is_adjacent(current_path_last_block, cursor_block):
 						# Corner revision case
 						if (current_path_last_block - current_path_second_to_last_block) + current_path_last_block != cursor_block:
@@ -361,6 +367,10 @@ func _process(delta):
 								current_path[cursor_block] = Vector3(j, 0, 1)
 						current_path_second_to_last_block = current_path_last_block
 						current_path_last_block = cursor_block
+					# Backtracking case
+					else:
+						# Delete the last path
+						pass
 		# Interacting with bank panel
 		elif over == 1:
 			bank_cursor.global_position = bank_plane.project(node_currently_interacting.global_position)
@@ -391,10 +401,14 @@ func transition_to_map():
 	over = 0
 	if dragging:
 		dragging_room.hide()
-		var i = bank_room_list.bsearch(dragging_room)
-		dragging_room = room_list[i]
+		var i = bank_room_list.find_key(dragging_room)
+		if (i==4):
+			pass
+		print(str("Transition to map - dragging: ", i))
+		dragging_room = room_list.values()[i]
 		dragging_room.show()
 		dragging_room_ghost = room_ghost_map[dragging_room]
+		dragging_room_ghost.show()
 
 func transition_to_bank():
 	map_cursor.hide()
@@ -402,8 +416,13 @@ func transition_to_bank():
 	over = 1
 	if dragging:
 		dragging_room.hide()
-		dragging_room = bank_room_list[room_list.bsearch(dragging_room)]
+		var i = room_list.find_key(dragging_room)
+		print(str("Transition to bank - dragging: ", i))
+		dragging_room = bank_room_list.values()[i]
 		dragging_room.show()
+		dragging_room_ghost.hide()
+		dragging_room_ghost = null
+		recalibrate_holders()
 	elif pathing:
 		pathing_clean_up()
 	
@@ -423,11 +442,13 @@ func slip_from_bank():
 	
 func put_back_room(room):
 	room.show()
-	room.global_position = bank_room_holder_list[bank_room_list.bsearch(room)].global_position
+	print(str("holder pos: ", bank_room_holder_list[bank_room_list.find_key(room)].global_position))
+	room.global_position = bank_room_holder_list[bank_room_list.find_key(room)].global_position
+	print(str("room pos: ", room.global_position))
 
 func recalibrate_holders():
 	for x in [0, 1, 2, 3, 4, 5, 6].filter(func(i): return bank_held_rooms[i]):
-		bank_room_list[x].global_position = bank_room_holder_list[x].global_position
+		bank_room_list.values()[x].global_position = bank_room_holder_list[x].global_position
 
 # Returns true or false based on if this block is available for drawing
 func valid_block():
@@ -569,11 +590,11 @@ func start_drag():
 	# Interacting with bank
 	else:
 		# For each held room
-		for x in [0, 1, 2, 3, 4, 5, 6].filter(func(i): return bank_held_rooms[i]).map(func(i):  return bank_room_list[i]):
+		for x in [0, 1, 2, 3, 4, 5, 6].filter(func(i): return bank_held_rooms[i]).map(func(i):  return bank_room_list.values()[i]):
 			if bank_cursor.position.distance_to(x.position) < bank_room_to_cursor_proximity:
 				dragging = true
 				dragging_room = x
-				bank_held_rooms[bank_room_list.bsearch(x)] = false
+				bank_held_rooms[bank_room_list.find_key(x)] = false
 
 # Cleans up room dragging
 func dragging_clean_up():
@@ -583,7 +604,7 @@ func dragging_clean_up():
 			rooms[cursor_block] = dragging_room
 		else:
 			dragging_room.hide()
-			put_back_room(bank_room_list[room_list.bsearch(dragging_room)])
+			put_back_room(bank_room_list.values()[room_list.find_key(dragging_room)])
 		dragging_room = null
 		dragging_room_ghost.hide()
 		dragging_room_ghost = null
@@ -596,7 +617,7 @@ func dragging_clean_up():
 func dragging_cancel():
 	if over == 0:
 		dragging_room.hide()
-		put_back_room(bank_room_list[room_list.bsearch(dragging_room)])
+		put_back_room(bank_room_list.values()[room_list.find_key(dragging_room)])
 		dragging_room = null
 		dragging_room_ghost.hide()
 		dragging_room_ghost = null
@@ -604,6 +625,7 @@ func dragging_cancel():
 	else:
 		put_back_room(dragging_room)
 		dragging_room = null
+		dragging = false
 
 # Cleans up drawing pane and hides it, hiding all elements and terminating all pathing, dragging, or ghosts
 func cancel_everything():
@@ -621,7 +643,7 @@ func _on_left_controller_button_pressed(name):
 		self.show()
 		node_currently_tracking = left_controller
 		node_currently_interacting = right_controller
-		node_
+		left_bank.show()
 		pause_stick_movement.emit()
 	elif name == "trigger_click":
 		if node_currently_interacting == left_controller:
@@ -633,7 +655,7 @@ func _on_left_controller_button_pressed(name):
 					double_click_timing = true
 					double_click_start_block = cursor_block
 					# start drag
-					if rooms.has(cursor_block) and !dragging and !pathing and !rooms_queued:
+					if rooms.has(cursor_block) and !dragging and !pathing:
 						start_drag()
 					# start path
 					elif temp_path_ghost != null and !rooms_queued:
@@ -648,6 +670,7 @@ func _on_right_controller_button_pressed(name):
 		self.show()
 		node_currently_tracking = right_controller
 		node_currently_interacting = left_controller
+		right_bank.show()
 		pause_stick_movement.emit()
 	elif name == "trigger_click":
 		if node_currently_interacting == right_controller:
@@ -660,7 +683,7 @@ func _on_right_controller_button_pressed(name):
 					double_click_timing = true
 					double_click_start_block = cursor_block
 					# start drag
-					if rooms.has(cursor_block) and !dragging and !pathing and !rooms_queued:
+					if rooms.has(cursor_block) and !dragging and !pathing:
 						start_drag()
 					# start path
 					elif temp_path_ghost != null and !rooms_queued:
@@ -669,30 +692,38 @@ func _on_right_controller_button_pressed(name):
 				if (not dragging):
 					start_drag()
 
-
 func _on_left_controller_button_released(name):
 	if name == "grip_click" and node_currently_tracking == left_controller:
 		cancel_everything()
+		left_bank.hide()
 	elif name == "trigger_click":
-		if node_currently_interacting == right_controller:
+		if over == 0:
+			if node_currently_interacting == left_controller:
+				if dragging:
+					dragging_clean_up()
+				elif pathing:
+					pathing_clean_up()
+		else:
 			if dragging:
-				dragging_clean_up()
-			elif pathing:
-				pathing_clean_up()
+				dragging_cancel()
 	elif name == "ax_button":
 		print(cursor_block)
-		
 
 func _on_right_controller_button_released(name):
 	if name == "grip_click" and node_currently_tracking == right_controller:
 		cancel_everything()
-	elif name == "trigger_click":
-		if node_currently_interacting == right_controller:
-			if dragging:
-				dragging_clean_up()
-			elif pathing:
-				pathing_clean_up()
+		right_bank.hide()
 		
+	elif name == "trigger_click":
+		if over == 0:
+			if node_currently_interacting == right_controller:
+				if dragging:
+					dragging_clean_up()
+				elif pathing:
+					pathing_clean_up()
+		else:
+			if dragging:
+				dragging_cancel()
 
 func _on_left_controller_input_vector_2_changed(name, value):
 	if name == "primary":
@@ -710,4 +741,4 @@ func _on_right_controller_input_vector_2_changed(name, value):
 
 func _on_room_explored(room):
 	bank_held_rooms[room] = true
-	put_back_room(bank_room_list[room])
+	put_back_room(bank_room_list.values()[room])
