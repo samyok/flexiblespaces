@@ -92,6 +92,9 @@ var right_bank_room_holder_group
 var bank_room_holder_group_offset_right = Vector3(.08, -0.02, 0)
 var bank_held_rooms = [true, false, false, false, false, false, false]
 var bank_room_to_cursor_proximity = 1.4
+var mapping_sprite
+var choosing_sprite
+var controls_alert_sprite
 
 signal pause_stick_movement
 signal resume_stick_movement
@@ -125,6 +128,9 @@ func _ready():
 	right_bank_room_list = {0: find_child("RightBankRoom1"), 1: find_child("RightBankRoom2"), 2: find_child("RightBankRoom3"), 3: find_child("RightBankRoom4"), 4: find_child("RightBankRoom5"), 5: find_child("RightBankRoom6"), 6: find_child("RightBankRoom7")}
 	right_bank_room_holder_list = find_children("RightRoomHolder?")
 	right_bank_room_holder_group = find_child("RightRoomHolderss")
+	mapping_sprite = %Overlay/MappingSprite
+	choosing_sprite = %Overlay/ChoosingSprite
+	controls_alert_sprite = %Overlay/ControlsAlertSprite
 	for i in [0, 1, 2, 3, 4, 5, 6]:
 		left_bank_room_list.values()[i].global_position = left_bank_room_holder_list[i].global_position
 		left_bank_room_list.values()[i].position += block_height_offset
@@ -486,6 +492,9 @@ func is_adjacent(vec3_1, vec3_2):
 	return false
 
 func transition_to_map():
+	mapping_sprite.show()
+	choosing_sprite.hide()
+	controls_alert_sprite.show()
 	map_cursor.show()
 	right_bank_cursor.hide()
 	left_bank_cursor.hide()
@@ -506,6 +515,9 @@ func transition_to_map():
 		dragging_room_ghost.show()
 
 func transition_to_bank():
+	mapping_sprite.hide()
+	choosing_sprite.show()
+	controls_alert_sprite.show()
 	map_cursor.hide()
 	#bank_cursor.show()
 	over = 1
@@ -537,6 +549,8 @@ func transition_to_bank():
 			pathing_clean_up()
 	
 func slip_from_map():
+	mapping_sprite.hide()
+	controls_alert_sprite.hide()
 	map_cursor.hide()
 	if dragging:
 		dragging_cancel()
@@ -545,6 +559,8 @@ func slip_from_map():
 	over = -1
 	
 func slip_from_bank():
+	choosing_sprite.hide()
+	controls_alert_sprite.hide()
 	left_bank_cursor.hide()
 	right_bank_cursor.hide()
 	if dragging:
