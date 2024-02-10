@@ -878,6 +878,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.75, 0)
 mesh = SubResource("BoxMesh_u41f1")
 skeleton = NodePath("../../..")
 
+[node name="RightBankRoom2" type="MeshInstance3D" parent="Map/RightBank/RightBankRoomss"]
+transform = Transform3D(0.5, 0, 0.866026, 0, 1, 0, -0.866026, 0, 0.5, 8.66026, -3.75, -5)
+visible = false
+mesh = ExtResource("8_x7l15")
+skeleton = NodePath("../../..")
+
 [node name="RightBankRoom3" type="MeshInstance3D" parent="Map/RightBank/RightBankRoomss"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -3.75, 0)
 visible = false
@@ -2000,8 +2006,10 @@ skeleton = NodePath("../..")
 [connection signal="button_released" from="XRUser/XROrigin3D/RightController" to="Map" method="_on_right_controller_button_released"]
 [connection signal="input_vector2_changed" from="XRUser/XROrigin3D/RightController" to="XRUser" method="process_input"]
 [connection signal="input_vector2_changed" from="XRUser/XROrigin3D/RightController" to="Map" method="_on_right_controller_input_vector_2_changed"]
+[connection signal="left_controller_signal" from="Map" to="Room" method="_on_map_left_controller_signal"]
 [connection signal="pause_stick_movement" from="Map" to="XRUser" method="_on_map_pause_stick_movement"]
 [connection signal="resume_stick_movement" from="Map" to="XRUser" method="_on_map_resume_stick_movement"]
+[connection signal="right_controller_signal" from="Map" to="Room" method="_on_map_right_controller_signal"]
 [connection signal="entered_hallway" from="Room" to="Paths" method="draw_path"]
 [connection signal="exited_hallway" from="Room" to="Paths" method="_on_exited_hallway"]
 [connection signal="explored_room" from="Room" to="Map" method="_on_room_explored"]

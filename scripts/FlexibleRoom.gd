@@ -25,10 +25,11 @@ var signs # Left sign pointers
 var door_guides # Door guide pointers
 var floor_guides # Floor guide pointers (0: turn left, 1: straight, 2: turn right)
 var signs_shown = []
+var last_controller
 
 var dfs = true # True for Depth-first search, False for Breadth-first search
 var dfs_room_order =        [0, 1, 3, 1, 5, 4, 0, 2, 6]
-var dfs_door_guide_order =  [0, 0, -1, 0, 1, 3, 2, 3, -1]
+var dfs_door_guide_order =  [0, 0, -1, 0, 2, 3, 2, 3, -1]
 var dfs_floor_guide_order = [3, 2, -1, 0, 1, 2, 2, 1, -1]
 var bfs_room_order = [0, 1, 2, 4, 5, 1, 3, 1, 0, 2, 6]
 var bfs_door_guide_order = []
@@ -50,13 +51,14 @@ var active_token
 var lerp_start_point
 var overlay
 var lerp_alpha
-var lerp_time = 1
+var lerp_time = 2
 
 signal entered_hallway(start_door, end_door)
 signal exited_hallway
 signal explored_room(room)
 
 func _ready():
+	last_controller = %LeftController
 	doors = self.find_child("Doors").find_children("Door*")
 	rooms_parent = self.find_child("Rooms")
 	rooms = rooms_parent.find_children("Room?")
@@ -80,9 +82,9 @@ func _process(delta):
 			active_token.hide()
 			active_token = null
 		else:
-			active_token.global_position = lerp(lerp_start_point, overlay.global_position, lerp_alpha)
+			active_token.global_position = lerp(lerp_start_point, last_controller.global_position, lerp_alpha)
 			active_token.global_rotation = Vector3(lerp(0.0, 8*PI, lerp_alpha), lerp(0.0, 2*PI, lerp_alpha), -lerp(0.0, 2*PI, lerp_alpha))
-			active_token.scale = Vector3(1 - lerp_alpha, 1 - lerp_alpha, 1 - lerp_alpha)
+			active_token.scale = Vector3(lerp_time - lerp_alpha, lerp_time - lerp_alpha, lerp_time - lerp_alpha)
 		
 
 func start_token_animation(room):
@@ -204,3 +206,11 @@ func _on_door_entered(area):
 		if area == doors[i]:
 			change_context(i)
 
+
+
+func _on_map_right_controller_signal():
+	last_controller = %RightController
+
+
+func _on_map_left_controller_signal():
+	last_controller = %LeftController

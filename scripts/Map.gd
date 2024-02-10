@@ -98,6 +98,8 @@ var controls_alert_sprite
 
 signal pause_stick_movement
 signal resume_stick_movement
+signal left_controller_signal
+signal right_controller_signal
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
@@ -794,6 +796,7 @@ func _on_left_controller_button_pressed(name):
 	if name == "grip_click" and node_currently_tracking != left_controller:
 		self.show()
 		node_currently_tracking = left_controller
+		left_controller_signal.emit()
 		node_currently_interacting = right_controller
 		right_bank.show()
 		pause_stick_movement.emit()
@@ -820,6 +823,7 @@ func _on_right_controller_button_pressed(name):
 	if name == "grip_click" and node_currently_tracking != right_controller:
 		self.show()
 		node_currently_tracking = right_controller
+		right_controller_signal.emit()
 		node_currently_interacting = left_controller
 		left_bank.show()
 		pause_stick_movement.emit()
