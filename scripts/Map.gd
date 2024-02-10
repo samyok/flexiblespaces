@@ -278,7 +278,6 @@ func _process(delta):
 			
 			# Dragging
 			if dragging:
-				delete_path_ghost()
 				dragging_room.position = map_cursor.position + dragging_float_height
 				#Dragging Ghost
 				dragging_room_ghost.position = cursor_block + block_height_offset + grid_offset
@@ -292,9 +291,12 @@ func _process(delta):
 				# New block in path
 				if current_path_last_block != cursor_block:
 					# If the block is valid and next to the path
-					if valid_block() and is_adjacent(current_path_last_block, cursor_block):
+					if (rooms.has(cursor_block) or valid_block()) and is_adjacent(current_path_last_block, cursor_block):
+						# Path ending case
+						if current_path_origin != cursor_block and rooms.has(cursor_block):
+							pathing_clean_up()
 						# Corner revision case
-						if (current_path_last_block - current_path_second_to_last_block) + current_path_last_block != cursor_block:
+						elif current_path_second_to_last_block != null and (current_path_last_block - current_path_second_to_last_block) + current_path_last_block != cursor_block:
 							# Left and Top
 							if (current_path_second_to_last_block - current_path_last_block == Vector3(-1, 0, 0) or cursor_block - current_path_last_block == Vector3(-1, 0, 0)) and (current_path_second_to_last_block - current_path_last_block == Vector3(0, 1, 0) or cursor_block - current_path_last_block == Vector3(0, 1, 0)):
 								# Hide current_path_last_block
@@ -567,14 +569,9 @@ func start_path():
 	# Initialize path variables
 	current_path_last_block = cursor_block
 	current_path_origin = cursor_block
-	for x in [cursor_block + Vector3.UP, cursor_block + Vector3.DOWN, cursor_block + Vector3.LEFT, cursor_block + Vector3.RIGHT]:
-		if rooms.has(x):
-			current_path_second_to_last_block = x
-			current_path_start_room = rooms.get(x)
-	# Co-opt ghost path into current path
-	temp_path_ghost = null
-	paths[cursor_block] = temp_path_ghost_i
-	current_path[cursor_block] = Vector3(temp_path_ghost_i, 0, temp_path_ghost_r)
+	if rooms.has(cursor_block):
+		current_path_second_to_last_block = null
+		current_path_start_room = rooms.get(cursor_block)
 
 # Cleans up pathing
 func pathing_clean_up():
@@ -677,11 +674,6 @@ func delete_selection(target):
 			path_accums.erase(d)
 		i += 1
 
-# Unrenders path ghost if it is being rendered
-func delete_path_ghost():
-	if temp_path_ghost != null:
-		path_multi_mesh.set_instance_transform(temp_path_ghost_i, Transform3D().scaled(delete_mesh_scale))
-		temp_path_ghost = null
 
 # Attempts to start dragging the current block
 func start_drag():
@@ -782,13 +774,15 @@ func _on_left_controller_button_pressed(name):
 					# start drag
 					if rooms.has(cursor_block) and !dragging and !pathing:
 						start_drag()
-					# start path
-					elif temp_path_ghost != null and !rooms_queued:
-						start_path()
 						
 			elif over == 1:
 				if (not dragging):
 					start_drag()
+	elif name == "ax_button" or "ay_button":
+		if over == 0:
+			# start path
+			if rooms.has(cursor_block) and !dragging and !pathing:
+				start_path()
 
 func _on_right_controller_button_pressed(name):
 	if name == "grip_click" and node_currently_tracking != right_controller:
