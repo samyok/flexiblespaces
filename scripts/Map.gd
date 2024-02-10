@@ -64,33 +64,33 @@ var path_instance_count = 0
 var corner_instance_count = 0
 var overlay
 var map_laser
-var bank
-var bank_position = Vector3(0, 3.75, 0)
-var bank_offset = Vector3(5, 0, 0)
-var bank_rotation = Vector3(0, PI/6, 0)
-var bank_panel
-var bank_panel_offset = Vector3(3.75, 0, 0)
 var over = -1 # Signifies the panel currently being interacted with: -1: no panel, 0: map panel, 1: bank panel, 2: tutorial panel
 var map_normal_guide
-var bank_normal_guide
 var bank_x_min_right = -7.5
 var bank_x_max_right = 0
 var bank_x_min_left = 0
 var bank_x_max_left = 7.5
 var bank_y_min = -3.75
 var bank_y_max = 3.75
+var left_bank
+var left_bank_panel
+var left_bank_normal_guide
 var left_bank_cursor
 var left_bank_laser
+var left_bank_room_list
+var left_bank_room_holder_list
+var right_bank
+var right_bank_panel
+var right_bank_normal_guide
 var right_bank_cursor
 var right_bank_laser
-var bank_room_list
-var bank_room_holder_list
+var right_bank_room_list
+var right_bank_room_holder_list
 var bank_held_rooms = [true, false, false, false, false, false, false]
 var bank_room_to_cursor_proximity = 1.4
-var bank_room_holder_group
-var bank_room_holder_group_offset_left = Vector3(-4.935, -0.02, 0)
-var bank_room_holder_group_offset_right = Vector3(5.08, -0.02, 0)
-var z = 0 # TODO: delete
+#var bank_room_holder_group
+#var bank_room_holder_group_offset_left = Vector3(-4.935, -0.02, 0)
+#var bank_room_holder_group_offset_right = Vector3(5.08, -0.02, 0)
 
 signal pause_stick_movement
 signal resume_stick_movement
@@ -101,27 +101,34 @@ func _ready():
 	right_controller = %RightController
 	camera = %XRCamera3D
 	overlay = %Overlay
-	bank = %RoomBank
-	bank_panel = %RoomBank/Panel
 	map_normal_guide = self.find_child("MapNormalGuide")
-	bank_normal_guide = %RoomBank/BankNormalGuide
 	path_multi_mesh = find_child("Paths").multimesh
 	corner_multi_mesh = find_child("Corners").multimesh
 	map_cursor = find_child("MapCursor")
-	bank_cursor = %RoomBank/BankCursor
 	map_laser = find_child("MapLaser")
-	bank_laser =  %RoomBank/BankCursor/BankLaser
 	room_list = {0: find_child("Room1"), 1: find_child("Room2"), 2: find_child("Room3"), 3: find_child("Room4"), 4: find_child("Room5"), 5: find_child("Room6"), 6: find_child("Room7")}
-	room_ghost_map = {room_list.values()[0]: find_child("GhostRoom1"), room_list.values()[1]: find_child("GhostRoom2"), room_list.values()[2]: find_child("GhostRoom3"), room_list.values()[3]: find_child("GhostRoom4"), room_list.values()[4]: find_child("GhostRoom5"), room_list.values()[5]: find_child("GhostRoom6"), room_list.values()[6]: find_child("GhostRoom7")} 
-	bank_room_list = {0: find_child("BankRoom1"), 1: find_child("BankRoom2"), 2: find_child("BankRoom3"), 3: find_child("BankRoom4"), 4: find_child("BankRoom5"), 5: find_child("BankRoom6"), 6: find_child("BankRoom7")}
-	bank_room_holder_list = find_children("RoomHolder?")
-	bank_room_holder_group = find_child("RoomHolderss")
+	room_ghost_map = {room_list.values()[0]: find_child("GhostRoom1"), room_list.values()[1]: find_child("GhostRoom2"), room_list.values()[2]: find_child("GhostRoom3"), room_list.values()[3]: find_child("GhostRoom4"), room_list.values()[4]: find_child("GhostRoom5"), room_list.values()[5]: find_child("GhostRoom6"), room_list.values()[6]: find_child("GhostRoom7")}
+	left_bank = %LeftBank
+	left_bank_panel = %LeftBank/Panel
+	left_bank_normal_guide = %LeftBank/BankNormalGuide
+	left_bank_cursor = %LeftBank/BankCursor
+	left_bank_laser =  %LeftBank/BankCursor/BankLaser
+	left_bank_room_list = {0: find_child("LeftBankRoom1"), 1: find_child("LeftBankRoom2"), 2: find_child("LeftBankRoom3"), 3: find_child("LeftBankRoom4"), 4: find_child("LeftBankRoom5"), 5: find_child("LeftBankRoom6"), 6: find_child("LeftBankRoom7")}
+	left_bank_room_holder_list = find_children("LeftRoomHolder?")
+	#left_bank_room_holder_group = find_child("RoomHolderss")
+	right_bank = %RightBank
+	right_bank_panel = %RightBank/Panel
+	right_bank_normal_guide = %RightBank/BankNormalGuide
+	right_bank_cursor = %RightBank/BankCursor
+	right_bank_laser =  %RightBank/BankCursor/BankLaser
+	right_bank_room_list = {0: find_child("RightBankRoom1"), 1: find_child("RightBankRoom2"), 2: find_child("RightBankRoom3"), 3: find_child("RightBankRoom4"), 4: find_child("RightBankRoom5"), 5: find_child("RightBankRoom6"), 6: find_child("RightBankRoom7")}
+	right_bank_room_holder_list = find_children("RightRoomHolder?")
+	#right_bank_room_holder_group = find_child("RoomHolderss")
 	for i in [0, 1, 2, 3, 4, 5, 6]:
-		bank_room_list.values()[i].global_position = bank_room_holder_list[i].global_position
-		if (i==4): 
-			pass
-		bank_room_list.values()[i].position += block_height_offset
-		print(bank_room_list.values()[i].position)
+		left_bank_room_list.values()[i].global_position = left_bank_room_holder_list[i].global_position
+		left_bank_room_list.values()[i].position += block_height_offset
+		right_bank_room_list.values()[i].global_position = right_bank_room_holder_list[i].global_position
+		right_bank_room_list.values()[i].position += block_height_offset
 
 # Called every frame. 'delta' is the elapsed time since the previous frame.
 func _process(delta):
@@ -138,7 +145,8 @@ func _process(delta):
 		self.rotation.x = rotation_x
 		overlay.rotation.x = 0 - rotation_x
 		var map_plane = Plane((map_normal_guide.global_position - self.global_position).normalized(), self.global_position)
-		var bank_plane = Plane((bank_normal_guide.global_position - bank.global_position).normalized(), bank.global_position)
+		var left_bank_plane = Plane((left_bank_normal_guide.global_position - left_bank.global_position).normalized(), left_bank.global_position)
+		var right_bank_plane = Plane((right_bank_normal_guide.global_position - right_bank.global_position).normalized(), right_bank.global_position)
 		
 		if input_vector.length() > scaling_deadzone:
 			self.scale = self.scale + Vector3(scaling_speed * input_vector.y, scaling_speed * input_vector.y, scaling_speed * input_vector.y)
