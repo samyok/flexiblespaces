@@ -566,7 +566,8 @@ surface_material_override/0 = SubResource("StandardMaterial3D_kwgxo")
 
 [node name="LeftBank" type="Node3D" parent="Map"]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 5, 3.5, 0)
+visible = false
 
 [node name="LeftBankRoomss" type="Node3D" parent="Map/LeftBank"]
 
@@ -612,7 +613,7 @@ mesh = SubResource("BoxMesh_yr38u")
 skeleton = NodePath("../../..")
 
 [node name="Panel" type="Node3D" parent="Map/LeftBank"]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 3.5, 0, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Map/LeftBank/Panel"]
 transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, 0)
@@ -643,7 +644,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, -1.5, 0)
 [node name="LeftRoomHolder7" type="Node3D" parent="Map/LeftBank/Panel/LeftRoomHolderss"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, -1.5, 0)
 
-[node name="BankNormalGuide" type="Node3D" parent="Map/LeftBank"]
+[node name="LeftBankNormalGuide" type="Node3D" parent="Map/LeftBank"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
 
 [node name="BankCursor" type="Node3D" parent="Map/LeftBank"]
@@ -658,7 +659,8 @@ surface_material_override/0 = SubResource("StandardMaterial3D_srtc7")
 
 [node name="RightBank" type="Node3D" parent="Map"]
 unique_name_in_owner = true
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 3.5, 0)
+transform = Transform3D(0.866025, 0, -0.5, 0, 1, 0, 0.5, 0, 0.866025, -5, 3.5, 0)
+visible = false
 
 [node name="RightBankRoomss" type="Node3D" parent="Map/RightBank"]
 
@@ -704,7 +706,7 @@ mesh = SubResource("BoxMesh_yr38u")
 skeleton = NodePath("../../..")
 
 [node name="Panel" type="Node3D" parent="Map/RightBank"]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, -3.5, 0, 0)
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Map/RightBank/Panel"]
 transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, 0)
@@ -735,29 +737,16 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.75, -1.5, 0)
 [node name="RightRoomHolder7" type="Node3D" parent="Map/RightBank/Panel/RightRoomHolderss"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.75, -1.5, 0)
 
-[node name="LeftBankNormalGuide" type="Node3D" parent="Map/RightBank"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
-
 [node name="RightBankNormalGuide" type="Node3D" parent="Map/RightBank"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
 
-[node name="LeftBankCursor" type="Node3D" parent="Map/RightBank"]
+[node name="BankCursor" type="Node3D" parent="Map/RightBank"]
 
-[node name="Ball" type="MeshInstance3D" parent="Map/RightBank/LeftBankCursor"]
+[node name="Ball" type="MeshInstance3D" parent="Map/RightBank/BankCursor"]
 mesh = SubResource("SphereMesh_td3q0")
 surface_material_override/0 = SubResource("StandardMaterial3D_88qy7")
 
-[node name="LeftBankLaser" type="MeshInstance3D" parent="Map/RightBank/LeftBankCursor"]
-mesh = SubResource("BoxMesh_t47kd")
-surface_material_override/0 = SubResource("StandardMaterial3D_srtc7")
-
-[node name="RightBankCursor" type="Node3D" parent="Map/RightBank"]
-
-[node name="Ball" type="MeshInstance3D" parent="Map/RightBank/RightBankCursor"]
-mesh = SubResource("SphereMesh_td3q0")
-surface_material_override/0 = SubResource("StandardMaterial3D_88qy7")
-
-[node name="RightBankLaser" type="MeshInstance3D" parent="Map/RightBank/RightBankCursor"]
+[node name="BankLaser" type="MeshInstance3D" parent="Map/RightBank/BankCursor"]
 mesh = SubResource("BoxMesh_t47kd")
 surface_material_override/0 = SubResource("StandardMaterial3D_srtc7")
 
