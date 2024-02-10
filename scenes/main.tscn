@@ -622,7 +622,6 @@ skeleton = NodePath("../..")
 surface_material_override/0 = SubResource("StandardMaterial3D_qxt7m")
 
 [node name="RoomHolderss" type="Node3D" parent="Map/RoomBank/Panel"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.558, -0.02, 0)
 
 [node name="RoomHolder1" type="Node3D" parent="Map/RoomBank/Panel/RoomHolderss"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.5, 1, 0)

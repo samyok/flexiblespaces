@@ -394,7 +394,7 @@ func transition_to_map():
 		var i = bank_room_list.bsearch(dragging_room)
 		dragging_room = room_list[i]
 		dragging_room.show()
-		dragging_room_ghost = room_ghost_map[i]
+		dragging_room_ghost = room_ghost_map[dragging_room]
 
 func transition_to_bank():
 	map_cursor.hide()
@@ -410,20 +410,24 @@ func transition_to_bank():
 func slip_from_map():
 	map_cursor.hide()
 	over = -1
+	if dragging:
+		dragging_cancel()
+	elif pathing:
+		pathing_clean_up()
 	
 func slip_from_bank():
 	bank_cursor.hide()
 	over = -1
+	if dragging:
+		dragging_cancel()
 	
 func put_back_room(room):
 	room.show()
-	room.position = bank_room_holder_list[bank_room_list.bsearch(room)].position
+	room.global_position = bank_room_holder_list[bank_room_list.bsearch(room)].global_position
 
 # Returns true or false based on if this block is available for drawing
 func valid_block():
 	return !(paths.has(cursor_block) or corners.has(cursor_block) or rooms.has(cursor_block) or cursor_block == null)
-
-		
 
 # Attempts to start pathing at the current block
 func start_path():
@@ -582,7 +586,20 @@ func dragging_clean_up():
 		dragging = false
 	else:
 		put_back_room(dragging_room)
+		dragging_room = null
 
+# Cleans up room dragging
+func dragging_cancel():
+	if over == 0:
+		dragging_room.hide()
+		put_back_room(bank_room_list[room_list.bsearch(dragging_room)])
+		dragging_room = null
+		dragging_room_ghost.hide()
+		dragging_room_ghost = null
+		dragging = false
+	else:
+		put_back_room(dragging_room)
+		dragging_room = null
 
 # Cleans up drawing pane and hides it, hiding all elements and terminating all pathing, dragging, or ghosts
 func cancel_everything():
