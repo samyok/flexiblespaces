@@ -81,6 +81,7 @@ func _process(delta):
 			active_token = null
 		else:
 			active_token.global_position = lerp(lerp_start_point, overlay.global_position, lerp_alpha)
+			active_token.global_rotation = lerp(0, 2*PI, lerp_alpha)
 		
 
 func start_token_animation(room):
