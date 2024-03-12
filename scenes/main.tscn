@@ -601,6 +601,7 @@ material = SubResource("ShaderMaterial_ds8yu")
 size = Vector2(1, 1)
 
 [node name="Main" type="Node3D"]
+transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 script = ExtResource("1_xecma")
 
 [node name="XRUser" type="Area3D" parent="."]
