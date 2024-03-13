@@ -674,8 +674,8 @@ func delete_selection(target):
 	for d in path_accums:
 		# Find the path dictionary that has the currently hovered block
 		if d.has(target):
-			path_starts.erase(path_starts[i])
-			path_ends.erase(path_ends[i])
+			path_starts.remove_at(i)
+			path_ends.remove_at(i)
 			# Loop through its entries
 			for k in d.keys():
 				var v = d.get(k)
@@ -699,9 +699,11 @@ func start_drag():
 		dragging_room = rooms.get(cursor_block)
 		rooms.erase(cursor_block)
 		dragging_room_ghost = room_ghost_map[dragging_room]
-		for i in path_accums.size():
+		var i = path_accums.size()-1
+		while i != -1:
 			if path_starts[i] == dragging_room or path_ends[i] == cursor_block:
 				delete_selection(path_accums[i].keys().front())
+			i -= 1
 	# Interacting with bank
 	else:
 		# For each held room

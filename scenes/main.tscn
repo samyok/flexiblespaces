@@ -1,4 +1,4 @@
-[gd_scene load_steps=157 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=158 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/locomotion.gd" id="2_g8nli"]
@@ -600,6 +600,9 @@ orientation = 2
 material = SubResource("ShaderMaterial_ds8yu")
 size = Vector2(1, 1)
 
+[sub_resource type="PlaneMesh" id="PlaneMesh_q2mls"]
+orientation = 2
+
 [node name="Main" type="Node3D"]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
 script = ExtResource("1_xecma")
@@ -995,6 +998,7 @@ shape = SubResource("BoxShape3D_trsr2")
 script = ExtResource("16_37bvc")
 
 [node name="Rooms" type="Node3D" parent="Room"]
+visible = false
 
 [node name="Room1" type="Node3D" parent="Room/Rooms"]
 
@@ -1482,10 +1486,9 @@ mesh = SubResource("PlaneMesh_d82ie")
 surface_material_override/0 = ExtResource("28_fcmcp")
 
 [node name="Paths" type="Node3D" parent="."]
-script = ExtResource("7_ctd0p")
+visible = false
 
 [node name="Path1" type="Node3D" parent="Paths"]
-visible = false
 
 [node name="1X" type="MeshInstance3D" parent="Paths/Path1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.5, 1.5, -2.5)
@@ -1995,6 +1998,12 @@ mesh = SubResource("PlaneMesh_yq7s5")
 skeleton = NodePath("../..")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="."]
+mesh = SubResource("PlaneMesh_q2mls")
+
+[node name="TempPaths" type="Node3D" parent="."]
+script = ExtResource("7_ctd0p")
 
 [connection signal="area_entered" from="XRUser" to="Room" method="_on_door_entered"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/LeftController" to="XRUser" method="button_pressed"]
