@@ -1,4 +1,4 @@
-[gd_scene load_steps=157 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=168 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/locomotion.gd" id="2_g8nli"]
@@ -418,19 +418,33 @@ size = Vector3(100, 1, 100)
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_phfgv"]
 albedo_texture = ExtResource("19_tndds")
-uv1_scale = Vector3(10, 10, 10)
+uv1_scale = Vector3(3.75, 10, 10)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_cgt6s"]
 material = SubResource("StandardMaterial3D_phfgv")
+size = Vector2(1.5, 3)
+orientation = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_wig2j"]
+material = ExtResource("7_3gso7")
 size = Vector2(4, 3)
 orientation = 2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c75ig"]
 albedo_texture = ExtResource("20_iwwja")
-uv1_scale = Vector3(10, 10, 10)
+uv1_scale = Vector3(3.75, 10, 10)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_c10q5"]
 material = SubResource("StandardMaterial3D_c75ig")
+size = Vector2(1.5, 3)
+orientation = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b1f7p"]
+albedo_texture = ExtResource("20_iwwja")
+uv1_scale = Vector3(10, 10, 10)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_jon33"]
+material = SubResource("StandardMaterial3D_b1f7p")
 size = Vector2(4, 3)
 orientation = 2
 
@@ -440,7 +454,7 @@ uv1_scale = Vector3(10, 10, 10)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_0k8k7"]
 material = SubResource("StandardMaterial3D_s2b2v")
-size = Vector2(4, 3)
+size = Vector2(1.5, 3)
 orientation = 2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hu1vl"]
@@ -452,18 +466,39 @@ material = SubResource("StandardMaterial3D_hu1vl")
 size = Vector2(4, 3)
 orientation = 2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e81jq"]
+albedo_texture = ExtResource("18_5su4m")
+uv1_scale = Vector3(3.75, 10, 10)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_tto4o"]
+material = SubResource("StandardMaterial3D_e81jq")
+size = Vector2(1.5, 3)
+orientation = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lhy0f"]
+albedo_texture = ExtResource("18_5su4m")
+uv1_scale = Vector3(3.75, 10, 10)
+uv1_offset = Vector3(0.25, 0, 0)
+uv2_scale = Vector3(3.75, 10, 10)
+uv2_offset = Vector3(-0.25, 0, 0)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_pqtcc"]
+material = SubResource("StandardMaterial3D_lhy0f")
+size = Vector2(1.5, 3)
+orientation = 2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lshpt"]
 albedo_texture = ExtResource("17_q3orn")
-uv1_scale = Vector3(10, 10, 10)
+uv1_scale = Vector3(3.75, 10, 10)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_1fvpt"]
 material = SubResource("StandardMaterial3D_lshpt")
-size = Vector2(4, 3)
+size = Vector2(1.5, 3)
 orientation = 2
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_dbk6f"]
 material = ExtResource("15_66snh")
-size = Vector2(4, 3)
+size = Vector2(1.5, 3)
 orientation = 2
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_yy4h6"]
@@ -482,10 +517,14 @@ material = ExtResource("14_842n3")
 size = Vector2(4, 3)
 orientation = 0
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qw6pj"]
+albedo_texture = ExtResource("9_77kk3")
+uv1_scale = Vector3(3.75, 10, 10)
+
 [sub_resource type="PlaneMesh" id="PlaneMesh_52etr"]
-material = ExtResource("14_842n3")
+material = SubResource("StandardMaterial3D_qw6pj")
 flip_faces = true
-size = Vector2(4, 3)
+size = Vector2(1.5, 3)
 orientation = 0
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_5hgp3"]
@@ -495,6 +534,9 @@ size = Vector3(1, 3, 0.001)
 material = ExtResource("15_qvas2")
 size = Vector2(1, 3)
 orientation = 2
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_m4ymg"]
+size = Vector3(4, 3, 1)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_qcgd5"]
 material = ExtResource("15_qvas2")
@@ -595,6 +637,15 @@ orientation = 2
 [sub_resource type="PlaneMesh" id="PlaneMesh_yq7s5"]
 material = SubResource("ShaderMaterial_ds8yu")
 size = Vector2(1, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l0cje"]
+albedo_texture = ExtResource("28_mw5ce")
+uv1_scale = Vector3(12, 6, 10)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_fg522"]
+material = SubResource("StandardMaterial3D_l0cje")
+size = Vector2(6, 3)
+orientation = 2
 
 [node name="Main" type="Node3D"]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
@@ -991,25 +1042,36 @@ shape = SubResource("BoxShape3D_trsr2")
 script = ExtResource("16_37bvc")
 
 [node name="Rooms" type="Node3D" parent="Room"]
-visible = false
 
 [node name="Room1" type="Node3D" parent="Room/Rooms"]
 
 [node name="Wall1" type="MeshInstance3D" parent="Room/Rooms/Room1"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 1.5, -2)
+mesh = SubResource("PlaneMesh_cgt6s")
+
+[node name="Wall5" type="MeshInstance3D" parent="Room/Rooms/Room1"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 1.5, -2)
 mesh = SubResource("PlaneMesh_cgt6s")
 
 [node name="Wall2" type="MeshInstance3D" parent="Room/Rooms/Room1"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, 2)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.25, 1.5, 2)
+mesh = SubResource("PlaneMesh_cgt6s")
+
+[node name="Wall6" type="MeshInstance3D" parent="Room/Rooms/Room1"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 1.25, 1.5, 2)
 mesh = SubResource("PlaneMesh_cgt6s")
 
 [node name="Wall3" type="MeshInstance3D" parent="Room/Rooms/Room1"]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 0)
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 1.25)
 mesh = SubResource("PlaneMesh_cgt6s")
 
-[node name="Wall4" type="MeshInstance3D" parent="Room/Rooms/Room1"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 0)
+[node name="Wall7" type="MeshInstance3D" parent="Room/Rooms/Room1"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, -1.25)
 mesh = SubResource("PlaneMesh_cgt6s")
+
+[node name="Wall8" type="MeshInstance3D" parent="Room/Rooms/Room1"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 0)
+mesh = SubResource("PlaneMesh_wig2j")
 
 [node name="StartPrompt" type="Sprite3D" parent="Room/Rooms/Room1"]
 transform = Transform3D(-8.74228e-09, -0.068404, 0.187939, 0, 0.187939, 0.068404, -0.2, 2.99003e-09, -8.21505e-09, -1.5, 1.3, 0.4)
@@ -1034,19 +1096,31 @@ frame = 2
 visible = false
 
 [node name="Wall1" type="MeshInstance3D" parent="Room/Rooms/Room2"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 1.5, -2)
 mesh = SubResource("PlaneMesh_c10q5")
 
-[node name="Wall2" type="MeshInstance3D" parent="Room/Rooms/Room2"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, 2)
+[node name="Wall5" type="MeshInstance3D" parent="Room/Rooms/Room2"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 1.5, -2)
 mesh = SubResource("PlaneMesh_c10q5")
+
+[node name="Wall6" type="MeshInstance3D" parent="Room/Rooms/Room2"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, 2)
+mesh = SubResource("PlaneMesh_jon33")
 
 [node name="Wall3" type="MeshInstance3D" parent="Room/Rooms/Room2"]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 0)
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 1.25)
+mesh = SubResource("PlaneMesh_c10q5")
+
+[node name="Wall7" type="MeshInstance3D" parent="Room/Rooms/Room2"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, -1.25)
 mesh = SubResource("PlaneMesh_c10q5")
 
 [node name="Wall4" type="MeshInstance3D" parent="Room/Rooms/Room2"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 0)
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 1.25)
+mesh = SubResource("PlaneMesh_c10q5")
+
+[node name="Wall8" type="MeshInstance3D" parent="Room/Rooms/Room2"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, -1.25)
 mesh = SubResource("PlaneMesh_c10q5")
 
 [node name="Path" type="Sprite3D" parent="Room/Rooms/Room2"]
@@ -1066,19 +1140,35 @@ skeleton = NodePath("../../../../Map")
 visible = false
 
 [node name="Wall1" type="MeshInstance3D" parent="Room/Rooms/Room3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 1.5, -2)
+mesh = SubResource("PlaneMesh_0k8k7")
+
+[node name="Wall5" type="MeshInstance3D" parent="Room/Rooms/Room3"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 1.5, -2)
 mesh = SubResource("PlaneMesh_0k8k7")
 
 [node name="Wall2" type="MeshInstance3D" parent="Room/Rooms/Room3"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, 2)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 1.25, 1.5, 2)
+mesh = SubResource("PlaneMesh_0k8k7")
+
+[node name="Wall6" type="MeshInstance3D" parent="Room/Rooms/Room3"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.25, 1.5, 2)
 mesh = SubResource("PlaneMesh_0k8k7")
 
 [node name="Wall3" type="MeshInstance3D" parent="Room/Rooms/Room3"]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 0)
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 1.25)
+mesh = SubResource("PlaneMesh_0k8k7")
+
+[node name="Wall7" type="MeshInstance3D" parent="Room/Rooms/Room3"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, -1.25)
 mesh = SubResource("PlaneMesh_0k8k7")
 
 [node name="Wall4" type="MeshInstance3D" parent="Room/Rooms/Room3"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 0)
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 1.25)
+mesh = SubResource("PlaneMesh_0k8k7")
+
+[node name="Wall8" type="MeshInstance3D" parent="Room/Rooms/Room3"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -1.9975, 1.50482, -1.24873)
 mesh = SubResource("PlaneMesh_0k8k7")
 
 [node name="Path" type="Sprite3D" parent="Room/Rooms/Room3"]
@@ -1109,8 +1199,12 @@ transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5
 mesh = SubResource("PlaneMesh_2m2uk")
 
 [node name="Wall4" type="MeshInstance3D" parent="Room/Rooms/Room4"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 0)
-mesh = SubResource("PlaneMesh_2m2uk")
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 1.25)
+mesh = SubResource("PlaneMesh_tto4o")
+
+[node name="Wall8" type="MeshInstance3D" parent="Room/Rooms/Room4"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, -1.25)
+mesh = SubResource("PlaneMesh_pqtcc")
 
 [node name="Path" type="Sprite3D" parent="Room/Rooms/Room4"]
 transform = Transform3D(-0.833, 7.28232e-08, -3.1832e-15, 0, -3.64116e-08, -0.833, -7.28232e-08, -0.833, 3.64116e-08, 0, 0.01, 0)
@@ -1130,19 +1224,35 @@ skeleton = NodePath("../../../../Map")
 visible = false
 
 [node name="Wall1" type="MeshInstance3D" parent="Room/Rooms/Room5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 1.5, -2)
+mesh = SubResource("PlaneMesh_1fvpt")
+
+[node name="Wall8" type="MeshInstance3D" parent="Room/Rooms/Room5"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 1.5, -2)
 mesh = SubResource("PlaneMesh_1fvpt")
 
 [node name="Wall2" type="MeshInstance3D" parent="Room/Rooms/Room5"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, 2)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 1.25, 1.5, 2)
+mesh = SubResource("PlaneMesh_1fvpt")
+
+[node name="Wall7" type="MeshInstance3D" parent="Room/Rooms/Room5"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.25, 1.5, 2)
 mesh = SubResource("PlaneMesh_1fvpt")
 
 [node name="Wall3" type="MeshInstance3D" parent="Room/Rooms/Room5"]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 0)
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 1.25)
+mesh = SubResource("PlaneMesh_1fvpt")
+
+[node name="Wall6" type="MeshInstance3D" parent="Room/Rooms/Room5"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, -1.25)
 mesh = SubResource("PlaneMesh_1fvpt")
 
 [node name="Wall4" type="MeshInstance3D" parent="Room/Rooms/Room5"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 0)
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, -1.25)
+mesh = SubResource("PlaneMesh_1fvpt")
+
+[node name="Wall5" type="MeshInstance3D" parent="Room/Rooms/Room5"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 1.25)
 mesh = SubResource("PlaneMesh_1fvpt")
 
 [node name="Path" type="Sprite3D" parent="Room/Rooms/Room5"]
@@ -1162,19 +1272,35 @@ skeleton = NodePath("../../../../Map")
 visible = false
 
 [node name="Wall1" type="MeshInstance3D" parent="Room/Rooms/Room6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 1.5, -2)
+mesh = SubResource("PlaneMesh_dbk6f")
+
+[node name="Wall5" type="MeshInstance3D" parent="Room/Rooms/Room6"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 1.5, -2)
 mesh = SubResource("PlaneMesh_dbk6f")
 
 [node name="Wall2" type="MeshInstance3D" parent="Room/Rooms/Room6"]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 0)
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 1.25)
+mesh = SubResource("PlaneMesh_dbk6f")
+
+[node name="Wall6" type="MeshInstance3D" parent="Room/Rooms/Room6"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, -1.25)
 mesh = SubResource("PlaneMesh_dbk6f")
 
 [node name="Wall3" type="MeshInstance3D" parent="Room/Rooms/Room6"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 0)
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 1.25)
+mesh = SubResource("PlaneMesh_dbk6f")
+
+[node name="Wall7" type="MeshInstance3D" parent="Room/Rooms/Room6"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, -1.25)
 mesh = SubResource("PlaneMesh_dbk6f")
 
 [node name="Wall4" type="MeshInstance3D" parent="Room/Rooms/Room6"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, 2)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 1.25, 1.5, 2)
+mesh = SubResource("PlaneMesh_dbk6f")
+
+[node name="Wall8" type="MeshInstance3D" parent="Room/Rooms/Room6"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.25, 1.5, 2)
 mesh = SubResource("PlaneMesh_dbk6f")
 
 [node name="Path" type="Sprite3D" parent="Room/Rooms/Room6"]
@@ -1204,8 +1330,12 @@ mesh = SubResource("PlaneMesh_8xjjw")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2, 1.5, 0)
 mesh = SubResource("PlaneMesh_ia2qr")
 
-[node name="Wall4" type="MeshInstance3D" parent="Room/Rooms/Room7"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, 0)
+[node name="Wall5" type="MeshInstance3D" parent="Room/Rooms/Room7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, 1.25)
+mesh = SubResource("PlaneMesh_52etr")
+
+[node name="Wall6" type="MeshInstance3D" parent="Room/Rooms/Room7"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2, 1.5, -1.25)
 mesh = SubResource("PlaneMesh_52etr")
 
 [node name="Path" type="Sprite3D" parent="Room/Rooms/Room7"]
@@ -1226,50 +1356,101 @@ skeleton = NodePath("../../../../Map")
 
 [node name="Doors" type="Node3D" parent="Room"]
 
-[node name="DoorNorthArea" type="Area3D" parent="Room/Doors"]
+[node name="DoorNorth" type="Node3D" parent="Room/Doors"]
+
+[node name="DoorNorthArea" type="Area3D" parent="Room/Doors/DoorNorth"]
 unique_name_in_owner = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorNorthArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorNorth/DoorNorthArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
 shape = SubResource("BoxShape3D_5hgp3")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Room/Doors/DoorNorthArea"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Room/Doors/DoorNorth/DoorNorthArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.999)
 mesh = SubResource("PlaneMesh_mabpu")
 
-[node name="DoorEastArea" type="Area3D" parent="Room/Doors"]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Room/Doors/DoorNorth/DoorNorthArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.001)
+mesh = SubResource("PlaneMesh_mabpu")
+
+[node name="NorthDoorProximityZone" type="Area3D" parent="Room/Doors/DoorNorth"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorNorth/NorthDoorProximityZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.5)
+shape = SubResource("BoxShape3D_m4ymg")
+
+[node name="DoorEast" type="Node3D" parent="Room/Doors"]
+
+[node name="DoorEastArea" type="Area3D" parent="Room/Doors/DoorEast"]
 unique_name_in_owner = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorEastArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorEast/DoorEastArea"]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 2, 1.5, 0)
 shape = SubResource("BoxShape3D_5hgp3")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Room/Doors/DoorEastArea"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Room/Doors/DoorEast/DoorEastArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.999, 1.5, 0)
 mesh = SubResource("PlaneMesh_qcgd5")
 
-[node name="DoorSouthArea" type="Area3D" parent="Room/Doors"]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Room/Doors/DoorEast/DoorEastArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.001, 1.5, 0)
+mesh = SubResource("PlaneMesh_qcgd5")
+
+[node name="NorthDoorProximityZone" type="Area3D" parent="Room/Doors/DoorEast"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorEast/NorthDoorProximityZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.5)
+shape = SubResource("BoxShape3D_m4ymg")
+
+[node name="DoorSouth" type="Node3D" parent="Room/Doors"]
+
+[node name="DoorSouthArea" type="Area3D" parent="Room/Doors/DoorSouth"]
 unique_name_in_owner = true
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorSouthArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorSouth/DoorSouthArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 2)
 shape = SubResource("BoxShape3D_5hgp3")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Room/Doors/DoorSouthArea"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Room/Doors/DoorSouth/DoorSouthArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 1.999)
 mesh = SubResource("PlaneMesh_mabpu")
 
-[node name="DoorWestArea" type="Area3D" parent="Room/Doors"]
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Room/Doors/DoorSouth/DoorSouthArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 2.001)
+mesh = SubResource("PlaneMesh_mabpu")
+
+[node name="NorthDoorProximityZone" type="Area3D" parent="Room/Doors/DoorSouth"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorSouth/NorthDoorProximityZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.5)
+shape = SubResource("BoxShape3D_m4ymg")
+
+[node name="DoorWest" type="Node3D" parent="Room/Doors"]
+
+[node name="DoorWestArea" type="Area3D" parent="Room/Doors/DoorWest"]
 unique_name_in_owner = true
 visible = false
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorWestArea"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorWest/DoorWestArea"]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, 0)
 shape = SubResource("BoxShape3D_5hgp3")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Room/Doors/DoorWestArea"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Room/Doors/DoorWest/DoorWestArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.999, 1.5, 0)
 mesh = SubResource("PlaneMesh_qcgd5")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="Room/Doors/DoorWest/DoorWestArea"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.001, 1.5, 0)
+mesh = SubResource("PlaneMesh_qcgd5")
+
+[node name="NorthDoorProximityZone" type="Area3D" parent="Room/Doors/DoorWest"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorWest/NorthDoorProximityZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.5)
+shape = SubResource("BoxShape3D_m4ymg")
 
 [node name="Signs" type="Node3D" parent="Room"]
 
@@ -1994,6 +2175,24 @@ skeleton = NodePath("../..")
 
 [node name="TempPaths" type="Node3D" parent="."]
 script = ExtResource("7_ctd0p")
+
+[node name="BorderWalls" type="Node3D" parent="."]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="BorderWalls"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -3.001)
+mesh = SubResource("PlaneMesh_fg522")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="BorderWalls"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -3.001, 1.5, 0)
+mesh = SubResource("PlaneMesh_fg522")
+
+[node name="MeshInstance3D3" type="MeshInstance3D" parent="BorderWalls"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 3.001, 1.5, 0)
+mesh = SubResource("PlaneMesh_fg522")
+
+[node name="MeshInstance3D4" type="MeshInstance3D" parent="BorderWalls"]
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, 3.001)
+mesh = SubResource("PlaneMesh_fg522")
 
 [connection signal="area_entered" from="XRUser" to="Room" method="_on_door_entered"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/LeftController" to="XRUser" method="button_pressed"]

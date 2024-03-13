@@ -18,7 +18,8 @@ var last_room
 var next_room
 var last_door
 var next_door
-var doors # Door pointers
+var doors # Door Area3D pointers
+var door_proximity_zones
 var rooms_parent # Node to hide all rooms
 var rooms # Wall pointers
 var signs # Left sign pointers
@@ -59,7 +60,8 @@ signal explored_room(room)
 
 func _ready():
 	last_controller = %LeftController
-	doors = self.find_child("Doors").find_children("Door*")
+	doors = self.find_children("Door*Area",)
+	door_proximity_zones = self.find_children("*DoorProximityZone")
 	rooms_parent = self.find_child("Rooms")
 	rooms = rooms_parent.find_children("Room?")
 	signs = self.find_child("Signs").find_children("Sign?")
@@ -205,8 +207,14 @@ func _on_door_entered(area):
 	for i in 4:
 		if area == doors[i]:
 			change_context(i)
-
-
+		elif area == door_proximity_zones[i]:
+			if doors[i].overlaps_area(%XRUser):
+				pass # TODO: implement
+				
+func _on_door_exited(area):
+	for i in 4:
+		if area == door_proximity_zones[i]:
+			pass # TODO: implement
 
 func _on_map_right_controller_signal():
 	last_controller = %RightController
