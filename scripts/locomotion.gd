@@ -1,9 +1,9 @@
 extends Node3D
 
-@export var max_speed:= 10
+@export var max_speed:= 3.0
 @export var dead_zone := 0.2
 
-@export var smooth_turn_speed:= 180.0
+@export var smooth_turn_speed:= 30.0
 @export var smooth_turn_dead_zone := 0.2
 @export var snap_turn_dead_zone := 0.9
 @export var snap_turn_reset_zone := 0.1
