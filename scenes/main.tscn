@@ -42,7 +42,7 @@
 [ext_resource type="PlaneMesh" uid="uid://cto8csjbkaisa" path="res://textures/wall_material.tres" id="36_ex5uo"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nj0ms"]
-size = Vector3(0.2, 0.2, 0.2)
+size = Vector3(0.01, 0.01, 0.01)
 
 [sub_resource type="CylinderShape3D" id="CylinderShape3D_4776p"]
 height = 0.1
