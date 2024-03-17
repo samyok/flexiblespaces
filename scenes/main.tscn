@@ -699,6 +699,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.6, 0)
 far = 500.0
 
 [node name="TokenStartPosition" type="Node3D" parent="XRUser/XROrigin3D/XRCamera3D"]
+unique_name_in_owner = true
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1, 0)
 
 [node name="LeftController" type="XRController3D" parent="XRUser/XROrigin3D"]
