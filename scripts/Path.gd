@@ -52,8 +52,8 @@ var path_grids = [
 		[ 0,  0,  0,  0,  0,  0,  0,  0],
 		[ 0,  0,  0,  8,  2,  3,  0,  0],
 		[ 0,  0,  0,  0,  0,  1,  0,  0],
-		[ 0, 10,  2,  2,  2,  4,  0,  0],
-		[ 0,  9,  2,  2,  2,  3,  0,  0],
+		[ 0,  6,  2,  2,  2,  4,  0,  0],
+		[ 0,  5,  2,  2,  2,  3,  0,  0],
 		[ 0,  0,  0,  0,  0,  1,  0,  0],
 		[ 0,  0,  0,  8,  2,  4,  0,  0],
 		[ 0,  0,  0,  0,  0,  0,  0,  0]
@@ -73,55 +73,55 @@ func draw_path(start_door, end_door):
 		self.rotation.y = 0
 		# Right
 		if end_door == 3:
-			create_walls(1)
+			create_walls(0)
 		# Straight
 		elif end_door == 2:
 			create_walls(2)
 		# Left
 		else:
-			create_walls(0)
+			create_walls(1)
 
 	# East
 	elif start_door == 1:
 		# Rotate
 		self.rotation.y = -PI/2
 		# Right
-		if end_door == 3:
-			create_walls(1)
+		if end_door == 0:
+			create_walls(0)
 		# Straight
-		elif end_door == 2:
+		elif end_door == 3:
 			create_walls(2)
 		# Left
 		else:
-			create_walls(0)
+			create_walls(1)
 
 	# South
 	elif start_door == 2:
 		# Rotate
 		self.rotation.y = PI
 		# Right
-		if end_door == 3:
-			create_walls(1)
+		if end_door == 1:
+			create_walls(0)
 		# Straight
-		elif end_door == 2:
+		elif end_door == 0:
 			create_walls(2)
 		# Left
 		else:
-			create_walls(0)
+			create_walls(1)
 
 	# West
 	else:
 		# Rotate
 		self.rotation.y = PI/2
 		# Right
-		if end_door == 3:
-			create_walls(1)
+		if end_door == 2:
+			create_walls(0)
 		# Straight
-		elif end_door == 2:
+		elif end_door == 1:
 			create_walls(2)
 		# Left
 		else:
-			create_walls(0)
+			create_walls(1)
 
 func create_walls(path_number):
 	var path_grid = path_grids[path_number]

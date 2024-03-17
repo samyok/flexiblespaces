@@ -1,4 +1,4 @@
-[gd_scene load_steps=168 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=175 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/locomotion.gd" id="2_g8nli"]
@@ -448,9 +448,18 @@ material = SubResource("StandardMaterial3D_b1f7p")
 size = Vector2(4, 3)
 orientation = 2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s2b2v"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0yxoe"]
 albedo_texture = ExtResource("16_t3fh3")
 uv1_scale = Vector3(10, 10, 10)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_pb7l1"]
+material = SubResource("StandardMaterial3D_0yxoe")
+size = Vector2(4, 3)
+orientation = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s2b2v"]
+albedo_texture = ExtResource("16_t3fh3")
+uv1_scale = Vector3(3.75, 10, 10)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_0k8k7"]
 material = SubResource("StandardMaterial3D_s2b2v")
@@ -487,6 +496,15 @@ material = SubResource("StandardMaterial3D_lhy0f")
 size = Vector2(1.5, 3)
 orientation = 2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m1xc0"]
+albedo_texture = ExtResource("17_q3orn")
+uv1_scale = Vector3(10, 10, 10)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_rne4v"]
+material = SubResource("StandardMaterial3D_m1xc0")
+size = Vector2(4, 3)
+orientation = 2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lshpt"]
 albedo_texture = ExtResource("17_q3orn")
 uv1_scale = Vector3(3.75, 10, 10)
@@ -494,6 +512,15 @@ uv1_scale = Vector3(3.75, 10, 10)
 [sub_resource type="PlaneMesh" id="PlaneMesh_1fvpt"]
 material = SubResource("StandardMaterial3D_lshpt")
 size = Vector2(1.5, 3)
+orientation = 2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3v5ux"]
+albedo_texture = ExtResource("18_wiklc")
+uv1_scale = Vector3(8, 5, 1)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_2cscc"]
+material = SubResource("StandardMaterial3D_3v5ux")
+size = Vector2(4, 3)
 orientation = 2
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_dbk6f"]
@@ -537,6 +564,9 @@ orientation = 2
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_m4ymg"]
 size = Vector3(4, 3, 1)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_3pdvl"]
+size = Vector3(1.5, 3, 1.5)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_qcgd5"]
 material = ExtResource("15_qvas2")
@@ -648,7 +678,7 @@ size = Vector2(6, 3)
 orientation = 2
 
 [node name="Main" type="Node3D"]
-transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 0, 0, 0)
+transform = Transform3D(3, 0, 0, 0, 3, 0, 0, 0, 3, 0, 0, 0)
 script = ExtResource("1_xecma")
 
 [node name="XRUser" type="Area3D" parent="."]
@@ -1140,20 +1170,12 @@ skeleton = NodePath("../../../../Map")
 visible = false
 
 [node name="Wall1" type="MeshInstance3D" parent="Room/Rooms/Room3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 1.5, -2)
-mesh = SubResource("PlaneMesh_0k8k7")
-
-[node name="Wall5" type="MeshInstance3D" parent="Room/Rooms/Room3"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 1.5, -2)
-mesh = SubResource("PlaneMesh_0k8k7")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
+mesh = SubResource("PlaneMesh_pb7l1")
 
 [node name="Wall2" type="MeshInstance3D" parent="Room/Rooms/Room3"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 1.25, 1.5, 2)
-mesh = SubResource("PlaneMesh_0k8k7")
-
-[node name="Wall6" type="MeshInstance3D" parent="Room/Rooms/Room3"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.25, 1.5, 2)
-mesh = SubResource("PlaneMesh_0k8k7")
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, 2)
+mesh = SubResource("PlaneMesh_pb7l1")
 
 [node name="Wall3" type="MeshInstance3D" parent="Room/Rooms/Room3"]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 1.25)
@@ -1168,7 +1190,7 @@ transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.
 mesh = SubResource("PlaneMesh_0k8k7")
 
 [node name="Wall8" type="MeshInstance3D" parent="Room/Rooms/Room3"]
-transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -1.9975, 1.50482, -1.24873)
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.5, -1.25)
 mesh = SubResource("PlaneMesh_0k8k7")
 
 [node name="Path" type="Sprite3D" parent="Room/Rooms/Room3"]
@@ -1224,12 +1246,12 @@ skeleton = NodePath("../../../../Map")
 visible = false
 
 [node name="Wall1" type="MeshInstance3D" parent="Room/Rooms/Room5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 1.5, -2)
-mesh = SubResource("PlaneMesh_1fvpt")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
+mesh = SubResource("PlaneMesh_rne4v")
 
-[node name="Wall8" type="MeshInstance3D" parent="Room/Rooms/Room5"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 1.5, -2)
-mesh = SubResource("PlaneMesh_1fvpt")
+[node name="Wall3" type="MeshInstance3D" parent="Room/Rooms/Room5"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 0)
+mesh = SubResource("PlaneMesh_rne4v")
 
 [node name="Wall2" type="MeshInstance3D" parent="Room/Rooms/Room5"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 1.25, 1.5, 2)
@@ -1237,14 +1259,6 @@ mesh = SubResource("PlaneMesh_1fvpt")
 
 [node name="Wall7" type="MeshInstance3D" parent="Room/Rooms/Room5"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.25, 1.5, 2)
-mesh = SubResource("PlaneMesh_1fvpt")
-
-[node name="Wall3" type="MeshInstance3D" parent="Room/Rooms/Room5"]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 1.25)
-mesh = SubResource("PlaneMesh_1fvpt")
-
-[node name="Wall6" type="MeshInstance3D" parent="Room/Rooms/Room5"]
-transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, -1.25)
 mesh = SubResource("PlaneMesh_1fvpt")
 
 [node name="Wall4" type="MeshInstance3D" parent="Room/Rooms/Room5"]
@@ -1272,12 +1286,8 @@ skeleton = NodePath("../../../../Map")
 visible = false
 
 [node name="Wall1" type="MeshInstance3D" parent="Room/Rooms/Room6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.25, 1.5, -2)
-mesh = SubResource("PlaneMesh_dbk6f")
-
-[node name="Wall5" type="MeshInstance3D" parent="Room/Rooms/Room6"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 1.5, -2)
-mesh = SubResource("PlaneMesh_dbk6f")
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
+mesh = SubResource("PlaneMesh_2cscc")
 
 [node name="Wall2" type="MeshInstance3D" parent="Room/Rooms/Room6"]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 2, 1.5, 1.25)
@@ -1296,12 +1306,8 @@ transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.
 mesh = SubResource("PlaneMesh_dbk6f")
 
 [node name="Wall4" type="MeshInstance3D" parent="Room/Rooms/Room6"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 1.25, 1.5, 2)
-mesh = SubResource("PlaneMesh_dbk6f")
-
-[node name="Wall8" type="MeshInstance3D" parent="Room/Rooms/Room6"]
-transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.25, 1.5, 2)
-mesh = SubResource("PlaneMesh_dbk6f")
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, 2)
+mesh = SubResource("PlaneMesh_2cscc")
 
 [node name="Path" type="Sprite3D" parent="Room/Rooms/Room6"]
 transform = Transform3D(-3.64116e-08, -0.833, 3.64116e-08, 0, -3.64116e-08, -0.833, 0.833, -3.64116e-08, 1.5916e-15, 0, 0.01, 0)
@@ -1379,6 +1385,12 @@ mesh = SubResource("PlaneMesh_mabpu")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.5)
 shape = SubResource("BoxShape3D_m4ymg")
 
+[node name="NorthDoorRoomEntryVerificationZone" type="Area3D" parent="Room/Doors/DoorNorth"]
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorNorth/NorthDoorRoomEntryVerificationZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.8)
+shape = SubResource("BoxShape3D_3pdvl")
+
 [node name="DoorEast" type="Node3D" parent="Room/Doors"]
 
 [node name="DoorEastArea" type="Area3D" parent="Room/Doors/DoorEast"]
@@ -1396,12 +1408,19 @@ mesh = SubResource("PlaneMesh_qcgd5")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.001, 1.5, 0)
 mesh = SubResource("PlaneMesh_qcgd5")
 
-[node name="NorthDoorProximityZone" type="Area3D" parent="Room/Doors/DoorEast"]
+[node name="EastDoorProximityZone" type="Area3D" parent="Room/Doors/DoorEast"]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorEast/NorthDoorProximityZone"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorEast/EastDoorProximityZone"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.5)
 shape = SubResource("BoxShape3D_m4ymg")
+
+[node name="EastDoorRoomEntryVerificationZone" type="Area3D" parent="Room/Doors/DoorEast"]
+transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorEast/EastDoorRoomEntryVerificationZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.8)
+shape = SubResource("BoxShape3D_3pdvl")
 
 [node name="DoorSouth" type="Node3D" parent="Room/Doors"]
 
@@ -1420,12 +1439,19 @@ mesh = SubResource("PlaneMesh_mabpu")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 2.001)
 mesh = SubResource("PlaneMesh_mabpu")
 
-[node name="NorthDoorProximityZone" type="Area3D" parent="Room/Doors/DoorSouth"]
+[node name="SouthDoorProximityZone" type="Area3D" parent="Room/Doors/DoorSouth"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorSouth/NorthDoorProximityZone"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorSouth/SouthDoorProximityZone"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.5)
 shape = SubResource("BoxShape3D_m4ymg")
+
+[node name="SouthDoorRoomEntryVerificationZone" type="Area3D" parent="Room/Doors/DoorSouth"]
+transform = Transform3D(-1, 0, 8.74228e-08, 0, 1, 0, -8.74228e-08, 0, -1, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorSouth/SouthDoorRoomEntryVerificationZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.8)
+shape = SubResource("BoxShape3D_3pdvl")
 
 [node name="DoorWest" type="Node3D" parent="Room/Doors"]
 
@@ -1445,12 +1471,19 @@ mesh = SubResource("PlaneMesh_qcgd5")
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.001, 1.5, 0)
 mesh = SubResource("PlaneMesh_qcgd5")
 
-[node name="NorthDoorProximityZone" type="Area3D" parent="Room/Doors/DoorWest"]
+[node name="WestDoorProximityZone" type="Area3D" parent="Room/Doors/DoorWest"]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorWest/NorthDoorProximityZone"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorWest/WestDoorProximityZone"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.5)
 shape = SubResource("BoxShape3D_m4ymg")
+
+[node name="WestDoorRoomEntryVerificationZone" type="Area3D" parent="Room/Doors/DoorWest"]
+transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Room/Doors/DoorWest/WestDoorRoomEntryVerificationZone"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.8)
+shape = SubResource("BoxShape3D_3pdvl")
 
 [node name="Signs" type="Node3D" parent="Room"]
 
@@ -2195,6 +2228,7 @@ transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5
 mesh = SubResource("PlaneMesh_fg522")
 
 [connection signal="area_entered" from="XRUser" to="Room" method="_on_door_entered"]
+[connection signal="area_exited" from="XRUser" to="Room" method="_on_door_exited"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/LeftController" to="XRUser" method="button_pressed"]
 [connection signal="button_pressed" from="XRUser/XROrigin3D/LeftController" to="Map" method="_on_left_controller_button_pressed"]
 [connection signal="button_released" from="XRUser/XROrigin3D/LeftController" to="Map" method="_on_left_controller_button_released"]

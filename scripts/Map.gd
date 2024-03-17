@@ -506,8 +506,10 @@ func transition_to_map():
 		var i
 		if node_currently_interacting == left_controller: 
 			i = left_bank_room_list.find_key(dragging_room)
+			right_bank_room_list.values()[i].hide()
 		elif node_currently_interacting == right_controller: 
 			i = right_bank_room_list.find_key(dragging_room)
+			left_bank_room_list.values()[i].hide()
 		if (i==4):
 			pass
 		print(str("Transition to map - dragging: ", i))
@@ -531,6 +533,7 @@ func transition_to_bank():
 			print(str("Transition to bank - dragging: ", i))
 			dragging_room = left_bank_room_list.values()[i]
 			dragging_room.show()
+			right_bank_room_list.values()[i].show()
 			dragging_room_ghost.hide()
 			dragging_room_ghost = null
 			recalibrate_holders()
@@ -544,6 +547,7 @@ func transition_to_bank():
 			print(str("Transition to bank - dragging: ", i))
 			dragging_room = right_bank_room_list.values()[i]
 			dragging_room.show()
+			left_bank_room_list.values()[i].show()
 			dragging_room_ghost.hide()
 			dragging_room_ghost = null
 			recalibrate_holders()
@@ -760,10 +764,9 @@ func dragging_clean_up():
 func dragging_cancel():
 	if over == 0:
 		dragging_room.hide()
-		if node_currently_interacting == left_controller:
-			put_back_room(left_bank_room_list.values()[room_list.find_key(dragging_room)], true)
-		elif node_currently_interacting == right_controller:
-			put_back_room(right_bank_room_list.values()[room_list.find_key(dragging_room)], false)
+		var i = room_list.find_key(dragging_room)
+		put_back_room(left_bank_room_list.values()[i], true)
+		put_back_room(right_bank_room_list.values()[i], false)
 		dragging_room = null
 		dragging_room_ghost.hide()
 		dragging_room_ghost = null
@@ -797,6 +800,8 @@ func cancel_everything():
 func _on_left_controller_button_pressed(name):
 	if name == "grip_click" and node_currently_tracking != left_controller:
 		self.show()
+		if node_currently_tracking == right_controller:
+			left_bank.hide()
 		node_currently_tracking = left_controller
 		left_controller_signal.emit()
 		node_currently_interacting = right_controller
@@ -823,6 +828,8 @@ func _on_left_controller_button_pressed(name):
 
 func _on_right_controller_button_pressed(name):
 	if name == "grip_click" and node_currently_tracking != right_controller:
+		if node_currently_tracking == left_controller:
+			right_bank.hide()
 		self.show()
 		node_currently_tracking = right_controller
 		right_controller_signal.emit()

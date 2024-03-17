@@ -18,8 +18,9 @@ var last_room
 var next_room
 var last_door
 var next_door
-var doors # Door Area3D pointers
+var doors
 var door_proximity_zones
+var room_entry_zones
 var rooms_parent # Node to hide all rooms
 var rooms # Wall pointers
 var signs # Left sign pointers
@@ -60,8 +61,9 @@ signal explored_room(room)
 
 func _ready():
 	last_controller = %LeftController
-	doors = self.find_children("Door*Area",)
+	doors = self.find_children("Door*Area")
 	door_proximity_zones = self.find_children("*DoorProximityZone")
+	room_entry_zones = self.find_children("*RoomEntryVerificationZone")
 	rooms_parent = self.find_child("Rooms")
 	rooms = rooms_parent.find_children("Room?")
 	signs = self.find_child("Signs").find_children("Sign?")
@@ -94,91 +96,6 @@ func start_token_animation(room):
 	lerp_start_point = active_token.global_position
 	lerp_alpha = 0
 
-func change_context(door):
-	# If currently in a room
-	if current_room > -1:
-		if adjacencies[current_room][door] != -2:
-			if dfs:
-				if current_room == dfs_room_order[current_search_index]:
-					if dfs_door_guide_order[current_search_index] != -1:
-						door_guides[dfs_door_guide_order[current_search_index]].hide()
-					if dfs_floor_guide_order[current_search_index] != -1:
-						floor_guides[dfs_floor_guide_order[current_search_index]].hide()
-			else:
-				if current_room == bfs_room_order[current_search_index]:
-					if bfs_door_guide_order[current_search_index] != -1:
-						door_guides[bfs_door_guide_order[current_search_index]].hide()
-					if bfs_floor_guide_order[current_search_index] != -1:
-						floor_guides[bfs_floor_guide_order[current_search_index]].hide()
-			rooms[current_room].hide()
-			rooms_parent.hide()
-			last_room = current_room
-			next_room = adjacencies[current_room][door]
-			if dfs:
-				if next_room == dfs_room_order[current_search_index+1]:
-					current_search_index += 1
-			else:
-				if next_room == bfs_room_order[current_search_index+1]:
-					current_search_index += 1
-			last_door = door
-			var size = signs_shown.size()
-			for i in size:
-				var sign = signs_shown.pop_front()
-				sign.hide()
-			for i in 4:
-				doors[i].hide()
-			for i in 4:
-				if adjacencies[next_room][i] == last_room:
-					next_door = i
-			doors[last_door].show()
-			doors[next_door].show()
-			entered_hallway.emit(last_door, next_door)
-			current_room = -1
-	# If in a hallway
-	else:
-		# Came back the same way
-		if last_door == door:
-			current_room = last_room
-			swap_room()
-			exited_hallway.emit()
-			if dfs:
-				if next_room == dfs_room_order[current_search_index]:
-					current_search_index -= 1
-				if current_room == dfs_room_order[current_search_index]:
-					if dfs_door_guide_order[current_search_index] != -1:
-						door_guides[dfs_door_guide_order[current_search_index]].show()
-					if dfs_floor_guide_order[current_search_index] != -1:
-						floor_guides[dfs_floor_guide_order[current_search_index]].show()
-			else:
-				if next_room == bfs_room_order[current_search_index]:
-					current_search_index -= 1
-				if current_room == bfs_room_order[current_search_index]:
-					if bfs_door_guide_order[current_search_index] != -1:
-						door_guides[bfs_door_guide_order[current_search_index]].show()
-					if bfs_floor_guide_order[current_search_index] != -1:
-						floor_guides[bfs_floor_guide_order[current_search_index]].show()
-			rooms_parent.show()
-		# Went to the other door
-		elif next_door == door:
-			current_room = next_room
-			swap_room()
-			exited_hallway.emit()
-			if dfs:
-				if current_room == dfs_room_order[current_search_index]:
-					if dfs_door_guide_order[current_search_index] != -1:
-						door_guides[dfs_door_guide_order[current_search_index]].show()
-					if dfs_floor_guide_order[current_search_index] != -1:
-						floor_guides[dfs_floor_guide_order[current_search_index]].rotation.y = -PI*door/2
-						floor_guides[dfs_floor_guide_order[current_search_index]].show()
-			else:
-				if current_room == bfs_room_order[current_search_index]:
-					if bfs_door_guide_order[current_search_index] != -1:
-						door_guides[bfs_door_guide_order[current_search_index]].show()
-					if bfs_floor_guide_order[current_search_index] != -1:
-						floor_guides[bfs_floor_guide_order[current_search_index]].rotation.y = -PI*door/2
-						floor_guides[bfs_floor_guide_order[current_search_index]].show()
-			rooms_parent.show()
-
 func swap_room():
 	
 	var door
@@ -203,18 +120,121 @@ func swap_room():
 		explored_room.emit(current_room)
 		start_token_animation(current_room)
 
+# Called when user moves from hallway -> threshhold
+# Renders room without exploring it
+func render_room(room):
+	if dfs:
+		if next_room == dfs_room_order[current_search_index]:
+			current_search_index -= 1
+		if current_room == dfs_room_order[current_search_index]:
+			if dfs_door_guide_order[current_search_index] != -1:
+				door_guides[dfs_door_guide_order[current_search_index]].show()
+			if dfs_floor_guide_order[current_search_index] != -1:
+				floor_guides[dfs_floor_guide_order[current_search_index]].show()
+	else:
+		if next_room == bfs_room_order[current_search_index]:
+			current_search_index -= 1
+		if current_room == bfs_room_order[current_search_index]:
+			if bfs_door_guide_order[current_search_index] != -1:
+				door_guides[bfs_door_guide_order[current_search_index]].show()
+			if bfs_floor_guide_order[current_search_index] != -1:
+				floor_guides[bfs_floor_guide_order[current_search_index]].show()
+	rooms_parent.show()
+
+# Called when user moves from threshhold -> room
+# Explores room and sets it as current room, and unrenders hallway
+func exit_hallway(door):
+	# Came back the same way
+	if last_door == door:
+		current_room = last_room
+		swap_room()
+		exited_hallway.emit()
+	# Went to the other door
+	elif next_door == door:
+		current_room = next_room
+		swap_room()
+		exited_hallway.emit()
+		if dfs:
+			if current_room == dfs_room_order[current_search_index]:
+				if dfs_door_guide_order[current_search_index] != -1:
+					door_guides[dfs_door_guide_order[current_search_index]].show()
+				if dfs_floor_guide_order[current_search_index] != -1:
+					floor_guides[dfs_floor_guide_order[current_search_index]].rotation.y = -PI*door/2
+					floor_guides[dfs_floor_guide_order[current_search_index]].show()
+		else:
+			if current_room == bfs_room_order[current_search_index]:
+				if bfs_door_guide_order[current_search_index] != -1:
+					door_guides[bfs_door_guide_order[current_search_index]].show()
+				if bfs_floor_guide_order[current_search_index] != -1:
+					floor_guides[bfs_floor_guide_order[current_search_index]].rotation.y = -PI*door/2
+					floor_guides[bfs_floor_guide_order[current_search_index]].show()
+		rooms_parent.show()
+
+# Called when user moves from room -> threshhold
+# Renders full hallway and enters it
+func enter_hallway(door):
+	if adjacencies[current_room][door] != -2:
+		if dfs:
+			if current_room == dfs_room_order[current_search_index]:
+				if dfs_door_guide_order[current_search_index] != -1:
+					door_guides[dfs_door_guide_order[current_search_index]].hide()
+				if dfs_floor_guide_order[current_search_index] != -1:
+					floor_guides[dfs_floor_guide_order[current_search_index]].hide()
+		else:
+			if current_room == bfs_room_order[current_search_index]:
+				if bfs_door_guide_order[current_search_index] != -1:
+					door_guides[bfs_door_guide_order[current_search_index]].hide()
+				if bfs_floor_guide_order[current_search_index] != -1:
+					floor_guides[bfs_floor_guide_order[current_search_index]].hide()
+		rooms[current_room].hide()
+		rooms_parent.hide()
+		last_room = current_room
+		next_room = adjacencies[current_room][door]
+		if dfs:
+			if next_room == dfs_room_order[current_search_index+1]:
+				current_search_index += 1
+		else:
+			if next_room == bfs_room_order[current_search_index+1]:
+				current_search_index += 1
+		last_door = door
+		var size = signs_shown.size()
+		for i in size:
+			var sign = signs_shown.pop_front()
+			sign.hide()
+		for i in 4:
+			doors[i].hide()
+		for i in 4:
+			if adjacencies[next_room][i] == last_room:
+				next_door = i
+		doors[last_door].show()
+		doors[next_door].show()
+		entered_hallway.emit(last_door, next_door)
+		current_room = -1
+
+# Called when user moves from threshhold -> hallway proper
+# Unrenders room
+func unrender_room(room):
+	rooms_parent.hide()
+
 func _on_door_entered(area):
 	for i in 4:
-		if area == doors[i]:
-			change_context(i)
-		elif area == door_proximity_zones[i]:
-			if doors[i].overlaps_area(%XRUser):
-				pass # TODO: implement
-				
+		if area == door_proximity_zones[i]:
+			if room_entry_zones[i].overlaps_area(%XRUser):
+				print("Entering hallway at door: " + str(i))
+				enter_hallway(i)
+			else:
+				render_room(i)
+				print("Renderin room at door: " + str(i))
+
 func _on_door_exited(area):
 	for i in 4:
 		if area == door_proximity_zones[i]:
-			pass # TODO: implement
+			if room_entry_zones[i].overlaps_area(%XRUser):
+				exit_hallway(i)
+				print("Exiting hallway at door: " + str(i))
+			else:
+				unrender_room(i)
+				print("Unrendering room at door: " + str(i))
 
 func _on_map_right_controller_signal():
 	last_controller = %RightController
