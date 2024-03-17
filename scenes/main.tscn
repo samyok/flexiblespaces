@@ -1,4 +1,4 @@
-[gd_scene load_steps=175 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=180 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/locomotion.gd" id="2_g8nli"]
@@ -38,6 +38,7 @@
 [ext_resource type="Material" uid="uid://ccat1q03tybd7" path="res://textures/half_cobblestone.tres" id="28_bycep"]
 [ext_resource type="Material" uid="uid://bbc1wclt3lj2" path="res://textures/guide.tres" id="28_fcmcp"]
 [ext_resource type="Texture2D" uid="uid://hhhl0nkxjnxk" path="res://textures/cobblestone1-export-export.png" id="28_mw5ce"]
+[ext_resource type="Material" uid="uid://b1cal66b7ko77" path="res://textures/not_transparent_portal_texture.tres" id="34_8my5f"]
 [ext_resource type="PlaneMesh" uid="uid://cto8csjbkaisa" path="res://textures/wall_material.tres" id="36_ex5uo"]
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_nj0ms"]
@@ -562,6 +563,11 @@ material = ExtResource("15_qvas2")
 size = Vector2(1, 3)
 orientation = 2
 
+[sub_resource type="PlaneMesh" id="PlaneMesh_ve08j"]
+material = ExtResource("34_8my5f")
+size = Vector2(1, 3)
+orientation = 2
+
 [sub_resource type="BoxShape3D" id="BoxShape3D_m4ymg"]
 size = Vector3(4, 3, 1)
 
@@ -570,6 +576,21 @@ size = Vector3(1.5, 3, 1.5)
 
 [sub_resource type="PlaneMesh" id="PlaneMesh_qcgd5"]
 material = ExtResource("15_qvas2")
+size = Vector2(1, 3)
+orientation = 0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_sn0y4"]
+material = ExtResource("34_8my5f")
+size = Vector2(1, 3)
+orientation = 0
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_n5g0i"]
+material = ExtResource("34_8my5f")
+size = Vector2(1, 3)
+orientation = 2
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_pe18g"]
+material = ExtResource("34_8my5f")
 size = Vector2(1, 3)
 orientation = 0
 
@@ -1380,8 +1401,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.999)
 mesh = SubResource("PlaneMesh_mabpu")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Room/Doors/DoorNorth/DoorNorthArea"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2.001)
-mesh = SubResource("PlaneMesh_mabpu")
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, -2.001)
+mesh = SubResource("PlaneMesh_ve08j")
 
 [node name="NorthDoorProximityZone" type="Area3D" parent="Room/Doors/DoorNorth"]
 
@@ -1410,7 +1431,7 @@ mesh = SubResource("PlaneMesh_qcgd5")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Room/Doors/DoorEast/DoorEastArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.001, 1.5, 0)
-mesh = SubResource("PlaneMesh_qcgd5")
+mesh = SubResource("PlaneMesh_sn0y4")
 
 [node name="EastDoorProximityZone" type="Area3D" parent="Room/Doors/DoorEast"]
 transform = Transform3D(-4.37114e-08, 0, -1, 0, 1, 0, 1, 0, -4.37114e-08, 0, 0, 0)
@@ -1441,7 +1462,7 @@ mesh = SubResource("PlaneMesh_mabpu")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Room/Doors/DoorSouth/DoorSouthArea"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, 2.001)
-mesh = SubResource("PlaneMesh_mabpu")
+mesh = SubResource("PlaneMesh_n5g0i")
 
 [node name="SouthDoorProximityZone" type="Area3D" parent="Room/Doors/DoorSouth"]
 transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 0, 0)
@@ -1472,8 +1493,8 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.999, 1.5, 0)
 mesh = SubResource("PlaneMesh_qcgd5")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Room/Doors/DoorWest/DoorWestArea"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.001, 1.5, 0)
-mesh = SubResource("PlaneMesh_qcgd5")
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -2.001, 1.5, 0)
+mesh = SubResource("PlaneMesh_pe18g")
 
 [node name="WestDoorProximityZone" type="Area3D" parent="Room/Doors/DoorWest"]
 transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, 0, 0, 0)

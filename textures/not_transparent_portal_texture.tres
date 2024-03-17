@@ -1,0 +1,8 @@
+[gd_resource type="StandardMaterial3D" load_steps=2 format=3 uid="uid://b1cal66b7ko77"]
+
+[ext_resource type="Texture2D" uid="uid://dbe3jx5jkihau" path="res://textures/nether_portal-export.png" id="1_ekahe"]
+
+[resource]
+albedo_color = Color(0.94902, 0, 0.94902, 1)
+albedo_texture = ExtResource("1_ekahe")
+uv1_scale = Vector3(5, 15, 1)
