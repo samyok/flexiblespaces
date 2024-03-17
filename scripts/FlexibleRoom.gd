@@ -84,7 +84,7 @@ func _process(delta):
 			active_token.hide()
 			active_token = null
 		else:
-			active_token.global_position = lerp(lerp_start_point, last_controller.global_position, lerp_alpha)
+			active_token.global_position = lerp(lerp_start_point, $TokenStartPosition.global_position, lerp_alpha)
 			active_token.global_rotation = Vector3(lerp(0.0, 8*PI, lerp_alpha), lerp(0.0, 2*PI, lerp_alpha), -lerp(0.0, 2*PI, lerp_alpha))
 			active_token.scale = Vector3(lerp_time - lerp_alpha, lerp_time - lerp_alpha, lerp_time - lerp_alpha)
 		
