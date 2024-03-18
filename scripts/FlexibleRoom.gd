@@ -28,6 +28,7 @@ var door_guides # Door guide pointers
 var floor_guides # Floor guide pointers (0: turn left, 1: straight, 2: turn right)
 var signs_shown = []
 var last_controller
+var current_section
 
 var dfs = true # True for Depth-first search, False for Breadth-first search
 var dfs_room_order =        [0, 1, 3, 1, 5, 4, 0, 2, 6]
@@ -58,6 +59,7 @@ var lerp_time = 2
 signal entered_hallway(start_door, end_door)
 signal exited_hallway
 signal explored_room(room)
+signal hallway_transition(index)
 
 func _ready():
 	last_controller = %LeftController
@@ -218,13 +220,31 @@ func unrender_room(room):
 
 func _on_door_entered(area):
 	for i in 4:
+		# Entered threshold zone
 		if area == door_proximity_zones[i]:
 			if room_entry_zones[i].overlaps_area(%XRUser):
 				print("Entering hallway at door: " + str(i))
 				enter_hallway(i)
+				current_section = 0
 			else:
 				render_room(i)
+				if current_section == 2 and i == last_door:
+					hallway_transition.emit(5) # MIDDLE BIT to THRESHOLD1
+					current_section == 1
+				if current_section == 2 and i == next_door:
+					hallway_transition.emit(2) # MIDDLE BIT to THRESHOLD2
+					current_section == 3
 				print("Renderin room at door: " + str(i))
+		# Entered door zone
+		elif area == room_entry_zones[i]:
+			# If in Threshold1
+			if current_section == 1:
+				hallway_transition.emit(4) # THRESHOLD1 to DOOR1
+				current_section = 0
+			elif current_section == 3:
+				hallway_transition.emit(3) # THRESHOLD2 to DOOR2
+				current_section = 4
+
 
 func _on_door_exited(area):
 	for i in 4:
@@ -234,8 +254,21 @@ func _on_door_exited(area):
 				print("Exiting hallway at door: " + str(i))
 			else:
 				unrender_room(i)
+				if i == last_door:
+					hallway_transition.emit(1) # THRESHOLD1 to MIDDLE BIT
+					current_section = 2
+				if i == next_door:
+					hallway_transition.emit(6) # THRESHOLD2 to MIDDLE BIT
+					current_section = 2
 				print("Unrendering room at door: " + str(i))
-
+		elif area == room_entry_zones[i]:
+			if current_section == 0 and door_proximity_zones[i].overlaps_area(%XRUser):
+				hallway_transition.emit(0)
+				current_section = 1
+			elif current_section == 4 and door_proximity_zones[i].overlaps_area(%XRUser): 
+				hallway_transition.emit(7)
+				current_section = 3
+	
 func _on_map_right_controller_signal():
 	last_controller = %RightController
 

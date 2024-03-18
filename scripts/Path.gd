@@ -209,7 +209,7 @@ var path_grids = [
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  8,  0,  0],
-			[ 0,  0,  0, 20, 16,  4,  0,  0],
+			[ 0,  0,  0, 19, 16,  4,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0]
 		]
 	]
@@ -380,7 +380,7 @@ func create_hallway_segment(position_offset, type, segment):
 			left_wall.mesh = PlaneMesh.new()
 			left_wall.mesh.set_size(HALF_SIZE)
 			left_wall.mesh.set_orientation(PlaneMesh.FACE_Z)
-			left_wall.position = TOP_WALL_OFFSET + position_offset + TOP_HALF_OFFSET
+			left_wall.position = TOP_WALL_OFFSET + position_offset + LEFT_HALF_OFFSET
 			left_wall.rotation = HORIZONTAL_WALL_OFFSET
 			left_wall.mesh.material = material
 			self.add_child(left_wall)
@@ -483,35 +483,83 @@ func create_hallway_segment(position_offset, type, segment):
 # transition functions between hallway segments
 func _on_entered_hallway(start_door, end_door): # door1
 	draw_path(start_door, end_door)
+	hide_all_but_door1()
+
+func hide_all_but_door1():
+	for i in range(walls.size()):
+		if i != DOOR1:
+			for wall in walls[i]:
+				wall.hide()
 
 func door1_to_threshold1():
-	for segment in walls:
-		if segment == THRESHOLD1:
-			for wall in segment:
+	for i in range(walls.size()):
+		if i == THRESHOLD1:
+			for wall in walls[i]:
 				wall.show()
 
 func threshold1_to_middle_bit():
-	for segment in walls:
-		if segment == MIDDLE_BIT:
-			for wall in segment:
+	for i in range(walls.size()):
+		if i == MIDDLE_BIT or i == THRESHOLD2 or i == DOOR2:
+			for wall in walls[i]:
 				wall.show()
 				
 func middle_bit_to_threshold2():
-	for segment in walls:
-		if segment == THRESHOLD2:
-			for wall in segment:
-				wall.show()
+	for i in range(walls.size()):
+		if i == THRESHOLD1 or i == MIDDLE_BIT or i == DOOR1:
+			for wall in walls[i]:
+				wall.hide()
 
 func threshold2_to_door2():
-	for segment in walls:
-		if segment == DOOR2:
-			for wall in segment:
+	for i in range(walls.size()):
+		if i == THRESHOLD2:
+			for wall in walls[i]:
+				wall.hide()
+
+func threshold1_to_door1():
+	for i in range(walls.size()):
+		if i == THRESHOLD1:
+			for wall in walls[i]:
+				wall.hide()
+
+func middle_bit_to_threshold1():
+	for i in range(walls.size()):
+		if i == THRESHOLD2 or i == DOOR2 or i == MIDDLE_BIT:
+			for wall in walls[i]:
+				wall.hide()
+
+func threshold2_to_middle_bit():
+	for i in range(walls.size()):
+		if i == THRESHOLD1 or i == DOOR1 or i == MIDDLE_BIT:
+			for wall in walls[i]:
 				wall.show()
-		
-/*
+
+func door2_to_threshold2():
+	for i in range(walls.size()):
+		if i == THRESHOLD2:
+			for wall in walls[i]:
+				wall.show()
+
 func _on_exited_hallway(): # door2
 	for segment in walls:
 		for wall in segment:
 			self.remove_child(wall)
 			print(self.get_child_count())
 	walls = [[], [], [], [], []]
+
+func _on_hallway_transition(index):
+	if index == 0:
+		door1_to_threshold1()
+	elif index == 1:
+		threshold1_to_middle_bit()
+	elif index == 2:
+		middle_bit_to_threshold2()
+	elif index == 3:
+		threshold2_to_door2()
+	elif index == 4:
+		threshold1_to_door1()
+	elif index == 5:
+		middle_bit_to_threshold1()
+	elif index == 6:
+		threshold2_to_middle_bit()
+	elif index == 7:
+		door2_to_threshold2()
