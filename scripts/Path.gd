@@ -489,38 +489,26 @@ func door1_to_threshold1():
 		if segment == THRESHOLD1:
 			for wall in segment:
 				wall.show()
-		else:
-			for wall in segment:
-				wall.hide()
 
 func threshold1_to_middle_bit():
 	for segment in walls:
 		if segment == MIDDLE_BIT:
 			for wall in segment:
 				wall.show()
-		else:
-			for wall in segment:
-				wall.hide()
 				
 func middle_bit_to_threshold2():
 	for segment in walls:
 		if segment == THRESHOLD2:
 			for wall in segment:
 				wall.show()
-		else:
-			for wall in segment:
-				wall.hide()
 
 func threshold2_to_door2():
 	for segment in walls:
 		if segment == DOOR2:
 			for wall in segment:
 				wall.show()
-		else:
-			for wall in segment:
-				wall.hide()		
 		
-
+/*
 func _on_exited_hallway(): # door2
 	for segment in walls:
 		for wall in segment:
