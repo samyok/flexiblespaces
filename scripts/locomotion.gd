@@ -1,16 +1,16 @@
 extends Node3D
 
-@export var max_speed:= 10#1.25
+@export var max_speed:= 1.25
 @export var dead_zone := 0.2
 
-@export var smooth_turn_speed:= 180#45.0
+@export var smooth_turn_speed:= 45.0
 @export var smooth_turn_dead_zone := 0.2
 @export var snap_turn_dead_zone := 0.9
 @export var snap_turn_reset_zone := 0.1
 var snap_turn_active := true
 
-enum LocomotionMethod {controller_turn, controller_direction}
-enum TurnMethod {snap, smooth}
+enum LocomotionMethod {controller_turn}
+enum TurnMethod {smooth}
 
 @export var locomtion_method := LocomotionMethod.controller_turn
 @export var turn_method := TurnMethod.smooth
@@ -24,19 +24,7 @@ func _ready():
 	camera = get_node("%XRCamera3D")
 	set_physics_process( true )
 
-func toggle_locomotion_method():
-	if locomtion_method == LocomotionMethod.controller_turn:
-		locomtion_method = LocomotionMethod.controller_direction
-	elif locomtion_method == LocomotionMethod.controller_direction:
-		locomtion_method = LocomotionMethod.controller_turn
-	print("new locomotion_method: ", locomtion_method)
 
-func toggle_turn_method():
-	if turn_method == TurnMethod.smooth:
-		turn_method = TurnMethod.snap
-	elif turn_method == TurnMethod.snap:
-		turn_method = TurnMethod.smooth
-	print("new turn_method: ", turn_method)
 
 func controller_turn(delta):
 	# Forward translation
@@ -46,8 +34,6 @@ func controller_turn(delta):
 
 	if turn_method == TurnMethod.smooth: 
 		smooth_turn(delta)
-	elif turn_method == TurnMethod.snap:
-		snap_turn()
 
 	
 func smooth_turn(delta):
@@ -92,12 +78,6 @@ func process_input(input_name: String, input_value: Vector2):
 		input_vector = input_value
 
 
-func button_pressed(button_name):
-	if button_name == "ax_button":
-		toggle_locomotion_method()
-
-	if button_name == "by_button":
-		toggle_turn_method()
 
 func reset_user_position():
 	self.position = Vector3.ZERO
@@ -118,8 +98,6 @@ func _process(delta):
 	if not movement_paused:
 		if locomtion_method == LocomotionMethod.controller_turn:
 			controller_turn(delta)
-		elif locomtion_method == LocomotionMethod.controller_direction:
-			controller_direction(delta)
 	
 func _physics_process(_delta): 
 	if is_touching_enemy():
