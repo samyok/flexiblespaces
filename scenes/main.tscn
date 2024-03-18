@@ -1,4 +1,4 @@
-[gd_scene load_steps=180 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=181 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/locomotion.gd" id="2_g8nli"]
@@ -48,8 +48,12 @@ size = Vector3(0.01, 0.01, 0.01)
 height = 0.1
 radius = 0.03
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a0txm"]
+albedo_texture = ExtResource("19_tndds")
+uv1_scale = Vector3(3, 3, 3)
+
 [sub_resource type="BoxMesh" id="BoxMesh_u41f1"]
-material = ExtResource("7_3gso7")
+material = SubResource("StandardMaterial3D_a0txm")
 
 [sub_resource type="BoxMesh" id="BoxMesh_akpcc"]
 material = ExtResource("9_oxv1f")
@@ -875,7 +879,6 @@ autoplay = "default"
 [node name="LeftBank" type="Node3D" parent="Map"]
 unique_name_in_owner = true
 transform = Transform3D(0.866025, 0, 0.5, 0, 1, 0, -0.5, 0, 0.866025, 5, 3.75, 0)
-visible = false
 
 [node name="LeftBankRoomss" type="Node3D" parent="Map/LeftBank"]
 
@@ -922,6 +925,7 @@ skeleton = NodePath("../../..")
 
 [node name="Panel" type="Node3D" parent="Map/LeftBank"]
 transform = Transform3D(1.5, 0, 0, 0, 1.5, 0, 0, 0, 1.5, 3.75, 0, 0)
+visible = false
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Map/LeftBank/Panel"]
 transform = Transform3D(-1, 0, -1.50996e-07, 0, 1, 0, 1.50996e-07, 0, -1, 0, 0, 0)
@@ -1397,7 +1401,7 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
 shape = SubResource("BoxShape3D_5hgp3")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Room/Doors/DoorNorth/DoorNorthArea"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -1.999)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, 0, 1.5, -1.999)
 mesh = SubResource("PlaneMesh_mabpu")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Room/Doors/DoorNorth/DoorNorthArea"]
@@ -1489,7 +1493,7 @@ transform = Transform3D(-4.37114e-08, 0, 1, 0, 1, 0, -1, 0, -4.37114e-08, -2, 1.
 shape = SubResource("BoxShape3D_5hgp3")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Room/Doors/DoorWest/DoorWestArea"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.999, 1.5, 0)
+transform = Transform3D(-1, 0, -8.74228e-08, 0, 1, 0, 8.74228e-08, 0, -1, -1.999, 1.5, 0)
 mesh = SubResource("PlaneMesh_qcgd5")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Room/Doors/DoorWest/DoorWestArea"]

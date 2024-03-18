@@ -3,7 +3,7 @@
 [ext_resource type="Texture2D" uid="uid://dbe3jx5jkihau" path="res://textures/nether_portal-export.png" id="1_8qd0q"]
 
 [resource]
-cull_mode = 2
+cull_mode = 1
 albedo_color = Color(0.94902, 0, 0.94902, 1)
 albedo_texture = ExtResource("1_8qd0q")
 uv1_scale = Vector3(5, 15, 5)
