@@ -124,23 +124,24 @@ func swap_room():
 
 # Called when user moves from hallway -> threshhold
 # Renders room without exploring it
-func render_room(room):
-	if dfs:
-		if next_room == dfs_room_order[current_search_index]:
-			current_search_index -= 1
-		if current_room == dfs_room_order[current_search_index]:
-			if dfs_door_guide_order[current_search_index] != -1:
-				door_guides[dfs_door_guide_order[current_search_index]].show()
-			if dfs_floor_guide_order[current_search_index] != -1:
-				floor_guides[dfs_floor_guide_order[current_search_index]].show()
-	else:
-		if next_room == bfs_room_order[current_search_index]:
-			current_search_index -= 1
-		if current_room == bfs_room_order[current_search_index]:
-			if bfs_door_guide_order[current_search_index] != -1:
-				door_guides[bfs_door_guide_order[current_search_index]].show()
-			if bfs_floor_guide_order[current_search_index] != -1:
-				floor_guides[bfs_floor_guide_order[current_search_index]].show()
+func render_room(room, door):
+	var current_search_index = self.current_search_index
+	if door == last_door:
+		current_search_index -= 1
+	if adjacencies[room][door] != -2:
+		if dfs:
+			if room == dfs_room_order[current_search_index]:
+				if dfs_door_guide_order[current_search_index] != -1:
+					door_guides[dfs_door_guide_order[current_search_index]].show()
+				if dfs_floor_guide_order[current_search_index] != -1:
+					floor_guides[dfs_floor_guide_order[current_search_index]].show()
+		else:
+			if room == bfs_room_order[current_search_index]:
+				if bfs_door_guide_order[current_search_index] != -1:
+					door_guides[bfs_door_guide_order[current_search_index]].show()
+				if bfs_floor_guide_order[current_search_index] != -1:
+					floor_guides[bfs_floor_guide_order[current_search_index]].show()
+	rooms[room].show()
 	rooms_parent.show()
 
 # Called when user moves from threshhold -> room
@@ -175,21 +176,6 @@ func exit_hallway(door):
 # Called when user moves from room -> threshhold
 # Renders full hallway and enters it
 func enter_hallway(door):
-	if adjacencies[current_room][door] != -2:
-		if dfs:
-			if current_room == dfs_room_order[current_search_index]:
-				if dfs_door_guide_order[current_search_index] != -1:
-					door_guides[dfs_door_guide_order[current_search_index]].hide()
-				if dfs_floor_guide_order[current_search_index] != -1:
-					floor_guides[dfs_floor_guide_order[current_search_index]].hide()
-		else:
-			if current_room == bfs_room_order[current_search_index]:
-				if bfs_door_guide_order[current_search_index] != -1:
-					door_guides[bfs_door_guide_order[current_search_index]].hide()
-				if bfs_floor_guide_order[current_search_index] != -1:
-					floor_guides[bfs_floor_guide_order[current_search_index]].hide()
-		rooms[current_room].hide()
-		rooms_parent.hide()
 		last_room = current_room
 		next_room = adjacencies[current_room][door]
 		if dfs:
@@ -199,75 +185,74 @@ func enter_hallway(door):
 			if next_room == bfs_room_order[current_search_index+1]:
 				current_search_index += 1
 		last_door = door
-		var size = signs_shown.size()
-		for i in size:
-			var sign = signs_shown.pop_front()
-			sign.hide()
-		for i in 4:
-			doors[i].hide()
 		for i in 4:
 			if adjacencies[next_room][i] == last_room:
 				next_door = i
-		doors[last_door].show()
-		doors[next_door].show()
 		entered_hallway.emit(last_door, next_door)
 		current_room = -1
 
 # Called when user moves from threshhold -> hallway proper
 # Unrenders room
-func unrender_room(room):
+func unrender_room(room, door):
+	for guide in door_guides:
+		guide.hide()
+	for guide in floor_guides:
+		guide.hide()
+	rooms[room].hide()
 	rooms_parent.hide()
+	var size = signs_shown.size()
+	for i in size:
+		var sign = signs_shown.pop_front()
+		sign.hide()
+	for i in 4:
+		doors[i].hide()
+	doors[last_door].show()
+	doors[next_door].show()
+	current_room = -1
 
 func _on_door_entered(area):
 	for i in 4:
-		# Entered threshold zone
-		if area == door_proximity_zones[i]:
-			if room_entry_zones[i].overlaps_area(%XRUser):
-				print("Entering hallway at door: " + str(i))
+		# Entered door
+		if area == doors[i]:
+			if current_room == -1:
+				exit_hallway(i)
+			else:
 				enter_hallway(i)
 				current_section = 0
-			else:
-				render_room(i)
-				if current_section == 2 and i == last_door:
-					hallway_transition.emit(5) # MIDDLE BIT to THRESHOLD1
-					current_section == 1
-				if current_section == 2 and i == next_door:
-					hallway_transition.emit(2) # MIDDLE BIT to THRESHOLD2
-					current_section == 3
-				print("Renderin room at door: " + str(i))
-		# Entered door zone
-		elif area == room_entry_zones[i]:
-			# If in Threshold1
+		# Entered threshold
+		elif area == door_proximity_zones[i]:
+			# If in Middle
 			if current_section == 1:
-				hallway_transition.emit(4) # THRESHOLD1 to DOOR1
-				current_section = 0
-			elif current_section == 3:
-				hallway_transition.emit(3) # THRESHOLD2 to DOOR2
-				current_section = 4
+				if i == last_door:
+					hallway_transition.emit(2) # MIDDLE BIT to DOOR1
+					current_section = 0
+				elif i == next_door:
+					hallway_transition.emit(3) # MIDDLE BIT to DOOR2
+					current_section = 2
+			
+			if i == last_door and current_section == 1:
+				if not rooms[last_room].is_visible():
+					render_room(last_room, i)
+			elif i == next_door and current_section == 1:
+				if not rooms[next_room].is_visible():
+					render_room(next_room, i)
 
 
 func _on_door_exited(area):
 	for i in 4:
 		if area == door_proximity_zones[i]:
-			if room_entry_zones[i].overlaps_area(%XRUser):
-				exit_hallway(i)
-				print("Exiting hallway at door: " + str(i))
-			else:
-				unrender_room(i)
+			if current_room == -1:
 				if i == last_door:
-					hallway_transition.emit(1) # THRESHOLD1 to MIDDLE BIT
-					current_section = 2
+					unrender_room(last_room, i)
+				elif i == next_door:
+					unrender_room(next_room, i)
+				if i == last_door:
+					hallway_transition.emit(0) # DOOR1 to MIDDLE BIT
+					current_section = 1
 				if i == next_door:
-					hallway_transition.emit(6) # THRESHOLD2 to MIDDLE BIT
-					current_section = 2
+					hallway_transition.emit(1) # DOOR2 to MIDDLE BIT
+					current_section = 1
 				print("Unrendering room at door: " + str(i))
-		elif area == room_entry_zones[i]:
-			if current_section == 0 and door_proximity_zones[i].overlaps_area(%XRUser):
-				hallway_transition.emit(0)
-				current_section = 1
-			elif current_section == 4 and door_proximity_zones[i].overlaps_area(%XRUser): 
-				hallway_transition.emit(7)
-				current_section = 3
 	
 func _on_map_right_controller_signal():
 	last_controller = %RightController

@@ -3,6 +3,7 @@ extends Node3D
 var paths
 var current_path
 var walls
+var portals
 var material
 var stone_texture
 
@@ -51,27 +52,15 @@ var WHOLE_SIZE = Vector2(1, 3)
 var HALF_SIZE = Vector2(0.5, 3)
 
 var DOOR1 = 0
-var THRESHOLD1 = 1
-var MIDDLE_BIT = 2
-var THRESHOLD2 = 3
-var DOOR2 = 4
+var MIDDLE_BIT = 1
+var DOOR2 = 2
 
 var path_grids = [
 	[# Path 1
 		[ # Door 1
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  6, 11, 24,  0,  0,  0],
-			[ 0,  0, 10,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0]
-		],
-		[ #Threshold 1
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  9,  2,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
@@ -81,20 +70,10 @@ var path_grids = [
 		[ # Middle bit
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  3,  0,  0,  0],
+			[ 0,  0,  5,  2,  3,  0,  0,  0],
 			[ 0,  0,  0,  0,  1,  0,  0,  0],
 			[ 0,  0,  0,  6,  4,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0]
-		],
-		[ # Threshold 2
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  7,  4,  0,  0,  0,  0],
+			[ 0,  0,  2,  4,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0]
 		],
@@ -104,7 +83,7 @@ var path_grids = [
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0, 25,  0,  0,  0,  0,  0,  0],
 			[ 0, 14,  0,  0,  0,  0,  0,  0],
-			[ 0,  5,  9,  0,  0,  0,  0,  0],
+			[ 0,  5,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0]
 		]
@@ -113,17 +92,7 @@ var path_grids = [
 		[ # Door 1
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0, 23, 12,  3,  0,  0],
-			[ 0,  0,  0,  0,  0,  8,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0]
-		],
-		[ # Threshold 1
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  2,  9,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
@@ -133,20 +102,10 @@ var path_grids = [
 		[ # Middle part
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  6,  0,  0,  0,  0],
+			[ 0,  0,  0,  6,  2,  4,  0,  0],
 			[ 0,  0,  0,  1,  0,  0,  0,  0],
 			[ 0,  0,  0,  5,  3,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0]
-		],
-		[ # Threshold 2
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  5,  9,  0,  0],
+			[ 0,  0,  0,  0,  5,  2,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0]
 		],
@@ -156,7 +115,7 @@ var path_grids = [
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0, 21,  0],
 			[ 0,  0,  0,  0,  0,  0, 18,  0],
-			[ 0,  0,  0,  0,  0,  7,  4,  0],
+			[ 0,  0,  0,  0,  0,  0,  4,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0]
 		]
@@ -165,18 +124,8 @@ var path_grids = [
 		[ # Door 1
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0, 23, 12,  3,  0,  0],
-			[ 0,  0,  0,  0,  0,  8,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0]
-		],
-		[ # Threshold 1
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0, 10,  0,  0],
-			[ 0,  0,  0,  0,  0,  4,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
@@ -185,20 +134,10 @@ var path_grids = [
 		[ # Middle part
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  6,  2,  2,  2,  0,  0,  0],
-			[ 0,  5,  2,  2,  2,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0]
-		],
-		[ # Threshold 2
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  3,  0,  0],
-			[ 0,  0,  0,  0,  0, 10,  0,  0],
+			[ 0,  0,  0,  0,  0,  1,  0,  0],
+			[ 0,  6,  2,  2,  2,  4,  0,  0],
+			[ 0,  5,  2,  2,  2,  3,  0,  0],
+			[ 0,  0,  0,  0,  0,  1,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0]
 		],
@@ -208,16 +147,26 @@ var path_grids = [
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0],
-			[ 0,  0,  0,  0,  0,  8,  0,  0],
+			[ 0,  0,  0,  0,  0,  0,  0,  0],
 			[ 0,  0,  0, 19, 16,  4,  0,  0],
 			[ 0,  0,  0,  0,  0,  0,  0,  0]
 		]
 	]
 ]
 
+var portal_spots = [Vector3(-1.5, 1.5, -2), Vector3(1.5, 1.5, -2), Vector3(1.5, 1.5, -2),
+					Vector3(-2, 1.5, 1.5), Vector3(2, 1.5, 1.5), Vector3(1.5, 1.5, 2)]
+var portal_rotations = [Vector3(0, PI, 0), Vector3(0, PI, 0), Vector3(0, PI, 0),
+						Vector3(0, -PI/2, 0), Vector3(0, PI/2, 0), Vector3(0, 0, 0)]
+var portal_material
+var active_portal1
+var active_portal2
+
 func _ready():
 	material = preload("res://textures/cobblestone.tres")
-	walls = [[], [], [], [], []]
+	portal_material = preload("res://textures/hallway_portal.tres")
+	make_portals()
+	walls = [[], [], []]
 
 func draw_path(start_door, end_door):
 	var rand = 0
@@ -228,12 +177,18 @@ func draw_path(start_door, end_door):
 		# Right
 		if end_door == 3:
 			create_walls(0)
+			active_portal1 = 0
+			active_portal2 = 3
 		# Straight
 		elif end_door == 2:
 			create_walls(2)
+			active_portal1 = 2
+			active_portal2 = 5
 		# Left
 		else:
 			create_walls(1)
+			active_portal1 = 1
+			active_portal2 = 4
 
 	# East
 	elif start_door == 1:
@@ -242,12 +197,18 @@ func draw_path(start_door, end_door):
 		# Right
 		if end_door == 0:
 			create_walls(0)
+			active_portal1 = 0
+			active_portal2 = 3
 		# Straight
 		elif end_door == 3:
 			create_walls(2)
+			active_portal1 = 2
+			active_portal2 = 5
 		# Left
 		else:
 			create_walls(1)
+			active_portal1 = 1
+			active_portal2 = 4
 
 	# South
 	elif start_door == 2:
@@ -256,12 +217,18 @@ func draw_path(start_door, end_door):
 		# Right
 		if end_door == 1:
 			create_walls(0)
+			active_portal1 = 0
+			active_portal2 = 3
 		# Straight
 		elif end_door == 0:
 			create_walls(2)
+			active_portal1 = 2
+			active_portal2 = 5
 		# Left
 		else:
 			create_walls(1)
+			active_portal1 = 1
+			active_portal2 = 4
 
 	# West
 	else:
@@ -270,15 +237,21 @@ func draw_path(start_door, end_door):
 		# Right
 		if end_door == 2:
 			create_walls(0)
+			active_portal1 = 0
+			active_portal2 = 3
 		# Straight
 		elif end_door == 1:
 			create_walls(2)
+			active_portal1 = 2
+			active_portal2 = 5
 		# Left
 		else:
 			create_walls(1)
+			active_portal1 = 1
+			active_portal2 = 4
 
 func create_walls(path_number):
-	for l in range(5):
+	for l in range(3):
 		var path_grid = path_grids[path_number][l]
 		
 		# Loop through the middle 6x6 of the path grid (which is an 8x8)
@@ -485,81 +458,71 @@ func _on_entered_hallway(start_door, end_door): # door1
 	draw_path(start_door, end_door)
 	hide_all_but_door1()
 
+func make_portals():
+	portals = [null, null, null, null, null, null]
+	for i in range(6):
+		var hallway_portal = MeshInstance3D.new()
+		hallway_portal.mesh = PlaneMesh.new()
+		hallway_portal.mesh.set_size(WHOLE_SIZE)
+		hallway_portal.mesh.set_orientation(PlaneMesh.FACE_Z)
+		hallway_portal.position = portal_spots[i]
+		hallway_portal.rotation = portal_rotations[i]
+		hallway_portal.mesh.material = portal_material
+		portals[i] = hallway_portal
+		self.add_child(portals[i])
+		portals[i].hide()
+
 func hide_all_but_door1():
 	for i in range(walls.size()):
 		if i != DOOR1:
 			for wall in walls[i]:
 				wall.hide()
+	portals[0].show()
+	
 
-func door1_to_threshold1():
+func door1_to_middle_bit():
 	for i in range(walls.size()):
-		if i == THRESHOLD1:
+		if i == MIDDLE_BIT or i == DOOR2:
 			for wall in walls[i]:
 				wall.show()
+	portals[active_portal1].hide()
 
-func threshold1_to_middle_bit():
+func door2_to_middle_bit():
 	for i in range(walls.size()):
-		if i == MIDDLE_BIT or i == THRESHOLD2 or i == DOOR2:
+		if i == MIDDLE_BIT or i == DOOR1:
 			for wall in walls[i]:
 				wall.show()
-				
-func middle_bit_to_threshold2():
+	portals[active_portal2].hide()
+
+func middle_bit_to_door1():
 	for i in range(walls.size()):
-		if i == THRESHOLD1 or i == MIDDLE_BIT or i == DOOR1:
+		if i == DOOR2 or i == MIDDLE_BIT:
 			for wall in walls[i]:
 				wall.hide()
+	portals[active_portal1].show()
 
-func threshold2_to_door2():
+func middle_bit_to_door2():
 	for i in range(walls.size()):
-		if i == THRESHOLD2:
+		if i == DOOR1 or i == MIDDLE_BIT:
 			for wall in walls[i]:
 				wall.hide()
-
-func threshold1_to_door1():
-	for i in range(walls.size()):
-		if i == THRESHOLD1:
-			for wall in walls[i]:
-				wall.hide()
-
-func middle_bit_to_threshold1():
-	for i in range(walls.size()):
-		if i == THRESHOLD2 or i == DOOR2 or i == MIDDLE_BIT:
-			for wall in walls[i]:
-				wall.hide()
-
-func threshold2_to_middle_bit():
-	for i in range(walls.size()):
-		if i == THRESHOLD1 or i == DOOR1 or i == MIDDLE_BIT:
-			for wall in walls[i]:
-				wall.show()
-
-func door2_to_threshold2():
-	for i in range(walls.size()):
-		if i == THRESHOLD2:
-			for wall in walls[i]:
-				wall.show()
+	portals[active_portal2].show()
 
 func _on_exited_hallway(): # door2
 	for segment in walls:
 		for wall in segment:
 			self.remove_child(wall)
 			print(self.get_child_count())
-	walls = [[], [], [], [], []]
+	walls = [[], [], []]
+	for i in range(6):
+		portals[i].hide()
 
 func _on_hallway_transition(index):
 	if index == 0:
-		door1_to_threshold1()
+		door1_to_middle_bit()
 	elif index == 1:
-		threshold1_to_middle_bit()
+		door2_to_middle_bit()
 	elif index == 2:
-		middle_bit_to_threshold2()
+		middle_bit_to_door1()
 	elif index == 3:
-		threshold2_to_door2()
-	elif index == 4:
-		threshold1_to_door1()
-	elif index == 5:
-		middle_bit_to_threshold1()
-	elif index == 6:
-		threshold2_to_middle_bit()
-	elif index == 7:
-		door2_to_threshold2()
+		middle_bit_to_door2()
