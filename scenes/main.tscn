@@ -1,5 +1,4 @@
-
-[gd_scene load_steps=181 format=3 uid="uid://d46wrkgdeynk"]
+[gd_scene load_steps=182 format=3 uid="uid://d46wrkgdeynk"]
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/locomotion.gd" id="2_g8nli"]
