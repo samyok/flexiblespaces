@@ -58,7 +58,7 @@ var room_ghost_map # Dictionary of Room -> Room
 var dragging = false
 var pathing = false
 var rooms_total = 7 # Change when adding rooms
-var paths_z_fighting_offset = Vector3(0, 0, -0.01)
+var paths_z_fighting_offset = Vector3(0, 0, -.01)
 var corners_z_fighting_offset = Vector3(0, 0, -0.02)
 var path_instance_count = 0
 var corner_instance_count = 0
@@ -80,7 +80,7 @@ var left_bank_laser
 var left_bank_room_list
 var left_bank_room_holder_list
 var left_bank_room_holder_group
-var bank_room_holder_group_offset_left = Vector3(-0.00, -0.02, 0)
+var bank_room_holder_group_offset_left = Vector3(-.08, -0.02, 0)
 var right_bank
 var right_bank_panel
 var right_bank_normal_guide
@@ -89,7 +89,7 @@ var right_bank_laser
 var right_bank_room_list
 var right_bank_room_holder_list
 var right_bank_room_holder_group
-var bank_room_holder_group_offset_right = Vector3(0.00, -0.02, 0)
+var bank_room_holder_group_offset_right = Vector3(.08, -0.02, 0)
 var bank_held_rooms = [true, false, false, false, false, false, false]
 var bank_room_to_cursor_proximity = 1.4
 var mapping_sprite
@@ -266,7 +266,7 @@ func _process(delta):
 			
 			map_cursor.global_position = map_plane.project(node_currently_interacting.global_position)
 			map_laser.scale = Vector3(1, 1, map_cursor.global_position.distance_to(node_currently_interacting.global_position)/(self.scale.z*3))
-			var laser_position_offset = map_cursor.global_position.distance_to(node_currently_interacting.global_position)/(-2*self.scale.z)
+			var laser_position_offset = map_cursor.global_position.distance_to(node_currently_interacting.global_position)/(-2*(self.scale.z*3))
 			if map_plane.is_point_over(node_currently_interacting.global_position):
 				map_laser.position = Vector3(0, 0, laser_position_offset)
 			else:
@@ -449,7 +449,7 @@ func _process(delta):
 		# Interacting with bank panel
 		elif over == 1:
 			#bank_cursor.global_position = bank_plane.project(node_currently_interacting.global_position)
-			#bank_laser.scale = Vector3(1, 1, bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(self.scale.z * bank.scale.z)/$".".scale.z)
+			#bank_laser.scale = Vector3(1, 1, bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(self.scale.z * bank.scale.z))
 			#var laser_position_offset = bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(-2*self.scale.z * bank.scale.z)
 			#if bank_plane.is_point_over(node_currently_interacting.global_position):
 				#bank_laser.position = Vector3(0, 0, laser_position_offset)
@@ -462,8 +462,8 @@ func _process(delta):
 			
 			if node_currently_interacting == left_controller: 
 				left_bank_cursor.global_position = left_bank_plane.project(node_currently_interacting.global_position)
-				left_bank_laser.scale = Vector3(1, 1, left_bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(self.scale.z * left_bank.scale.z * 3))
-				var laser_position_offset = left_bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(-2*self.scale.z * left_bank.scale.z)
+				left_bank_laser.scale = Vector3(1, 1, left_bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/((self.scale.z*3) * left_bank.scale.z))
+				var laser_position_offset = left_bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(-2*(self.scale.z*3) * left_bank.scale.z)
 				if left_bank_plane.is_point_over(node_currently_interacting.global_position):
 					left_bank_laser.position = Vector3(0, 0, laser_position_offset)
 				else:
@@ -474,8 +474,8 @@ func _process(delta):
 			
 			elif node_currently_interacting == right_controller: 
 				right_bank_cursor.global_position = right_bank_plane.project(node_currently_interacting.global_position)
-				right_bank_laser.scale = Vector3(1, 1, right_bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(self.scale.z * right_bank.scale.z * 3))
-				var laser_position_offset = right_bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(-2*self.scale.z * right_bank.scale.z)
+				right_bank_laser.scale = Vector3(1, 1, right_bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/((self.scale.z*3) * right_bank.scale.z))
+				var laser_position_offset = right_bank_cursor.global_position.distance_to(node_currently_interacting.global_position)/(-2*(self.scale.z*3) * right_bank.scale.z)
 				if right_bank_plane.is_point_over(node_currently_interacting.global_position):
 					right_bank_laser.position = Vector3(0, 0, laser_position_offset)
 				else:
