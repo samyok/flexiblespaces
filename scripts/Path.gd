@@ -452,40 +452,76 @@ func create_hallway_segment(position_offset, type, segment):
 			walls[segment].push_front(right_wall)
 			print("\tCreating Right Bottom Half wall at: " + str(RIGHT_WALL_OFFSET + position_offset + BOTTOM_HALF_OFFSET))
 
-func hide_all_but_door1():
-	for segment in walls:
-		if segment != DOOR1:
-			for wall in segment:
-				wall.hide()
+# hide walls depending on which  hallway segment user is currently in
+#func hide_all_but_door1():
+	#for segment in walls:
+		#if segment != DOOR1:
+			#for wall in segment:
+				#wall.hide()
+#
+#func hide_all_but_threshold1():
+	#
+#
+#func hide_all_but_middle_bit():
+	#for segment in walls:
+		#if segment != MIDDLE_BIT:
+			#for wall in segment:
+				#wall.hide()
+#
+#func hide_all_but_threshold2():
+	#for segment in walls:
+		#if segment != THRESHOLD2:
+			#for wall in segment:
+				#wall.hide()
+#
+#func hide_all_but_door2():
+	#for segment in walls:
+		#if segment != DOOR2:
+			#for wall in segment:
+				#wall.hide()		
 
-func hide_all_but_threshold1():
-	for segment in walls:
-		if segment != THRESHOLD1:
-			for wall in segment:
-				wall.hide()
-
-func hide_all_but_middle_bit():
-	for segment in walls:
-		if segment != MIDDLE_BIT:
-			for wall in segment:
-				wall.hide()
-
-func hide_all_but_threshold2():
-	for segment in walls:
-		if segment != THRESHOLD2:
-			for wall in segment:
-				wall.hide()
-
-func hide_all_but_door2():
-	for segment in walls:
-		if segment != DOOR2:
-			for wall in segment:
-				wall.hide()		
-
-func _on_entered_hallway(start_door, end_door):
+# transition functions between hallway segments
+func _on_entered_hallway(start_door, end_door): # door1
 	draw_path(start_door, end_door)
 
-func _on_exited_hallway():
+func door1_to_threshold1():
+	for segment in walls:
+		if segment == THRESHOLD1:
+			for wall in segment:
+				wall.show()
+		else:
+			for wall in segment:
+				wall.hide()
+
+func threshold1_to_middle_bit():
+	for segment in walls:
+		if segment == MIDDLE_BIT:
+			for wall in segment:
+				wall.show()
+		else:
+			for wall in segment:
+				wall.hide()
+				
+func middle_bit_to_threshold2():
+	for segment in walls:
+		if segment == THRESHOLD2:
+			for wall in segment:
+				wall.show()
+		else:
+			for wall in segment:
+				wall.hide()
+
+func threshold2_to_door2():
+	for segment in walls:
+		if segment == DOOR2:
+			for wall in segment:
+				wall.show()
+		else:
+			for wall in segment:
+				wall.hide()		
+		
+
+func _on_exited_hallway(): # door2
 	for segment in walls:
 		for wall in segment:
 			self.remove_child(wall)
