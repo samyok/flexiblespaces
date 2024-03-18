@@ -458,6 +458,30 @@ func hide_all_but_door1():
 			for wall in segment:
 				wall.hide()
 
+func hide_all_but_threshold1():
+	for segment in walls:
+		if segment != THRESHOLD1:
+			for wall in segment:
+				wall.hide()
+
+func hide_all_but_middle_bit():
+	for segment in walls:
+		if segment != MIDDLE_BIT:
+			for wall in segment:
+				wall.hide()
+
+func hide_all_but_threshold2():
+	for segment in walls:
+		if segment != THRESHOLD2:
+			for wall in segment:
+				wall.hide()
+
+func hide_all_but_door2():
+	for segment in walls:
+		if segment != DOOR2:
+			for wall in segment:
+				wall.hide()		
+
 func _on_entered_hallway(start_door, end_door):
 	draw_path(start_door, end_door)
 
