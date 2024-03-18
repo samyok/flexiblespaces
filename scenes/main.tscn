@@ -1,7 +1,5 @@
 
 [gd_scene load_steps=181 format=3 uid="uid://d46wrkgdeynk"]
->>>>>>> 094f4bc49396cb29b48ee5189e37f0133bfe08d1
->>>>>>> 2dfa9291d22d004272df6def59694ae720c8031b
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/locomotion.gd" id="2_g8nli"]
