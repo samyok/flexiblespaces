@@ -1,4 +1,7 @@
+
 [gd_scene load_steps=181 format=3 uid="uid://d46wrkgdeynk"]
+>>>>>>> 094f4bc49396cb29b48ee5189e37f0133bfe08d1
+>>>>>>> 2dfa9291d22d004272df6def59694ae720c8031b
 
 [ext_resource type="Script" path="res://scripts/initialize.gd" id="1_xecma"]
 [ext_resource type="Script" path="res://scripts/locomotion.gd" id="2_g8nli"]
@@ -452,6 +455,8 @@ uv1_scale = Vector3(10, 10, 10)
 material = SubResource("StandardMaterial3D_b1f7p")
 size = Vector2(4, 3)
 orientation = 2
+
+[sub_resource type="BoxMesh" id="BoxMesh_jud6w"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0yxoe"]
 albedo_texture = ExtResource("16_t3fh3")
@@ -1103,6 +1108,7 @@ script = ExtResource("16_37bvc")
 [node name="Rooms" type="Node3D" parent="Room"]
 
 [node name="Room1" type="Node3D" parent="Room/Rooms"]
+visible = false
 
 [node name="Wall1" type="MeshInstance3D" parent="Room/Rooms/Room1"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.25, 1.5, -2)
@@ -1195,6 +1201,10 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 3, 0)
 mesh = ExtResource("8_x7l15")
 skeleton = NodePath("../../../../Map")
 
+[node name="Podium" type="MeshInstance3D" parent="Room/Rooms/Room2"]
+transform = Transform3D(0.5, 0, 0, 0, 1.25, 0, 0, 0, 0.5, 0.000757853, -0.00459576, 1.25262)
+mesh = SubResource("BoxMesh_jud6w")
+
 [node name="Room3" type="Node3D" parent="Room/Rooms"]
 visible = false
 
@@ -1234,6 +1244,11 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 3, 0)
 mesh = SubResource("BoxMesh_akpcc")
 skeleton = NodePath("../../../../Map")
 
+[node name="Podium" type="MeshInstance3D" parent="Room/Rooms/Room3"]
+transform = Transform3D(0.5, 0, 0, 0, 1.25, 0, 0, 0, 0.5, 0.000757853, -0.00459576, 1.25262)
+mesh = SubResource("BoxMesh_jud6w")
+skeleton = NodePath("../../Room2")
+
 [node name="Room4" type="Node3D" parent="Room/Rooms"]
 visible = false
 
@@ -1270,6 +1285,11 @@ frame = 1
 transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 3, 0)
 mesh = ExtResource("10_11v5s")
 skeleton = NodePath("../../../../Map")
+
+[node name="Podium" type="MeshInstance3D" parent="Room/Rooms/Room4"]
+transform = Transform3D(0.5, 0, 0, 0, 1.25, 0, 0, 0, 0.5, 0.000757853, -0.00459576, 1.25262)
+mesh = SubResource("BoxMesh_jud6w")
+skeleton = NodePath("../../Room2")
 
 [node name="Room5" type="Node3D" parent="Room/Rooms"]
 visible = false
@@ -1311,6 +1331,11 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 3, 0)
 mesh = SubResource("BoxMesh_acsba")
 skeleton = NodePath("../../../../Map")
 
+[node name="Podium" type="MeshInstance3D" parent="Room/Rooms/Room5"]
+transform = Transform3D(0.5, 0, 0, 0, 1.25, 0, 0, 0, 0.5, 1.25, 0, -0.75)
+mesh = SubResource("BoxMesh_jud6w")
+skeleton = NodePath("../../Room2")
+
 [node name="Room6" type="Node3D" parent="Room/Rooms"]
 visible = false
 
@@ -1350,8 +1375,12 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 3, 0)
 mesh = SubResource("BoxMesh_0qyor")
 skeleton = NodePath("../../../../Map")
 
+[node name="Podium" type="MeshInstance3D" parent="Room/Rooms/Room6"]
+transform = Transform3D(0.5, 0, 0, 0, 1.25, 0, 0, 0, 0.5, 0.000757853, -0.00459576, 1.25262)
+mesh = SubResource("BoxMesh_jud6w")
+skeleton = NodePath("../../Room2")
+
 [node name="Room7" type="Node3D" parent="Room/Rooms"]
-visible = false
 
 [node name="Wall1" type="MeshInstance3D" parent="Room/Rooms/Room7"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.5, -2)
@@ -1389,7 +1418,13 @@ transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 3, 0)
 mesh = SubResource("BoxMesh_yr38u")
 skeleton = NodePath("../../../../Map")
 
+[node name="Podium" type="MeshInstance3D" parent="Room/Rooms/Room7"]
+transform = Transform3D(0.5, 0, 0, 0, 1.25, 0, 0, 0, 0.5, 1, 0, -1.25)
+mesh = SubResource("BoxMesh_jud6w")
+skeleton = NodePath("../../Room2")
+
 [node name="Doors" type="Node3D" parent="Room"]
+visible = false
 
 [node name="DoorNorth" type="Node3D" parent="Room/Doors"]
 
